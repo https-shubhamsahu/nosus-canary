@@ -15,6 +15,7 @@ supabase/.temp/
 .env.*.local
 !.env.example
 .cursor/*.local.*
+tool/threshold-spike/.lit-auth/
 
 # Editors and operating system
 .DS_Store

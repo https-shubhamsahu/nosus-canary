@@ -9,8 +9,6 @@ test below has a recorded result in `STATUS.md`.
 - User explicitly approves a named Monad Testnet deployment target.
 - `NoSusMonadDrops` is deployed and its bytecode/constructor-free address is
   verified in the Monad explorer.
-- A fresh, isolated Supabase project is linked and migrated; it contains only
-  encrypted payload, Lit metadata, and receipt metadata.
 - Two controlled test wallets and only a harmless personal test note are ready.
 - A current, supported Lit SDK is selected from Lit’s official documentation.
   Do not silently revive the retired V3/`@lit-protocol/lit-node-client` Datil
@@ -28,8 +26,10 @@ boolean result `true`.
 
 That chain key is published by Lit. It is **not** yet recorded evidence that
 Lit nodes evaluate Monad Testnet state. Run `npm run dry-run` in
-`tool/threshold-spike` to print the condition. A live encrypt/decrypt still
-needs a named testnet deployment and two wallets (`npm run live`).
+`tool/threshold-spike` to print the condition. `npm run live` runs the sender,
+recipient, and stranger sequence against a named testnet deployment. It needs
+three controlled test-wallet keys, not a Supabase project. Set
+`THRESHOLD_SPIKE_CHECK_EXPIRY=1` to include the bounded wait-and-deny expiry test.
 
 ## Condition to prove
 
@@ -72,3 +72,25 @@ When all acceptance tests are clean:
    tests for the six cases above.
 5. Update `STATUS.md`, `ARCHITECTURE.md`, and `web/README.md` with the exact
    evidence and remaining limitations.
+
+## Runner environment
+
+The runner reads values only from the process environment. Never paste a test
+wallet private key into a command history, repository file, or `NEXT_PUBLIC_*`
+variable.
+
+```text
+THRESHOLD_SPIKE_RUN=1
+DROPS_CONTRACT_ADDRESS=0x...
+SENDER_PRIVATE_KEY=0x...
+RECIPIENT_PRIVATE_KEY=0x...
+STRANGER_PRIVATE_KEY=0x...
+SPIKE_DROP_ID=0x... # fresh random 32-byte value
+SPIKE_EXPIRY_SECONDS=300
+THRESHOLD_SPIKE_CHECK_EXPIRY=1 # optional, makes the runner wait until expiry
+```
+
+The runner creates a harmless in-memory probe, prints no plaintext, and leaves
+the product gate unchanged regardless of its result. Record the transaction
+hashes, SDK versions, and all observed outcomes in `STATUS.md` before enabling
+the browser flow.

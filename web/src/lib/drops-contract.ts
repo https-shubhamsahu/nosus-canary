@@ -25,6 +25,14 @@ function paddedGas(estimatedGas: bigint): bigint {
   return (estimatedGas * 120n) / 100n;
 }
 
+async function waitForSuccessfulReceipt(hash: Hex) {
+  const receipt = await publicClient().waitForTransactionReceipt({ hash });
+  if (receipt.status !== "success") {
+    throw new Error(`Monad transaction reverted: ${hash}`);
+  }
+  return receipt;
+}
+
 export async function sealDrop(args: {
   dropId: Hex;
   ciphertextDigest: Hex;
@@ -43,7 +51,7 @@ export async function sealDrop(args: {
     ...request,
     gas: paddedGas(await publicClient().estimateContractGas(request)),
   });
-  await publicClient().waitForTransactionReceipt({ hash });
+  await waitForSuccessfulReceipt(hash);
   return { hash, address };
 }
 
@@ -60,7 +68,7 @@ export async function acknowledgeOpen(dropId: Hex): Promise<{ hash: Hex; address
     ...request,
     gas: paddedGas(await publicClient().estimateContractGas(request)),
   });
-  await publicClient().waitForTransactionReceipt({ hash });
+  await waitForSuccessfulReceipt(hash);
   return { hash, address };
 }
 

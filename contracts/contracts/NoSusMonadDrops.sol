@@ -66,7 +66,7 @@ contract NoSusMonadDrops {
         Drop storage drop = drops[id];
         if (drop.sender == address(0)) revert DropDoesNotExist();
         if (drop.opener != address(0)) revert DropAlreadyOpened();
-        if (drop.expiresAt != 0 && block.timestamp > drop.expiresAt) revert DropExpired();
+        if (drop.expiresAt != 0 && block.timestamp >= drop.expiresAt) revert DropExpired();
         if (drop.recipient != address(0) && drop.recipient != msg.sender) {
             revert RecipientOnly();
         }
@@ -80,8 +80,8 @@ contract NoSusMonadDrops {
 
     function canDecrypt(bytes32 id, address account) external view returns (bool) {
         Drop memory drop = drops[id];
-        if (drop.sender == address(0) || drop.opener != account) return false;
-        if (drop.expiresAt != 0 && block.timestamp > drop.expiresAt) return false;
+        if (account == address(0) || drop.sender == address(0) || drop.opener != account) return false;
+        if (drop.expiresAt != 0 && block.timestamp >= drop.expiresAt) return false;
         return true;
     }
 

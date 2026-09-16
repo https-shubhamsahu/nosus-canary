@@ -9,14 +9,16 @@
 5. Lit allows only the acknowledged wallet to decrypt after `canDecrypt(dropId, wallet)` succeeds
    on Monad Testnet. The Lit access-control condition uses chain key `monadTestnet` and binds the
    second argument to the authenticated wallet (`:userAddress`).
-6. The backend may remove the encrypted object after consumption, but that deletion is operational—not
-   publicly or cryptographically provable.
+6. The acknowledged wallet may retry decryption until expiry. An acknowledgement is not evidence that
+   decryption succeeded, and the product does not claim to count or prevent repeated local reads.
+7. The backend may remove an encrypted object after its retention window, but that deletion is
+   operational—not publicly or cryptographically provable.
 
 ## What the receipt proves
 
 It proves a wallet acknowledged a drop with a committed ciphertext digest at a chain timestamp. It does
-not prove a human read it, establish real-world identity, stop screenshots, prove storage deletion, or
-create legal evidence by itself.
+not prove a human read it, establish real-world identity, stop screenshots, count decryptions, prove
+storage deletion, or create legal evidence by itself.
 
 ## Data boundaries
 

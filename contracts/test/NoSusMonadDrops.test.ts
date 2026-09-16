@@ -32,6 +32,7 @@ describe("NoSusMonadDrops", () => {
     assert.equal(receipt.sender.toLowerCase(), sender.account.address.toLowerCase());
     assert.equal(receipt.ciphertextDigest, digest);
     assert.equal(receipt.opener, noRecipient);
+    assert.equal(await drops.read.canDecrypt([id, noRecipient]), false);
     assert.equal(await drops.read.canDecrypt([id, sender.account.address]), false);
     const sealedEvents = await drops.getEvents.Sealed({ id }, { fromBlock: 0n });
     assert.equal(sealedEvents.length, 1);
@@ -105,6 +106,23 @@ describe("NoSusMonadDrops", () => {
     });
     await publicClient.request({ method: "evm_mine", params: [] });
 
+    assert.equal(await drops.read.canDecrypt([id, recipient.account.address]), false);
+  });
+
+  it("treats the exact expiry timestamp as expired", async () => {
+    const { drops, recipient, viem } = await deployDropContract();
+    const publicClient = await viem.getPublicClient();
+    const now = BigInt((await publicClient.getBlock()).timestamp);
+    const expiry = now + 60n;
+
+    await drops.write.seal([id, digest, recipient.account.address, expiry]);
+    await publicClient.request({
+      method: "evm_increaseTime",
+      params: [60],
+    });
+    await publicClient.request({ method: "evm_mine", params: [] });
+
+    await expectCustomError(drops.write.acknowledgeOpen([id], { account: recipient.account }), "DropExpired");
     assert.equal(await drops.read.canDecrypt([id, recipient.account.address]), false);
   });
 });

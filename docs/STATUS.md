@@ -11,7 +11,8 @@ deployed, no Supabase project is linked, and the product latch in
 - `NoSusMonadDrops` records a digest, optional recipient, expiry, sender, and exactly one opener.
   It has no owner, payment, key, salt, or plaintext path. `canDecrypt` is false before
   acknowledgement, false for any non-opener, and false after expiry even if already opened.
-- Contract tests: `5 passing (5 nodejs)` from `contracts/npm test`.
+- Contract tests: `6 passing (6 nodejs)` from `contracts/npm test`, including zero-address
+  denial and the exact-expiry boundary.
 - The Next.js experience includes a restrained, flat black-and-white sender view, recipient acknowledgement route,
   verifier, and backend-powered-but-empty Receipt Wall. It refuses to create or decrypt a drop
   until Gate T1 is verified. The verifier can read `receiptOf` / `canDecrypt` from Monad when a
@@ -21,8 +22,10 @@ deployed, no Supabase project is linked, and the product latch in
   are not direct dependencies. Nested packages still print retirement warnings at install time.
 - The access-control condition uses Lit chain key `monadTestnet` (in
   `@lit-protocol/accs-schemas`, chain ID 10143) and `canDecrypt(id, :userAddress)`.
-- Dry-run runner: `tool/threshold-spike` (`npm run check` → 2 passing, `npm run dry-run`).
-  `--connect` / live decrypt were not run in this session.
+- Gate T1 runner: `tool/threshold-spike` now prepares the sender, recipient, and stranger proof:
+  recipient denial before acknowledgement, sender seal, recipient acknowledgement and decrypt,
+  stranger denial, and an optional expiry denial. `npm run check` → 2 passing and `npm run dry-run`
+  passed. It has not connected to Lit or Monad, and no live wallet/decrypt result has been recorded.
 - Web check: `web/npm run check` passed.
 - Local visual review passed at `http://127.0.0.1:3017`. The UI uses local Geist assets and the
   documented three-layer token system; production Burn components were not imported.
