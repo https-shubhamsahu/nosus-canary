@@ -1,0 +1,9 @@
+---
+description: Solidity contract scope and receipt invariants.
+globs: contracts/**
+alwaysApply: false
+---
+
+The contract records a ciphertext digest and wallet acknowledgement only. Never add plaintext, keys,
+salts, filenames, payment logic, admin bypasses, or an on-chain key-proof function. Preserve one open,
+recipient, and expiry invariants. Add a failing test before every contract behavior change.

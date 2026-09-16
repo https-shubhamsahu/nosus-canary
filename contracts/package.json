@@ -1,0 +1,17 @@
+{
+  "name": "@nosus-monad/contracts",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:monad": "hardhat run scripts/deploy.ts --network monadTestnet"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox-viem": "5.0.7",
+    "@types/node": "24.10.1",
+    "hardhat": "3.16.0",
+    "typescript": "7.0.2"
+  }
+}

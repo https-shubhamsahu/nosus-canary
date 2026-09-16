@@ -1,0 +1,14 @@
+---
+description: Project-wide NO SUS Monad experiment rules and handover map.
+alwaysApply: true
+---
+
+Read `AGENTS.md` and `docs/STATUS.md` before changing code. This is a separate, testnet-only NO SUS
+experiment; do not read, edit, deploy, or reuse secrets from the production NO SUS repository.
+
+Preserve the threshold-custody honesty boundary: no plaintext, key, salt, filename, private key, or
+service-role key may reach the contract, client logs, or public environment. Do not claim a human read,
+legal proof, screenshot prevention, or independently verifiable deletion.
+
+Use focused checks in normal work. Ask the exact finalization question from `AGENTS.md` after every
+substantive file-changing response.

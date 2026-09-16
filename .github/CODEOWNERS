@@ -1,0 +1,8 @@
+# Replace the handle if the GitHub repository uses a different owner account.
+* @https-shubhamsahu
+
+/contracts/ @https-shubhamsahu
+/web/ @https-shubhamsahu
+/supabase/ @https-shubhamsahu
+/.github/ @https-shubhamsahu
+/docs/ @https-shubhamsahu

@@ -1,0 +1,9 @@
+---
+description: Web experience and client security rules.
+globs: web/**
+alwaysApply: false
+---
+
+Keep browser crypto and wallet actions in client components; keep Supabase service-role access in server
+route handlers only. Show explicit testnet and experimental labels. Dynamic wallet and receipt state must
+be accessible, keyboard usable, and respect reduced-motion preferences.

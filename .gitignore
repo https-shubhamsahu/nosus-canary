@@ -1,0 +1,24 @@
+# Dependencies and builds
+**/node_modules/
+**/.next/
+**/*.tsbuildinfo
+**/dist/
+**/coverage/
+contracts/artifacts/
+contracts/cache/
+contracts/typechain-types/
+supabase/.temp/
+
+# Secrets and local state
+.env
+.env.local
+.env.*.local
+!.env.example
+.cursor/*.local.*
+
+# Editors and operating system
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
