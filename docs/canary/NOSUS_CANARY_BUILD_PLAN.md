@@ -564,17 +564,17 @@ laptop web app plus phone browsers. **Never cut:** the reader flow, Seen by, the
 - [x] 1.2 edit script applied once
 - [x] 1.3 packages added
 - [x] 1.4 analyze clean, tests green
-- [ ] 1.5 commit (owner OK)
-- [ ] 2.1 contract tests 11 passing
+- [x] 1.5 commit (owner OK)
+- [x] 2.1 contract tests 11 passing
 - [ ] 2.2 deployer .env ready (owner)
 - [ ] 2.3 deployed: CANARY_CONTRACT_ADDRESS = ______________________
 - [ ] 2.4 relayers ready (count ___)
-- [ ] 3.2 migration applied + verified
+- [x] 3.2 migration applied + verified
 - [ ] 4.2 secrets set
 - [ ] 4.3 function deployed
 - [ ] 4.4 smoke tests pass
-- [ ] 5.1 web built, CNAME removed
-- [ ] 5.3 Pages live at https://https-shubhamsahu.github.io/nosus-canary/
+- [x] 5.1 web built, CNAME removed
+- [x] 5.3 Pages live at https://https-shubhamsahu.github.io/nosus-canary/
 - [ ] 6.1 APK built → NO-SUS-Canary.apk
 - [ ] 6.2 installed on demo phone
 - [ ] 7 acceptance 1–10 passed
