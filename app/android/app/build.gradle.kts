@@ -41,7 +41,10 @@ android {
     }
 
     defaultConfig {
-        applicationId = "foo.nosus.app"
+        // Separate app id so this build installs next to the production
+        // NO SUS app and never uses its Play identity. namespace stays
+        // foo.nosus.app because the Kotlin sources live in that package.
+        applicationId = "foo.nosus.canary"
         minSdk = flutter.minSdkVersion  // flutter_secure_storage requires API 23+
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

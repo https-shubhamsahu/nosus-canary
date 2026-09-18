@@ -14,7 +14,7 @@ class ExperimentFrame extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 12, vertical: 7),
             child: Center(
               child: Text(
-                'NO SUS — Monad Experiment · Test data only',
+                'NO SUS · Monad testnet · use harmless test notes only',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
               ),

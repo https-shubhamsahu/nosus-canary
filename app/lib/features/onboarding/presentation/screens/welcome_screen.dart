@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../monad/presentation/monad_entry_card.dart';
+import '../../../canary/presentation/canary_entry_card.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -186,7 +186,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 ),
                 const SizedBox(height: NoSusTheme.s32),
 
-                const MonadEntryCard(),
+                const CanaryEntryCard(),
                 // ── Usable right now, no account ─────────────────────────────
                 _SectionLabel(
                   text: 'TRY IT NOW — NO ACCOUNT NEEDED',

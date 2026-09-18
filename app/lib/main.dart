@@ -2,6 +2,9 @@ import 'dart:async';
 import 'features/monad/domain/monad_receipt.dart';
 import 'features/monad/presentation/experiment_frame.dart';
 import 'features/monad/presentation/monad_screen.dart';
+import 'features/canary/domain/canary_link.dart';
+import 'features/canary/presentation/canary_home_screen.dart';
+import 'features/canary/presentation/canary_reader_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -211,6 +214,13 @@ List<BurnFileToken>? extractBurnFilesToken(Uri uri) {
   return tokens;
 }
 
+/// NO SUS Canary reader link: `#/canary/<uuid>?k=<64 hex key>`. Public so the
+/// URL contract has regression tests (test/unit/canary_link_test.dart).
+CanaryLinkToken? extractCanaryToken(Uri uri) {
+  final fullUrl = kIsWeb ? html.window.location.href : uri.toString();
+  return parseCanaryReaderLink(fullUrl);
+}
+
 /// Extracts the opaque token carried by a two-digit redemption pairing link.
 /// The token is deliberately long and unguessable; the two visible digits are
 /// only a human confirmation step and must never be accepted on their own.
@@ -417,6 +427,21 @@ void main() async {
         return;
       }
 
+      // NO SUS Canary reader path: anonymous and standalone, like Burn links.
+      final canaryToken = extractCanaryToken(Uri.base);
+      if (canaryToken != null) {
+        runApp(
+          ProviderScope(
+            overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+            child: CanaryReaderApp(
+              noteId: canaryToken.noteId,
+              keyHex: canaryToken.keyHex,
+            ),
+          ),
+        );
+        return;
+      }
+
       final redemptionToken = extractRedemptionToken(Uri.base);
       if (redemptionToken != null) {
         runApp(
@@ -570,7 +595,7 @@ class MyApp extends ConsumerWidget {
     final inviteToken = extractInviteToken(Uri.base);
 
     return MaterialApp(
-      title: 'NO SUS — Monad Experiment',
+      title: 'NO SUS',
       builder: (context, child) => ExperimentFrame(child: child ?? const SizedBox.shrink()),
       debugShowCheckedModeBanner: false,
       navigatorKey: ScreenshotGuard.instance.navigatorKey,
@@ -582,6 +607,12 @@ class MyApp extends ConsumerWidget {
           : const AuthGate(child: WorkspaceHome()),
       onGenerateRoute: (settings) {
         final route = settings.name ?? '';
+        if (route == '/canary') {
+          return MaterialPageRoute<void>(
+            settings: settings,
+            builder: (_) => const CanaryHomeScreen(),
+          );
+        }
         if (route == '/monad' || route.startsWith('/monad/')) {
           final id = route.startsWith('/monad/')
               ? parseMonadDropId(route.substring('/monad/'.length)) : null;
@@ -1196,6 +1227,20 @@ bool _routeIncomingWebLink(Uri uri) {
   final shareToken = extractShareToken(uri);
   if (shareToken != null) {
     _handleInAppShareView(shareToken);
+    return true;
+  }
+
+  final canary = extractCanaryToken(uri);
+  if (canary != null) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CanaryReaderScreen(
+          noteId: canary.noteId,
+          keyHex: canary.keyHex,
+        ),
+      ),
+    );
     return true;
   }
 

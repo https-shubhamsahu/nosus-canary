@@ -43,3 +43,10 @@
 -dontwarn com.google.android.play.core.**
 -dontwarn android.support.**
 -dontwarn androidx.**
+
+# --- NO SUS Canary: ML Kit text recognition (Latin model only) ---
+# The plugin references optional script recognizers that are not bundled.
+-dontwarn com.google.mlkit.vision.text.chinese.**
+-dontwarn com.google.mlkit.vision.text.devanagari.**
+-dontwarn com.google.mlkit.vision.text.japanese.**
+-dontwarn com.google.mlkit.vision.text.korean.**

@@ -4,11 +4,18 @@ import 'package:flutter/foundation.dart';
 /// owns the bare `nosus.foo` root; the app is served from this subdomain.
 /// The landing page carries a forwarding shim, so legacy `nosus.foo/#/...`
 /// links (shared before the split) still resolve into the app here.
-const String kWebAppOrigin = 'https://monad.nosus.foo';
+/// Override at build time for the APK, e.g.
+/// --dart-define=WEB_APP_ORIGIN=https://https-shubhamsahu.github.io
+const String kWebAppOrigin = String.fromEnvironment(
+  'WEB_APP_ORIGIN',
+  defaultValue: 'https://monad.nosus.foo',
+);
 
 /// The path prefix the Flutter web app is deployed under on [kWebAppOrigin].
 /// Empty — the app sits at the subdomain root.
-const String kWebAppBasePath = '';
+/// Override at build time, e.g. --dart-define=WEB_APP_BASE_PATH=/nosus-canary
+/// (leading slash, no trailing slash).
+const String kWebAppBasePath = String.fromEnvironment('WEB_APP_BASE_PATH');
 
 /// Origin + base path to prefix any deep link shared out of the app with.
 ///
