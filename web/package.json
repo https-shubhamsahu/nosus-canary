@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "test:notes": "node --experimental-strip-types --test tests/private-notes.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.116.0",

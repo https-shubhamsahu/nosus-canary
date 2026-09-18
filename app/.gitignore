@@ -1,0 +1,120 @@
+# === NO SUS — .gitignore ===
+
+# --- Secrets & Credentials ---
+.env
+.env.local
+.env.production
+.env.development
+*.pem
+*.key
+signing_keys.json
+
+# Firebase per-project config. This repo is public, so the file is injected in
+# CI from GOOGLE_SERVICES_JSON_BASE64 rather than checked in — same convention
+# as ANDROID_KEYSTORE_BASE64. android/app/build.gradle.kts applies the
+# google-services plugin only when the file exists, so a clone without it still
+# builds; it just ships without push.
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# --- Supabase temp files ---
+supabase/.temp/
+supabase/.branches/
+
+# --- Flutter / Dart ---
+**/doc/api/
+.dart_tool/
+.pub-cache/
+.pub/
+**/build/
+coverage/
+.flutter-plugins-dependencies
+*.flutter-plugins
+
+# --- Rust (fhe-compute) ---
+# CRITICAL: target/ is the Rust build cache (~39GB). Never commit it.
+**/target/
+**/*.rs.bk
+
+# --- Release artifacts ---
+# Built APKs/bundles are large; keep them out of git (archive separately).
+releases/
+
+# --- Agent / editor tooling ---
+.agents/
+.cursor/
+
+# --- IDE ---
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.swp
+*.swo
+*~
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+*.log
+*.class
+*.pyc
+
+# --- Android ---
+/android/app/debug
+/android/app/profile
+/android/app/release
+/local.properties
+android/local.properties
+/key.properties
+*.jks
+*.keystore
+
+# --- iOS ---
+**/ios/Flutter/.last_build_id
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Runner.xcworkspace/
+*.xcworkspace
+
+# --- macOS ---
+**/macos/Pods/
+**/macos/.symlinks/
+
+# --- Windows ---
+**/windows/out/
+**/windows/runner/Debug/
+**/windows/runner/Release/
+*.vcxproj.user
+
+# --- Build outputs ---
+app.*.symbols
+app.*.map.json
+*.dill
+*.dill.map
+
+# --- Generated files ---
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# --- Temporary ---
+migrate_working_dir/
+.history
+.svn/
+.atom/
+.build/
+.buildlog/
+.swiftpm/
+
+# --- Node / Edge Functions ---
+supabase/functions/**/node_modules/
+supabase/functions/**/dist/
+
+*.lcov
+
+# Local marker for the AGENTS.md change-log hook (per-checkout state)
+.claude/.changelog-head

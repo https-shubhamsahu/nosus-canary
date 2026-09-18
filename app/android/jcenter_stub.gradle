@@ -1,0 +1,18 @@
+// Dynamic Groovy metaclass injection to mock jcenter() repository method in older plugins
+try {
+    org.gradle.api.artifacts.dsl.RepositoryHandler.metaClass.jcenter = { ->
+        delegate.mavenCentral()
+    }
+} catch (Exception e) {
+    println "jcenter-stub: RepositoryHandler registration failed: $e"
+}
+
+try {
+    Class defaultRepoHandler = Class.forName("org.gradle.api.internal.artifacts.dsl.DefaultRepositoryHandler")
+    defaultRepoHandler.metaClass.jcenter = { ->
+        delegate.mavenCentral()
+    }
+    println "jcenter-stub: Successfully registered jcenter() stub on DefaultRepositoryHandler"
+} catch (Exception e) {
+    println "jcenter-stub: DefaultRepositoryHandler registration failed: $e"
+}

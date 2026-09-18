@@ -1,0 +1,185 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Network permissions required for Supabase connectivity -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Notifications. POST_NOTIFICATIONS was previously absent and documented
+         as dead weight, correctly: the only "notification" in the app was a
+         ScaffoldMessenger SnackBar. That is no longer true — there is now a
+         real FCM path (lib/features/notifications/, supabase/functions/send-push)
+         that this permission gates on Android 13+.
+
+         It is requested contextually, not at launch: see
+         NotificationPermissionPrompt, which asks only after the user has done
+         something that produces notifications worth receiving. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Still no storage/media permissions, and the original reasoning stands:
+         file_picker's pickFiles() calls (upload_modal.dart, profile_screen.dart,
+         burn_file_creator_screen.dart) all use `withData: true`, which reads
+         bytes through Android's Storage Access Framework picker UI via a
+         content:// URI — this never touches READ_EXTERNAL_STORAGE/
+         READ_MEDIA_* on any API level. There is no permission_handler
+         dependency and no code path that would ever request them. Do not add
+         them back without an actual code path that needs them — Play Store's
+         Data Safety review and least-privilege expectations both flag unused
+         dangerous-permission declarations. -->
+
+    <!-- android:name is NoSusApplication, not Flutter's ${applicationName}
+         placeholder, because the Measure SDK has no Dart-side init path and
+         must come up in Application.onCreate — see NoSusApplication.kt. It
+         extends plain android.app.Application, which is correct for the v2
+         embedding this app uses. -->
+    <application
+        android:label="NO SUS"
+        android:name=".NoSusApplication"
+        android:icon="@mipmap/launcher_icon"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:networkSecurityConfig="@xml/network_security_config">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:filterTouchesWhenObscured="true"
+            android:windowSoftInputMode="adjustResize">
+            <!-- Specifies an Android theme to apply to this Activity as soon as
+                 the Android process has started. This theme is visible to the user
+                 while the Flutter UI initializes. After that, this theme continues
+                 to determine the Window background behind the Flutter UI. -->
+            <meta-data
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme"
+              />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="io.supabase.nosus" />
+            </intent-filter>
+            <!-- SecureSend deep link receiver -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="foo.nosus.app" android:host="v" />
+            </intent-filter>
+            <!-- Plain app launcher for the website's "Open in app" flow
+                 (nosus.foo → foo.nosus.app://open). Carries no payload; the
+                 deep-link parsers in lib/main.dart ignore it, so the app
+                 just opens normally. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="foo.nosus.app" android:host="open" />
+            </intent-filter>
+            <!-- Android App Links for the web app's own origin.
+                 Verified against https://app.nosus.foo/.well-known/assetlinks.json,
+                 which ships from web/.well-known/ in this repo (Flutter copies
+                 web/ verbatim into build/web, and web/.nojekyll stops GitHub
+                 Pages from dropping the dot-directory).
+
+                 Necessarily host-wide, not path-scoped: every link the app
+                 mints is fragment-shaped at path "/" (/#/burn/…, /#/join/…,
+                 /?cb=…#/v/…) and an intent filter cannot match a fragment. So
+                 this intercepts EVERY app.nosus.foo link once installed —
+                 lib/main.dart's _routeIncomingWebLink must therefore handle
+                 every shape, or a single-use link dead-ends on the home screen
+                 with no browser fallback. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="app.nosus.foo" />
+            </intent-filter>
+            <!-- Android Share Intent Filter -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+            <!-- Disable automatic deep link routing through Flutter Navigator -->
+            <meta-data
+                android:name="flutter_deeplinking_enabled"
+                android:value="false" />
+        </activity>
+
+        <!-- Fallback channel for FCM messages that arrive without a channel id.
+             send-push targets per-category channels (nosus_invites /
+             nosus_membership / nosus_documents / nosus_security), all of which
+             are created by NotificationChannels.kt from MainActivity.onCreate —
+             Android drops a notification addressed to a channel that does not
+             exist, silently, so that registration is required for push to work
+             at all. This is the backstop for anything that arrives unaddressed.
+             Harmless when no Firebase project is configured. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="nosus_general" />
+
+        <!-- Measure (measure.sh) credentials. Injected by
+             android/app/build.gradle.kts out of the repo-root .env — the same
+             file the dart-define-from-file flag feeds to
+             lib/config/measure_reporting_config.dart. Both resolve to the
+             empty string on a build without that .env, and NoSusApplication
+             skips SDK init entirely when either is blank, so a fresh clone or
+             a CI run without the secrets ships an inert SDK rather than one
+             pointed at a bad endpoint. -->
+        <meta-data
+            android:name="sh.measure.android.API_KEY"
+            android:value="${measureApiKey}" />
+        <meta-data
+            android:name="sh.measure.android.API_URL"
+            android:value="${measureApiUrl}" />
+
+        <!-- Don't delete the meta-data below.
+             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+    </application>
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
+         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Package visibility (API 30+) for the device-integrity scanner's
+             root/hook-framework manager checks — see
+             android/app/src/main/kotlin/foo/nosus/app/security/RootDetector.kt
+             and InstrumentationDetector.kt. Without these entries,
+             PackageManager.getPackageInfo() silently reports "not found"
+             for every package below regardless of whether it's installed,
+             which would make root/hook detection always negative. -->
+        <package android:name="com.topjohnwu.magisk"/>
+        <package android:name="eu.chainfire.supersu"/>
+        <package android:name="com.noshufou.android.su"/>
+        <package android:name="com.koushikdutta.superuser"/>
+        <package android:name="com.thirdparty.superuser"/>
+        <package android:name="com.yellowes.su"/>
+        <package android:name="me.phh.superuser"/>
+        <package android:name="com.kingroot.kinguser"/>
+        <package android:name="com.kingouser.com"/>
+        <package android:name="com.smedialink.oneclickroot"/>
+        <package android:name="com.zhiqupk.root.global"/>
+        <package android:name="com.alephzain.framaroot"/>
+        <package android:name="de.robv.android.xposed.installer"/>
+        <package android:name="org.meowcat.edxposed.manager"/>
+        <package android:name="io.github.lsposed.manager"/>
+        <package android:name="org.lsposed.manager"/>
+    </queries>
+</manifest>

@@ -1,0 +1,4 @@
+# app.nosus.foo — the app shell itself has no indexable content; the
+# marketing site at nosus.foo is the canonical, indexed surface.
+User-agent: *
+Disallow: /
