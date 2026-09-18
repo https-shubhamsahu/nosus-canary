@@ -575,7 +575,7 @@ laptop web app plus phone browsers. **Never cut:** the reader flow, Seen by, the
 - [ ] 4.4 smoke tests pass
 - [x] 5.1 web built, CNAME removed
 - [x] 5.3 Pages live at https://https-shubhamsahu.github.io/nosus-canary/
-- [ ] 6.1 APK built → NO-SUS-Canary.apk
+- [x] 6.1 APK built → NO-SUS-Canary.apk
 - [ ] 6.2 installed on demo phone
 - [ ] 7 acceptance 1–10 passed
 - [ ] 8 demo rehearsed twice
