@@ -1,0 +1,110 @@
+name: no_sus
+description: "NO SUS — Secure study group workspace with file sharing, watermarking, and audit logging."
+publish_to: 'none'
+
+version: 1.4.0+11
+
+environment:
+  sdk: ^3.12.1
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_animate: ^4.5.2
+  smooth_page_indicator: ^2.0.1
+  flutter_riverpod: ^3.3.1
+  supabase_flutter: ^2.6.0
+  app_links: ^6.0.0
+  file_picker: ^11.0.2
+  shared_preferences: ^2.2.0
+  uuid: ^4.5.3
+  pdfrx: ^2.4.4
+  screen_protector: ^1.5.2
+  share_plus: ^12.0.2
+  http: ^1.2.0
+  universal_html: ^2.3.0
+  encrypt: ^5.0.3
+  crypto: ^3.0.6
+  rive: ^0.13.20
+  collection: ^1.19.0
+  package_info_plus: ^9.0.1
+  image: ^4.8.0
+  url_launcher: ^6.3.2
+  sentry_flutter: ^8.14.2
+
+  # Push notifications. google-services.json landed 2026-07-30 (Firebase
+  # project no-sus-isagi0011), so the Gradle plugin now applies for real — see
+  # android/app/build.gradle.kts, which keys off that file's presence. The file
+  # is git-ignored, so CI needs GOOGLE_SERVICES_JSON_BASE64 to reproduce it;
+  # without it a CI build still succeeds, PushService just catches the
+  # initialisation failure and sets _available = false. The inbox reads
+  # Postgres directly and works either way.
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.1.5
+
+  # Measure (measure.sh) app monitoring. Android-only — the package registers
+  # plugin implementations for android/ios only and contains unsupported web
+  # code. services/measure_reporting.dart conditionally excludes it from web
+  # compilation. Inert unless MEASURE_API_KEY *and* MEASURE_API_URL are
+  # supplied; see AGENTS.md §8 for the two defaults that are hostile to this
+  # product (server-side screenshot-on-crash, and gesture labels) and why the
+  # app is deliberately not wrapped in MeasureWidget.
+  #
+  # Pulls image_picker transitively for a bug-report feature this app does not
+  # use. Checked: it adds a FileProvider and a Play-services module service to
+  # the merged manifest, no permissions.
+  measure_flutter: ^0.6.0
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
+  mocktail: ^1.0.5
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icon/LuxandNox.png
+    - assets/mascot/
+    # Bundled font binaries. google_fonts resolves these by filename
+    # ({Family}-{Variant}.ttf) out of the asset manifest, so with
+    # GoogleFonts.config.allowRuntimeFetching = false (main.dart) nothing is
+    # ever fetched from fonts.gstatic.com at runtime. Costs ~1.6 MB; buys a
+    # correct first paint on a cold or blocked network and removes a
+    # third-party call at startup. Only the weights the app actually renders
+    # are here — see lib/theme.dart (Inter 400/500/600/700, Outfit 400/600/700)
+    # and anonymous_share_viewer_screen.dart (VT323 400).
+    - assets/google_fonts/
+    # Note: the rest of assets/icon/ (app_icon.png etc.) is used by
+    # flutter_launcher_icons at build time but is NOT included here as a
+    # runtime asset (reduces APK size).
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  remove_alpha_ios: true
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/icon/adaptive_foreground.png"
+  adaptive_icon_monochrome: "assets/icon/adaptive_monochrome.png"
+

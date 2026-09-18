@@ -1,5 +1,5 @@
-import { HomeDashboard } from "@/components/home-dashboard";
+import { ConsumerHome } from "@/features/private-notes/consumer-home";
 
 export default function HomePage() {
-  return <HomeDashboard />;
+  return <ConsumerHome />;
 }

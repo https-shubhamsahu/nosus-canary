@@ -23,3 +23,11 @@ Thumbs.db
 .idea/
 .vscode/
 *.log
+
+# Flutter experiment and hosting metadata
+app/.dart_tool/
+app/.flutter-plugins-dependencies
+app/build/
+**/.vercel/
+app/supabase/.temp/
+*.local.json

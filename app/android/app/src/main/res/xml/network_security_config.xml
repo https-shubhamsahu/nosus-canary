@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Explicit network security policy for NO SUS. Cleartext traffic is already
+  blocked by default at this app's targetSdkVersion (28+), but stating it
+  here removes any ambiguity for reviewers and keeps the intent visible in
+  source rather than implicit in a Gradle-resolved SDK level. No custom
+  certificate pinning — Supabase rotates its TLS certs outside this app's
+  control, and pinning without a rotation plan is a reliable way to brick
+  the app for every user the day a cert renews.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
