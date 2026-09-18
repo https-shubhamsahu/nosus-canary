@@ -555,15 +555,15 @@ laptop web app plus phone browsers. **Never cut:** the reader flow, Seen by, the
 ```
 
 ## 9. Progress log (tick as you go; add dates, notes and addresses)
-- [ ] 0.1 location/branch checked
-- [ ] 0.2 branch `feat/nosus-canary`
-- [ ] 0.3 .gitignore rules
-- [ ] 0.4 baseline commit (owner OK)
-- [ ] 0.5 AGENTS.md section present
-- [ ] 1.1 Canary files copied
-- [ ] 1.2 edit script applied once
-- [ ] 1.3 packages added
-- [ ] 1.4 analyze clean, tests green
+- [x] 0.1 location/branch checked
+- [x] 0.2 branch `feat/nosus-canary`
+- [x] 0.3 .gitignore rules
+- [x] 0.4 baseline commit (owner OK)
+- [x] 0.5 AGENTS.md section present
+- [x] 1.1 Canary files copied
+- [x] 1.2 edit script applied once
+- [x] 1.3 packages added
+- [x] 1.4 analyze clean, tests green
 - [ ] 1.5 commit (owner OK)
 - [ ] 2.1 contract tests 11 passing
 - [ ] 2.2 deployer .env ready (owner)

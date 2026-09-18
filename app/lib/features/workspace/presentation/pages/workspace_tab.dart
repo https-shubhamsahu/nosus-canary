@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../monad/presentation/monad_entry_card.dart';
+import '../../../canary/presentation/canary_entry_card.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:no_sus/main.dart' show activeTabProvider;
@@ -141,7 +141,7 @@ class _WorkspaceTabState extends ConsumerState<WorkspaceTab>
         children: [
           const OfflineBanner(),
           const UpdateBanner(),
-          const MonadEntryCard(),
+          const CanaryEntryCard(),
           if (!isLive) const SizedBox(height: NoSusTheme.s16),
           // ── Welcome + Status Banner ───────────────────────────────────────────
           Container(

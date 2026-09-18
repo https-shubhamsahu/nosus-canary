@@ -26,6 +26,17 @@ class ScreenshotGuard {
     if (!Platform.isAndroid) return;
 
 
+    // Demo builds pass --dart-define=NOSUS_ALLOW_SCREEN_CAPTURE=true so the
+    // phone can be mirrored to a projector. MainActivity sets FLAG_SECURE in
+    // onCreate, so this must actively clear it, and skip the popups.
+    const allowCapture = bool.fromEnvironment('NOSUS_ALLOW_SCREEN_CAPTURE');
+    if (allowCapture) {
+      try {
+        await _channel.invokeMethod('disableSecure');
+      } catch (_) {}
+      return;
+    }
+
     try {
       await _channel.invokeMethod('enableSecure');
     } catch (_) {}

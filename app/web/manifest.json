@@ -1,6 +1,6 @@
 {
-    "name": "NO SUS — Monad Experiment",
-    "short_name": "NO SUS Monad",
+    "name": "NO SUS",
+    "short_name": "NO SUS",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0D0D0D",

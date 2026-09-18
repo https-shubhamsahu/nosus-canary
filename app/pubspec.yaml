@@ -61,6 +61,9 @@ dependencies:
   # use. Checked: it adds a FileProvider and a Play-services module service to
   # the merged manifest, no permissions.
   measure_flutter: ^0.6.0
+  qr_flutter: ^4.1.0
+  image_picker: ^1.2.3
+  google_mlkit_text_recognition: ^0.17.1
 
 
 dev_dependencies:

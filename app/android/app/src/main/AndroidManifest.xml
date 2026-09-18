@@ -81,25 +81,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="foo.nosus.app" android:host="open" />
             </intent-filter>
-            <!-- Android App Links for the web app's own origin.
-                 Verified against https://app.nosus.foo/.well-known/assetlinks.json,
-                 which ships from web/.well-known/ in this repo (Flutter copies
-                 web/ verbatim into build/web, and web/.nojekyll stops GitHub
-                 Pages from dropping the dot-directory).
-
-                 Necessarily host-wide, not path-scoped: every link the app
-                 mints is fragment-shaped at path "/" (/#/burn/…, /#/join/…,
-                 /?cb=…#/v/…) and an intent filter cannot match a fragment. So
-                 this intercepts EVERY app.nosus.foo link once installed —
-                 lib/main.dart's _routeIncomingWebLink must therefore handle
-                 every shape, or a single-use link dead-ends on the home screen
-                 with no browser fallback. -->
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="app.nosus.foo" />
-            </intent-filter>
+            <!-- NO SUS Canary build: no App Links filter. Canary links open
+                 in the browser (web reader), and this APK never intercepts
+                 production app.nosus.foo links. -->
             <!-- Android Share Intent Filter -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
