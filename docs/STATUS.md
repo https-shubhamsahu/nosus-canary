@@ -5,6 +5,7 @@
 - Contract NoSusCanary: Unit tests passing (5/5 NoSusCanary, 11/11 total). Deployment awaiting testnet wallet configuration.
 - Migration `20260919090000_nosus_canary.sql` applied to ffidvfguojalzpclipzi: Yes (tables `canary_notes`, `canary_copies`, `canary_relayer_leases` verified with RLS active).
 - Web app: Live on GitHub Pages at [https://https-shubhamsahu.github.io/nosus-canary/](https://https-shubhamsahu.github.io/nosus-canary/) (HTTP 200).
+- APK: Built `NO-SUS-Canary.apk` (34.4 MB, package `foo.nosus.canary`, `--target-platform android-arm64`, screen capture allowed for demo mirroring).
 - Flutter app tests: 129 passed, 1 skipped, analyze 0 issues.
 
 ## Current state
