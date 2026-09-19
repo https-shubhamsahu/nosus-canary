@@ -29,12 +29,6 @@ class _SwapWordTextState extends State<SwapWordText> {
   Timer? _timer;
 
   @override
-  void initState() {
-    super.initState();
-    _arm();
-  }
-
-  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _arm();
