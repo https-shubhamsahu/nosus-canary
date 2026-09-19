@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/layout/app_breakpoints.dart';
-import '../../../theme.dart';
 import '../domain/canary_link.dart';
-import 'ui/canary_backdrop.dart';
-import 'ui/canary_mark.dart';
 
 /// Small shared pieces for the Canary screens.
 class CanaryUi {
@@ -37,105 +33,22 @@ class CanaryUi {
     }
   }
 
-  static Widget scaffold({
-    required String title,
-    required List<Widget> Function(BuildContext context) builder,
-    List<Widget>? actions,
-  }) {
-    return Theme(
-      data: CanaryTokens.theme(),
-      child: Builder(
-        builder: (context) {
-          return Scaffold(
-            backgroundColor: CanaryTokens.bg,
-            appBar: AppBar(
-              title: Row(
-                children: [
-                  const CanaryMark(size: 28),
-                  const SizedBox(width: 12),
-                  Flexible(
-                    child: Text(title, overflow: TextOverflow.ellipsis),
-                  ),
-                ],
-              ),
-              actions: actions,
-            ),
-            body: CanaryBackdrop(child: page(children: builder(context))),
-          );
-        },
-      ),
-    );
-  }
+  static Widget page({required List<Widget> children}) => Center(
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 720),
+      child: ListView(padding: const EdgeInsets.all(24), children: children),
+    ),
+  );
 
-  static Widget frame({
-    required String title,
-    required Widget Function(BuildContext context) body,
-    List<Widget>? actions,
-    PreferredSizeWidget? customAppBar,
-    bool showAppBar = true,
-  }) {
-    return Theme(
-      data: CanaryTokens.theme(),
-      child: Builder(
-        builder: (context) {
-          return Scaffold(
-            backgroundColor: CanaryTokens.bg,
-            appBar: !showAppBar
-                ? null
-                : customAppBar ??
-                    AppBar(
-                      title: Row(
-                        children: [
-                          const CanaryMark(size: 28),
-                          const SizedBox(width: 12),
-                          Flexible(
-                            child: Text(title, overflow: TextOverflow.ellipsis),
-                          ),
-                        ],
-                      ),
-                      actions: actions,
-                    ),
-            body: CanaryBackdrop(child: body(context)),
-          );
-        },
+  static Widget testnetChip(BuildContext context) => Align(
+    alignment: Alignment.centerLeft,
+    child: Chip(
+      visualDensity: VisualDensity.compact,
+      avatar: const Icon(Icons.link, size: 16),
+      label: Text(
+        'Recorded on Monad testnet',
+        style: Theme.of(context).textTheme.labelSmall,
       ),
-    );
-  }
-
-  static Widget missing({required String message}) {
-    return Theme(
-      data: CanaryTokens.theme(),
-      child: Scaffold(
-        backgroundColor: CanaryTokens.bg,
-        appBar: AppBar(),
-        body: CanaryBackdrop(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(message, textAlign: TextAlign.center),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  static Widget page({required List<Widget> children}) => LayoutBuilder(
-    builder: (context, constraints) {
-      final expanded = constraints.maxWidth >= AppBreakpoints.expanded;
-      return Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: expanded
-                ? AppBreakpoints.contentMaxExpanded
-                : AppBreakpoints.contentMaxCompact,
-          ),
-          child: ListView(
-            padding: EdgeInsets.all(expanded ? 32 : 20),
-            children: children,
-          ),
-        ),
-      );
-    },
+    ),
   );
 }
