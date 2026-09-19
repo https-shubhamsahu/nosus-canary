@@ -16,7 +16,16 @@ class CanaryRepository {
   final CanaryStore _store;
   final CanaryApi _api;
 
-  static const int maxNoteLength = 1500;
+  /// Characters allowed in the composer. Each copy carries an invisible
+  /// marker every 10 words, so a copy is about 1.75x the note in bytes; with
+  /// the server's per-copy cap below, English notes fit up to ~5,170
+  /// characters at 100 readers. [createNote] also checks every copy exactly.
+  static const int maxNoteLength = 5000;
+
+  /// Must match MAX_CIPHERTEXT in the canary edge function and the
+  /// canary_copies.ciphertext check (base64 of AES-CBC, about 8,990 bytes
+  /// of copy text).
+  static const int maxCiphertextLength = 12000;
   static const int maxReaderNameLength = 40;
 
   List<CanaryOwnerRecord> listNotes() => _store.loadNotes();
@@ -61,6 +70,15 @@ class CanaryRepository {
     for (var i = 0; i < copyCount; i++) {
       final copyText = renderCanaryCopy(plan, codewords[i], copyIndex: i);
       final sealed = CanaryCrypto.encrypt(copyText, keyHex);
+      final over = sealed.ciphertextB64.length - maxCiphertextLength;
+      if (over > 0) {
+        // Base64 is 4 chars per 3 bytes; round up and add a small margin.
+        final trim = (over * 3 / 4).ceil() + 20;
+        throw CanaryUserException(
+          'This note is a little too long for the server. Remove about '
+          '$trim characters and try again.',
+        );
+      }
       encrypted.add((index: i, ciphertext: sealed.ciphertextB64, iv: sealed.ivHex));
       digests.add(CanaryCrypto.copyDigest(saltHex, i, copyText));
     }
