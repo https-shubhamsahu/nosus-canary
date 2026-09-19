@@ -5,58 +5,17 @@ import 'package:flutter/material.dart';
 import '../../../../theme.dart';
 import 'canary_mark.dart';
 import 'glow_card.dart';
+import 'pixel_canary.dart';
 
-/// Canary mark that bobs ±6 px. Final pose when animations are disabled.
-class BobbingCanaryMark extends StatefulWidget {
+/// The animated pixel canary (bobs, flaps, blinks). Still when animations
+/// are disabled.
+class BobbingCanaryMark extends StatelessWidget {
   const BobbingCanaryMark({super.key, this.size = 64});
 
   final double size;
 
   @override
-  State<BobbingCanaryMark> createState() => _BobbingCanaryMarkState();
-}
-
-class _BobbingCanaryMarkState extends State<BobbingCanaryMark>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c;
-
-  @override
-  void initState() {
-    super.initState();
-    _c = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (CanaryTokens.reduceMotion(context)) {
-      _c.stop();
-      _c.value = 0;
-    } else if (!_c.isAnimating) {
-      _c.repeat(reverse: true);
-    }
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _c,
-      builder: (context, child) {
-        final y = math.sin(_c.value * math.pi) * 6;
-        return Transform.translate(offset: Offset(0, -y), child: child);
-      },
-      child: CanaryMark(size: widget.size),
-    );
-  }
+  Widget build(BuildContext context) => PixelCanary(size: size);
 }
 
 /// Sealed envelope shown while the copy is assigned on Monad.
