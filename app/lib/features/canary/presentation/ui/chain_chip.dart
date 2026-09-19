@@ -27,7 +27,11 @@ class ChainChip extends StatelessWidget {
     final hash = txHash;
     if (hash == null) return;
     final ok = await launchUrl(
-      Uri.parse(canaryExplorerTxUrl(hash)),
+      Uri.parse(
+        hash.length == 42
+            ? 'https://testnet.monadscan.com/address/$hash'
+            : canaryExplorerTxUrl(hash),
+      ),
       mode: LaunchMode.externalApplication,
     );
     if (!ok && context.mounted) {
