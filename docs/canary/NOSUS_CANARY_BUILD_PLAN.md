@@ -566,13 +566,13 @@ laptop web app plus phone browsers. **Never cut:** the reader flow, Seen by, the
 - [x] 1.4 analyze clean, tests green
 - [x] 1.5 commit (owner OK)
 - [x] 2.1 contract tests 11 passing
-- [ ] 2.2 deployer .env ready (owner)
-- [ ] 2.3 deployed: CANARY_CONTRACT_ADDRESS = ______________________
-- [ ] 2.4 relayers ready (count ___)
+- [x] 2.2 deployer .env ready (owner)
+- [x] 2.3 deployed: CANARY_CONTRACT_ADDRESS = 0xb1a1858866122c84cf97861ca815fb070e010e68
+- [x] 2.4 relayers ready (count 10, 0.5 MON each)
 - [x] 3.2 migration applied + verified
-- [ ] 4.2 secrets set
-- [ ] 4.3 function deployed
-- [ ] 4.4 smoke tests pass
+- [x] 4.2 secrets set
+- [x] 4.3 function deployed
+- [x] 4.4 smoke tests pass
 - [x] 5.1 web built, CNAME removed
 - [x] 5.3 Pages live at https://shubham-sahu.me/nosus-canary/#/canary
 - [x] 6.1 APK built → NO-SUS-Canary.apk
