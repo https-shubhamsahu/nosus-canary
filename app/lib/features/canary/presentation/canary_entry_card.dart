@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'canary_home_screen.dart';
+import 'ui/canary_mark.dart';
 
 /// Entry point shown on Welcome (no account needed) and in Workspace.
 class CanaryEntryCard extends StatelessWidget {
@@ -49,7 +50,7 @@ class CanaryEntryCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.flutter_dash, color: fg, size: 28),
+                      const CanaryMark(size: 32),
                       const SizedBox(width: 10),
                       Container(
                         padding: const EdgeInsets.symmetric(

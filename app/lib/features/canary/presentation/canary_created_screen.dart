@@ -4,11 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../theme.dart';
 import '../domain/canary_fingerprint.dart';
 import '../domain/canary_models.dart';
 import 'canary_note_screen.dart';
 import 'canary_providers.dart';
 import 'canary_ui.dart';
+import 'ui/chain_chip.dart';
+import 'ui/glow_card.dart';
 
 /// Shown right after creating a note, and from the dashboard's "Show QR".
 class CanaryCreatedScreen extends ConsumerWidget {
@@ -19,18 +22,17 @@ class CanaryCreatedScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final record = ref.read(canaryRepositoryProvider).findNote(noteId);
-    final theme = Theme.of(context);
     if (record == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: Text('This note is not on this device.')),
+      return CanaryUi.missing(
+        message: 'This note is not on this device.',
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Your Canary link')),
-      body: CanaryUi.page(
-        children: [
+    return CanaryUi.scaffold(
+      title: 'Your Canary link',
+      builder: (context) {
+        final theme = Theme.of(context);
+        return [
           Text(
             'Share this one link with the group.',
             style: theme.textTheme.headlineSmall,
@@ -43,7 +45,11 @@ class CanaryCreatedScreen extends ConsumerWidget {
           const SizedBox(height: 20),
           Center(
             child: Container(
-              color: Colors.white,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(CanaryTokens.rCard),
+                border: Border.all(color: CanaryTokens.canary, width: 3),
+              ),
               padding: const EdgeInsets.all(16),
               child: QrImageView(
                 data: record.readerLink,
@@ -54,7 +60,14 @@ class CanaryCreatedScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          SelectableText(record.readerLink, style: theme.textTheme.bodySmall),
+          SelectableText(
+            record.readerLink,
+            style: const TextStyle(
+              fontFamily: CanaryTokens.monoFont,
+              color: CanaryTokens.textDim,
+              fontSize: 15,
+            ),
+          ),
           const SizedBox(height: 12),
           Wrap(
             spacing: 12,
@@ -99,17 +112,16 @@ class CanaryCreatedScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerLeft,
-              child: TextButton.icon(
-                icon: const Icon(Icons.verified_outlined, size: 18),
-                label: const Text('Sealed on Monad testnet · view proof'),
-                onPressed: () => CanaryUi.openTx(context, record.sealTxHash!),
+              child: ChainChip(
+                label: 'Sealed on Monad',
+                txHash: record.sealTxHash,
               ),
             ),
           ],
           const Divider(height: 40),
           _MagicView(record: record),
-        ],
-      ),
+        ];
+      },
     );
   }
 }
@@ -123,43 +135,49 @@ class _MagicView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final base = theme.textTheme.bodyMedium ?? const TextStyle();
+    final base = theme.textTheme.bodyLarge ?? const TextStyle();
     final highlight = base.copyWith(
       fontWeight: FontWeight.w800,
-      decoration: TextDecoration.underline,
+      color: CanaryTokens.canary,
     );
     final shown = record.copyCount < 3 ? record.copyCount : 3;
 
-    return ExpansionTile(
-      tilePadding: EdgeInsets.zero,
-      title: Text('See the magic', style: theme.textTheme.titleMedium),
-      subtitle: const Text('The same note, as three different readers get it'),
-      children: [
-        for (var i = 0; i < shown; i++) ...[
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text('Copy ${i + 1}', style: theme.textTheme.labelLarge),
-          ),
-          const SizedBox(height: 4),
-          Builder(
-            builder: (_) {
-              final tokens = renderCanaryTokens(record.plan, record.codewords[i]);
-              return Text.rich(
-                TextSpan(
-                  children: [
-                    for (var t = 0; t < tokens.length; t++)
-                      TextSpan(
-                        text: tokens[t],
-                        style: tokens[t] == record.plan.tokens[t] ? base : highlight,
-                      ),
-                  ],
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 16),
+    return GlowCard(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      child: ExpansionTile(
+        tilePadding: EdgeInsets.zero,
+        title: Text('See the magic', style: theme.textTheme.titleMedium),
+        subtitle: const Text('The same note, as three different readers get it'),
+        children: [
+          for (var i = 0; i < shown; i++) ...[
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Copy ${i + 1}', style: theme.textTheme.labelLarge),
+            ),
+            const SizedBox(height: 4),
+            Builder(
+              builder: (_) {
+                final tokens =
+                    renderCanaryTokens(record.plan, record.codewords[i]);
+                return Text.rich(
+                  TextSpan(
+                    children: [
+                      for (var t = 0; t < tokens.length; t++)
+                        TextSpan(
+                          text: tokens[t],
+                          style: tokens[t] == record.plan.tokens[t]
+                              ? base
+                              : highlight,
+                        ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
