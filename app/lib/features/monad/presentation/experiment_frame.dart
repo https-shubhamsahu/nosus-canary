@@ -16,7 +16,7 @@ class ExperimentFrame extends StatelessWidget {
               child: Text(
                 'NO SUS · Monad testnet · use harmless test notes only',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
               ),
             ),
           ),
