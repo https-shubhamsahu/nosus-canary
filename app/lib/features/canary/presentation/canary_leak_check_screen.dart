@@ -11,6 +11,7 @@ import 'canary_ui.dart';
 import 'ui/canary_mark.dart';
 import 'ui/chain_chip.dart';
 import 'ui/glow_card.dart';
+import 'ui/liquid_carve_button.dart';
 
 /// Paste a leaked text (or read a screenshot on Android) and find the copy.
 /// Matching runs on this device; the leak is never uploaded.
@@ -106,9 +107,10 @@ class _CanaryLeakCheckScreenState extends ConsumerState<CanaryLeakCheckScreen> {
             spacing: 12,
             runSpacing: 12,
             children: [
-              FilledButton.icon(
-                icon: const Icon(Icons.search),
-                label: const Text('Find the copy'),
+              LiquidCarveButton(
+                label: 'Find the copy',
+                icon: Icons.search,
+                busy: _busy,
                 onPressed: _busy ? null : _check,
               ),
               OutlinedButton.icon(
