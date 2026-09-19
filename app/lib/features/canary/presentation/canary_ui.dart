@@ -71,6 +71,8 @@ class CanaryUi {
     required String title,
     required Widget Function(BuildContext context) body,
     List<Widget>? actions,
+    PreferredSizeWidget? customAppBar,
+    bool showAppBar = true,
   }) {
     return Theme(
       data: CanaryTokens.theme(),
@@ -78,18 +80,21 @@ class CanaryUi {
         builder: (context) {
           return Scaffold(
             backgroundColor: CanaryTokens.bg,
-            appBar: AppBar(
-              title: Row(
-                children: [
-                  const CanaryMark(size: 28),
-                  const SizedBox(width: 12),
-                  Flexible(
-                    child: Text(title, overflow: TextOverflow.ellipsis),
-                  ),
-                ],
-              ),
-              actions: actions,
-            ),
+            appBar: !showAppBar
+                ? null
+                : customAppBar ??
+                    AppBar(
+                      title: Row(
+                        children: [
+                          const CanaryMark(size: 28),
+                          const SizedBox(width: 12),
+                          Flexible(
+                            child: Text(title, overflow: TextOverflow.ellipsis),
+                          ),
+                        ],
+                      ),
+                      actions: actions,
+                    ),
             body: CanaryBackdrop(child: body(context)),
           );
         },
