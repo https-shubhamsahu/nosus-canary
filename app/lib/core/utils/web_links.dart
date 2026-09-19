@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 /// --dart-define=WEB_APP_ORIGIN=https://https-shubhamsahu.github.io
 const String kWebAppOrigin = String.fromEnvironment(
   'WEB_APP_ORIGIN',
-  defaultValue: 'https://monad.nosus.foo',
+  defaultValue: 'http://shubham-sahu.me',
 );
 
 /// The path prefix the Flutter web app is deployed under on [kWebAppOrigin].
