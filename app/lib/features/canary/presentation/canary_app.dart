@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../theme.dart';
 import '../../monad/presentation/experiment_frame.dart';
 import 'canary_home_screen.dart';
+import 'canary_paper_theme.dart';
 
 /// The standalone NO SUS Canary web app: Canary home is the root page.
 /// No AuthGate, no workspace. Reader links (`#/canary/<id>?k=...`) are still
@@ -14,9 +14,9 @@ class CanaryApp extends StatelessWidget {
   Widget build(BuildContext context) => MaterialApp(
     title: 'NO SUS Canary',
     debugShowCheckedModeBanner: false,
-    theme: NoSusTheme.lightTheme,
-    darkTheme: NoSusTheme.darkTheme,
-    themeMode: ThemeMode.dark,
+    theme: CanaryPaper.theme(),
+    darkTheme: CanaryPaper.theme(),
+    themeMode: ThemeMode.light,
     builder: (context, child) =>
         ExperimentFrame(child: child ?? const SizedBox.shrink()),
     home: const CanaryHomeScreen(),

@@ -5,6 +5,7 @@ import '../../../theme.dart';
 import '../../monad/presentation/experiment_frame.dart';
 import '../data/canary_api.dart';
 import '../domain/canary_models.dart';
+import 'canary_paper_theme.dart';
 import 'canary_providers.dart';
 import 'canary_ui.dart';
 
@@ -20,8 +21,9 @@ class CanaryReaderApp extends StatelessWidget {
   Widget build(BuildContext context) => MaterialApp(
     title: 'NO SUS',
     debugShowCheckedModeBanner: false,
-    theme: NoSusTheme.lightTheme,
-    darkTheme: NoSusTheme.darkTheme,
+    theme: CanaryPaper.theme(),
+    darkTheme: CanaryPaper.theme(),
+    themeMode: ThemeMode.light,
     builder: (context, child) =>
         ExperimentFrame(child: child ?? const SizedBox.shrink()),
     home: CanaryReaderScreen(noteId: noteId, keyHex: keyHex),
