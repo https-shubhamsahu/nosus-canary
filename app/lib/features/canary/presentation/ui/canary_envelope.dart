@@ -124,7 +124,7 @@ class _CanaryEnvelopeState extends State<CanaryEnvelope>
                   style: const TextStyle(
                     fontFamily: CanaryTokens.monoFont,
                     fontSize: 28,
-                    color: CanaryTokens.canary,
+                    color: CanaryTokens.text,
                     height: 1,
                   ),
                 );
@@ -147,16 +147,11 @@ class _ShimmerPainter extends CustomPainter {
     final t = progress.value;
     if (t <= 0 || t >= 1) return;
     final x = size.width * (t * 1.4 - 0.2);
-    final rect = Rect.fromLTWH(x, 0, size.width * 0.28, size.height);
-    final paint = Paint()
-      ..shader = LinearGradient(
-        colors: [
-          CanaryTokens.canary.withValues(alpha: 0),
-          CanaryTokens.canaryHi.withValues(alpha: 0.18),
-          CanaryTokens.canary.withValues(alpha: 0),
-        ],
-      ).createShader(rect);
-    canvas.drawRect(rect, paint);
+    final rect = Rect.fromLTWH(x, 0, size.width * 0.12, size.height);
+    canvas.drawRect(
+      rect,
+      Paint()..color = CanaryTokens.canary.withValues(alpha: 0.25),
+    );
   }
 
   @override
