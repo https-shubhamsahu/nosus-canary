@@ -15,17 +15,38 @@ import 'ui/liquid_carve_button.dart';
 
 /// Paste a leaked text (or read a screenshot on Android) and find the copy.
 /// Matching runs on this device; the leak is never uploaded.
-class CanaryLeakCheckScreen extends ConsumerStatefulWidget {
+class CanaryLeakCheckScreen extends StatelessWidget {
   const CanaryLeakCheckScreen({super.key, required this.noteId});
 
   final String noteId;
 
   @override
-  ConsumerState<CanaryLeakCheckScreen> createState() =>
-      _CanaryLeakCheckScreenState();
+  Widget build(BuildContext context) {
+    return CanaryUi.scaffold(
+      title: 'Check a leak',
+      builder: (context) => [
+        CanaryLeakPanel(noteId: noteId, showHonesty: true),
+      ],
+    );
+  }
 }
 
-class _CanaryLeakCheckScreenState extends ConsumerState<CanaryLeakCheckScreen> {
+/// Leak-check controls. Used as a full page and as the desktop dashboard panel.
+class CanaryLeakPanel extends ConsumerStatefulWidget {
+  const CanaryLeakPanel({
+    super.key,
+    required this.noteId,
+    this.showHonesty = false,
+  });
+
+  final String noteId;
+  final bool showHonesty;
+
+  @override
+  ConsumerState<CanaryLeakPanel> createState() => _CanaryLeakPanelState();
+}
+
+class _CanaryLeakPanelState extends ConsumerState<CanaryLeakPanel> {
   final _leak = TextEditingController();
   CanaryMatch? _match;
   CanaryNoteStatus? _status;
@@ -78,73 +99,73 @@ class _CanaryLeakCheckScreenState extends ConsumerState<CanaryLeakCheckScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CanaryUi.scaffold(
-      title: 'Check a leak',
-      builder: (context) {
-        final theme = Theme.of(context);
-        return [
-          const Text(
-            'Paste the text that leaked — from a forward, a post, or a '
-            'screenshot. Even part of it helps.',
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Paste the text that leaked — from a forward, a post, or a '
+          'screenshot. Even part of it helps.',
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _leak,
+          minLines: 5,
+          maxLines: 12,
+          style: const TextStyle(
+            fontFamily: CanaryTokens.monoFont,
+            fontSize: 16,
+            color: CanaryTokens.text,
           ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _leak,
-            minLines: 5,
-            maxLines: 12,
-            style: const TextStyle(
-              fontFamily: CanaryTokens.monoFont,
-              fontSize: 16,
-              color: CanaryTokens.text,
-            ),
-            decoration: const InputDecoration(
-              labelText: 'Leaked text',
-              alignLabelWithHint: true,
-            ),
+          decoration: const InputDecoration(
+            labelText: 'Leaked text',
+            alignLabelWithHint: true,
           ),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              LiquidCarveButton(
-                label: 'Find the copy',
-                icon: Icons.search,
-                busy: _busy,
-                onPressed: _busy ? null : _check,
-              ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            LiquidCarveButton(
+              label: 'Find the copy',
+              icon: Icons.search,
+              busy: _busy,
+              onPressed: _busy ? null : _check,
+            ),
+            OutlinedButton.icon(
+              icon: const Icon(Icons.content_paste),
+              label: const Text('Paste'),
+              onPressed: () async {
+                final data = await Clipboard.getData(Clipboard.kTextPlain);
+                if (data?.text != null) _leak.text = data!.text!;
+              },
+            ),
+            if (canaryOcrAvailable)
               OutlinedButton.icon(
-                icon: const Icon(Icons.content_paste),
-                label: const Text('Paste'),
-                onPressed: () async {
-                  final data = await Clipboard.getData(Clipboard.kTextPlain);
-                  if (data?.text != null) _leak.text = data!.text!;
-                },
+                icon: const Icon(Icons.image_search),
+                label: const Text('Read a screenshot'),
+                onPressed: _busy ? null : _readScreenshot,
               ),
-              if (canaryOcrAvailable)
-                OutlinedButton.icon(
-                  icon: const Icon(Icons.image_search),
-                  label: const Text('Read a screenshot'),
-                  onPressed: _busy ? null : _readScreenshot,
-                ),
-            ],
-          ),
-          if (_error != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: Text(
-                _error!,
-                style: TextStyle(color: theme.colorScheme.error),
-              ),
-            ),
-          if (_match != null) ...[
-            const SizedBox(height: 20),
-            _ResultCard(match: _match!, status: _status),
           ],
+        ),
+        if (_error != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Text(
+              _error!,
+              style: TextStyle(color: theme.colorScheme.error),
+            ),
+          ),
+        if (_match != null) ...[
+          const SizedBox(height: 20),
+          _ResultCard(match: _match!, status: _status),
+        ],
+        if (widget.showHonesty) ...[
           const SizedBox(height: 24),
           const Text(CanaryUi.honestyNote),
-        ];
-      },
+        ],
+      ],
     );
   }
 }
