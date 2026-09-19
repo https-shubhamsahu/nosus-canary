@@ -43,6 +43,11 @@ class CanaryTopBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final expanded = AppBreakpoints.isExpanded(context);
+    final width = MediaQuery.sizeOf(context).width;
+    // Keep the bar on one line: the centre links need ~1440 px next to a
+    // connected wallet pill; the testnet badge needs ~1180 px.
+    final showNav = expanded && width >= 1440;
+    final showPill = expanded && width >= 1180;
     final pad = expanded ? 32.0 : 16.0;
 
     return Container(
@@ -81,8 +86,8 @@ class CanaryTopBar extends StatelessWidget implements PreferredSizeWidget {
                   ],
                 ),
 
-                // Center Navigation (Desktop only)
-                if (expanded)
+                // Center navigation (wide desktop only)
+                if (showNav)
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -98,7 +103,7 @@ class CanaryTopBar extends StatelessWidget implements PreferredSizeWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (expanded) ...[
+                    if (showPill) ...[
                       const MonadTestnetPill(),
                       const SizedBox(width: 14),
                     ],
