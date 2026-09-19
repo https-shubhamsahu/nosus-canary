@@ -3,8 +3,10 @@ import 'features/monad/domain/monad_receipt.dart';
 import 'features/monad/presentation/experiment_frame.dart';
 import 'features/monad/presentation/monad_screen.dart';
 import 'features/canary/domain/canary_link.dart';
+import 'features/canary/presentation/canary_app.dart';
 import 'features/canary/presentation/canary_home_screen.dart';
 import 'features/canary/presentation/canary_reader_screen.dart';
+import 'config/app_mode.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -568,7 +570,7 @@ void main() async {
             remoteConfigServiceProvider.overrideWithValue(remoteConfig),
             sharedPreferencesProvider.overrideWithValue(prefs),
           ],
-          child: const MyApp(),
+          child: kCanaryOnly ? const CanaryApp() : const MyApp(),
         ),
       );
     },
