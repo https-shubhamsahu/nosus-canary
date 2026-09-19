@@ -1,7 +1,7 @@
 import type { HardhatUserConfig } from "hardhat/config";
 import hardhatToolboxViem from "@nomicfoundation/hardhat-toolbox-viem";
 
-const monadRpcUrl = process.env.MONAD_RPC_URL ?? "https://rpc.testnet.monad.xyz";
+const monadRpcUrl = process.env.MONAD_RPC_URL ?? "https://testnet-rpc.monad.xyz";
 const deployerPrivateKey = process.env.DEPLOYER_PRIVATE_KEY;
 
 const config: HardhatUserConfig = {
