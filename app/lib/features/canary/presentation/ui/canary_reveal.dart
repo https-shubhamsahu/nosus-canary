@@ -335,7 +335,7 @@ class _ScanHitChipsState extends State<ScanHitChips>
           label,
           style: TextStyle(
             fontFamily: CanaryTokens.monoFont,
-            fontSize: 14,
+            fontSize: 18,
             color: found ? CanaryTokens.canaryHi : CanaryTokens.textDim,
           ),
         ),

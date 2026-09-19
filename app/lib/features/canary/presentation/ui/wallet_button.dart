@@ -193,7 +193,7 @@ class _ConnectedMenu extends StatelessWidget {
                 : '${state.shortAddress} · ${state.balanceMon} MON',
             style: const TextStyle(
               fontFamily: CanaryTokens.monoFont,
-              fontSize: 18,
+              fontSize: 23,
               color: CanaryTokens.text,
             ),
           ),
@@ -283,7 +283,7 @@ class _WalletPanel extends StatelessWidget {
                               address,
                               style: const TextStyle(
                                 fontFamily: CanaryTokens.monoFont,
-                                fontSize: 16,
+                                fontSize: 21,
                                 color: CanaryTokens.text,
                               ),
                             ),
@@ -412,7 +412,7 @@ class _VerifyDialog extends StatelessWidget {
                   Expanded(
                     child: SelectableText(
                       v,
-                      style: const TextStyle(fontFamily: CanaryTokens.monoFont, fontSize: 18),
+                      style: const TextStyle(fontFamily: CanaryTokens.monoFont, fontSize: 23),
                     ),
                   ),
                 ],

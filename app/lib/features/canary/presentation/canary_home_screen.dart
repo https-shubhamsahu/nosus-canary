@@ -310,7 +310,7 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
                   style: const TextStyle(
                     fontFamily: CanaryTokens.monoFont,
                     color: CanaryTokens.textDim,
-                    fontSize: 14,
+                    fontSize: 18,
                   ),
                 ),
               ],
@@ -345,7 +345,7 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
             style: TextStyle(
               color: CanaryTokens.monad,
               fontFamily: CanaryTokens.monoFont,
-              fontSize: 18,
+              fontSize: 23,
               letterSpacing: 1.2,
             ),
           ),
@@ -443,7 +443,7 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
                 '~0.015 MON per reader · final in < 1 s · ',
                 style: TextStyle(
                   fontFamily: CanaryTokens.monoFont,
-                  fontSize: 16,
+                  fontSize: 21,
                   color: CanaryTokens.textDim,
                 ),
               ),
@@ -453,7 +453,7 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
                   'open source ↗',
                   style: TextStyle(
                     fontFamily: CanaryTokens.monoFont,
-                    fontSize: 16,
+                    fontSize: 21,
                     color: CanaryTokens.text,
                     decoration: TextDecoration.underline,
                     decorationColor: CanaryTokens.canary,

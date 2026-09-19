@@ -79,7 +79,7 @@ class _SwapWordTextState extends State<SwapWordText> {
             fontFamily: CanaryTokens.monoFont,
             color: CanaryTokens.text,
             backgroundColor: CanaryTokens.canary,
-            fontSize: 16,
+            fontSize: 21,
           ),
         ),
         const SizedBox(height: 8),

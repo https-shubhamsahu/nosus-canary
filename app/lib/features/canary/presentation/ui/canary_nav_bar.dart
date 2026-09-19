@@ -209,11 +209,11 @@ class _NavLinkState extends State<_NavLink> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.label,
+                widget.label.toUpperCase(),
                 style: TextStyle(
-                  fontFamily: CanaryTokens.bodyFont,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+                  fontFamily: CanaryTokens.monoFont,
+                  fontSize: 22,
+                  letterSpacing: 1,
                   color: _hovered ? CanaryTokens.text : CanaryTokens.textDim,
                 ),
               ),
@@ -221,8 +221,8 @@ class _NavLinkState extends State<_NavLink> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOutCubic,
-                height: 2,
-                width: _hovered ? 24 : 0,
+                height: 3,
+                width: _hovered ? 40 : 0,
                 decoration: BoxDecoration(
                   color: CanaryTokens.canary,
                   borderRadius: BorderRadius.circular(1),
@@ -279,9 +279,9 @@ class _MonadTestnetPillState extends State<MonadTestnetPill>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: CanaryTokens.monad.withValues(alpha: 0.12),
+        color: CanaryTokens.surface,
         borderRadius: BorderRadius.circular(CanaryTokens.rChip),
-        border: Border.all(color: CanaryTokens.monad.withValues(alpha: 0.35)),
+        border: Border.all(color: CanaryTokens.text, width: 2),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -293,22 +293,24 @@ class _MonadTestnetPillState extends State<MonadTestnetPill>
                   ? 1.0
                   : 0.4 + 0.6 * _controller.value;
               return Container(
-                width: 6,
-                height: 6,
+                width: 10,
+                height: 10,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: CanaryTokens.monad.withValues(alpha: opacity),
+                  color: CanaryTokens.canary.withValues(alpha: opacity),
+                  border: Border.all(color: CanaryTokens.text, width: 1.5),
                 ),
               );
             },
           ),
           const SizedBox(width: 8),
           const Text(
-            'Monad testnet',
+            'MONAD TESTNET',
             style: TextStyle(
               fontFamily: CanaryTokens.monoFont,
-              fontSize: 15,
-              color: CanaryTokens.monad,
+              fontSize: 21,
+              letterSpacing: 1,
+              color: CanaryTokens.text,
               height: 1.1,
             ),
           ),

@@ -85,7 +85,7 @@ class _CopyBadgeState extends State<CopyBadge>
               label,
               style: const TextStyle(
                 fontFamily: CanaryTokens.monoFont,
-                fontSize: 16,
+                fontSize: 21,
                 color: CanaryTokens.onCanary,
                 fontWeight: FontWeight.w600,
               ),

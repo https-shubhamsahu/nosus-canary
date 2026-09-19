@@ -171,7 +171,7 @@ class _CanaryCreatedScreenState extends ConsumerState<CanaryCreatedScreen> {
             style: const TextStyle(
               fontFamily: CanaryTokens.monoFont,
               color: CanaryTokens.textDim,
-              fontSize: 15,
+              fontSize: 20,
             ),
           ),
         ),
