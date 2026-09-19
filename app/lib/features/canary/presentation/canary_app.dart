@@ -14,8 +14,8 @@ class CanaryApp extends StatelessWidget {
   Widget build(BuildContext context) => MaterialApp(
     title: 'NO SUS Canary',
     debugShowCheckedModeBanner: false,
-    theme: CanaryTokens.theme(),
-    darkTheme: CanaryTokens.theme(),
+    theme: NoSusTheme.lightTheme,
+    darkTheme: NoSusTheme.darkTheme,
     themeMode: ThemeMode.dark,
     builder: (context, child) =>
         ExperimentFrame(child: child ?? const SizedBox.shrink()),

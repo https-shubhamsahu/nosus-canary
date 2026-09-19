@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../theme.dart';
 import 'canary_home_screen.dart';
-import 'ui/canary_mark.dart';
 
 /// Entry point shown on Welcome (no account needed) and in Workspace.
 class CanaryEntryCard extends StatelessWidget {
@@ -27,6 +25,7 @@ class CanaryEntryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final fg = theme.colorScheme.onSurface;
 
     return Semantics(
       button: true,
@@ -34,78 +33,60 @@ class CanaryEntryCard extends StatelessWidget {
           'NO SUS Canary. Every reader gets their own copy. If it leaks, see whose copy it was.',
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: CanaryTokens.brand,
+        child: Material(
+          color: theme.colorScheme.surface,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: fg, width: 1.4),
           ),
-          padding: const EdgeInsets.all(1.4),
-          child: Material(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(14.6),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(14.6),
-              onTap: () => _open(context),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const CanaryMark(size: 28),
-                        const SizedBox(width: 10),
-                        Text(
-                          'NO SUS Canary',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => _open(context),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.flutter_dash, color: fg, size: 28),
+                      const SizedBox(width: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: fg),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'NEW',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            fontSize: 11,
+                            letterSpacing: 1.2,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: CanaryTokens.canary,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            'NEW',
-                            style: TextStyle(
-                              color: CanaryTokens.onCanary,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.0,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Every reader gets their own copy. If it leaks, see whose copy it was.',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text('NO SUS Canary', style: theme.textTheme.titleLarge),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Every reader gets their own copy. If it leaks, see whose copy it was.',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 48,
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () => _open(context),
+                      child: const Text('Open NO SUS Canary'),
                     ),
-                    const SizedBox(height: 16),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          'Open Canary →',
-                          style: TextStyle(
-                            color: CanaryTokens.canary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

@@ -43,7 +43,7 @@ void main() {
 
     expect(find.text('TRY IT NOW — NO ACCOUNT NEEDED'), findsOneWidget);
     expect(find.text('NO SUS Canary'), findsOneWidget);
-    expect(find.text('Open Canary →'), findsWidgets);
+    expect(find.text('Open NO SUS Canary'), findsWidgets);
     expect(find.text('Monad receipts'), findsNothing);
     expect(find.text('Send a Burn Note'), findsOneWidget);
     expect(find.text('Send a Burn File'), findsOneWidget);
