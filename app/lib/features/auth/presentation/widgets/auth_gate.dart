@@ -5,13 +5,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:no_sus/theme.dart';
 import '../providers/auth_providers.dart';
 import '../providers/risk_state_provider.dart';
-import '../screens/auth_screen.dart';
 import '../screens/reset_password_screen.dart';
 import '../../../../services/supabase_service.dart';
 import '../../../../services/risk_engine_service.dart';
 import '../../../../services/device_integrity_service.dart';
 import '../../../onboarding/presentation/screens/get_started_screen.dart';
-import '../../../onboarding/presentation/screens/welcome_screen.dart';
 import '../../../onboarding/presentation/providers/onboarding_providers.dart';
 import '../../../../screens/splash_screen.dart';
 
@@ -34,19 +32,10 @@ class AuthGate extends ConsumerWidget {
           return const ResetPasswordScreen();
         }
 
-        // Signed out. This used to render AuthScreen unconditionally, which
-        // made an email field the first thing anyone ever saw — no explanation
-        // of the product, and no way to try any part of it. WelcomeScreen
-        // explains what this is and hands over the features that genuinely
-        // need no account (Burn Notes, Burn Files, code redemption); it pushes
-        // AuthScreen when the user asks for it.
-        //
-        // A returning user who has already seen the pitch and signed out goes
-        // straight back to the form.
+        // Signed out. Skip login for this demo and open the full five-tab
+        // workspace (guest tools plus Vault, Study Desk, Audit, Groups).
         if (user == null) {
-          return ref.watch(welcomeSeenProvider)
-              ? const AuthScreen()
-              : const WelcomeScreen();
+          return child;
         }
 
         // ── 2a. Email confirmation gate ────────────────────────────────────────
