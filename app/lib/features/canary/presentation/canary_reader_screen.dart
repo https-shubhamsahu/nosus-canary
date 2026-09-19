@@ -10,6 +10,7 @@ import 'canary_ui.dart';
 import 'ui/canary_mark.dart';
 import 'ui/chain_chip.dart';
 import 'ui/glow_card.dart';
+import 'ui/liquid_carve_button.dart';
 
 /// Standalone app for the web reader path (main.dart runs it directly for
 /// `#/canary/<id>?k=...` links, like the Burn viewers).
@@ -124,19 +125,14 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
         ),
       ),
       const SizedBox(height: 8),
-      FilledButton.icon(
-        onPressed: _busy ? null : _open,
-        icon: _busy
-            ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: CanaryTokens.onCanary,
-                ),
-              )
-            : const Icon(Icons.lock_open),
-        label: Text(_busy ? 'Making your copy…' : 'Open my copy'),
+      Align(
+        alignment: Alignment.center,
+        child: LiquidCarveButton(
+          label: _busy ? 'Making your copy…' : 'Open my copy',
+          icon: Icons.lock_open,
+          busy: _busy,
+          onPressed: _busy ? null : _open,
+        ),
       ),
       if (_error != null)
         Padding(

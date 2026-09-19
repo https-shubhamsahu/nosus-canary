@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../theme.dart';
 import '../data/canary_api.dart';
 import '../data/canary_repository.dart';
 import '../domain/canary_fingerprint.dart';
@@ -9,6 +8,7 @@ import '../domain/canary_models.dart';
 import 'canary_created_screen.dart';
 import 'canary_providers.dart';
 import 'canary_ui.dart';
+import 'ui/liquid_carve_button.dart';
 
 /// A demo note that has 15 swappable words (checked by the test harness), so
 /// it supports up to 100 readers.
@@ -184,19 +184,14 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
                 : (value) => setState(() => _hours = value.first),
           ),
           const SizedBox(height: 28),
-          FilledButton.icon(
-            onPressed: _busy || !strongEnough ? null : _create,
-            icon: _busy
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: CanaryTokens.onCanary,
-                    ),
-                  )
-                : const Icon(Icons.link),
-            label: Text(_busy ? (_stage ?? 'Working…') : 'Create Canary link'),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: LiquidCarveButton(
+              label: _busy ? (_stage ?? 'Working…') : 'Create Canary link',
+              icon: Icons.link,
+              busy: _busy,
+              onPressed: _busy || !strongEnough ? null : _create,
+            ),
           ),
           if (_error != null)
             Padding(
