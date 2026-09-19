@@ -6,6 +6,7 @@ import '../../../theme.dart';
 import '../domain/canary_link.dart';
 import 'ui/canary_backdrop.dart';
 import 'ui/canary_mark.dart';
+import 'ui/wallet_button.dart';
 
 /// Small shared pieces for the Canary screens.
 class CanaryUi {
@@ -93,7 +94,11 @@ class CanaryUi {
                           ),
                         ],
                       ),
-                      actions: actions,
+                      actions: [
+                        ...?actions,
+                        const WalletButton(compact: true),
+                        const SizedBox(width: 8),
+                      ],
                     ),
             body: CanaryBackdrop(child: body(context)),
           );

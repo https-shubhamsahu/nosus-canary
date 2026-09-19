@@ -12,6 +12,7 @@ import 'canary_providers.dart';
 import 'canary_ui.dart';
 import 'ui/chain_chip.dart';
 import 'ui/glow_card.dart';
+import 'ui/wallet_button.dart';
 
 /// Owner dashboard: live "Seen by" list plus the leak check.
 class CanaryNoteScreen extends ConsumerStatefulWidget {
@@ -171,6 +172,10 @@ class _CanaryNoteScreenState extends ConsumerState<CanaryNoteScreen> {
                 ),
               ),
             ),
+          VerifyOnMonadButton(
+            noteId: record.noteId,
+            localOpened: status?.copies.length,
+          ),
           OutlinedButton.icon(
             icon: const Icon(Icons.qr_code),
             label: const Text('Show link & QR'),

@@ -7,6 +7,7 @@ import '../../../../config/app_mode.dart';
 import '../../../../core/layout/app_breakpoints.dart';
 import '../../../../theme.dart';
 import 'canary_mark.dart';
+import 'wallet_button.dart';
 
 /// Desktop & mobile top navigation bar for the Canary site.
 class CanaryTopBar extends StatelessWidget implements PreferredSizeWidget {
@@ -101,6 +102,8 @@ class CanaryTopBar extends StatelessWidget implements PreferredSizeWidget {
                       const MonadTestnetPill(),
                       const SizedBox(width: 14),
                     ],
+                    WalletButton(compact: !expanded),
+                    const SizedBox(width: 12),
                     if (standalone)
                       expanded
                           ? ConstrainedBox(
