@@ -42,27 +42,25 @@ void main() {
     await pumpWelcome(tester);
 
     expect(find.text('TRY IT NOW — NO ACCOUNT NEEDED'), findsOneWidget);
+    expect(find.text('NO SUS Canary'), findsOneWidget);
+    expect(find.text('Open NO SUS Canary'), findsWidgets);
+    expect(find.text('Monad receipts'), findsNothing);
     expect(find.text('Send a Burn Note'), findsOneWidget);
     expect(find.text('Send a Burn File'), findsOneWidget);
     expect(find.text('Redeem a code'), findsOneWidget);
   });
 
-  testWidgets('explains what an account adds rather than just gating', (
+  testWidgets('shows account features as a static mockup, without sign-in', (
     tester,
   ) async {
     await pumpWelcome(tester);
 
-    expect(find.text('WITH A FREE ACCOUNT'), findsOneWidget);
+    expect(find.text('COMING LATER — MOCKUP'), findsOneWidget);
     expect(find.text('Study groups'), findsOneWidget);
     expect(find.text('Secure documents'), findsOneWidget);
     expect(find.text('Activity log'), findsOneWidget);
-  });
-
-  testWidgets('offers both sign-up and sign-in', (tester) async {
-    await pumpWelcome(tester);
-
-    expect(find.text('CREATE A FREE ACCOUNT'), findsOneWidget);
-    expect(find.text('I ALREADY HAVE AN ACCOUNT'), findsOneWidget);
+    expect(find.text('CREATE A FREE ACCOUNT'), findsNothing);
+    expect(find.text('I ALREADY HAVE AN ACCOUNT'), findsNothing);
   });
 
   testWidgets('help is reachable without an account', (tester) async {

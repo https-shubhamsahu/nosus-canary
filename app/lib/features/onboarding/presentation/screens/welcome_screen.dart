@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../canary/presentation/canary_entry_card.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,15 +6,15 @@ import '../../../../core/mascot/mascot_state.dart';
 import '../../../../core/mascot/mascot_view.dart';
 import '../../../../core/providers/theme_provider.dart';
 import '../../../../theme.dart';
-import '../../../auth/presentation/providers/pending_intent_provider.dart';
-import '../../../auth/presentation/screens/auth_screen.dart';
+import '../../../analytics/data/analytics_service.dart';
+import '../../../canary/presentation/canary_entry_card.dart';
+import '../../../canary/presentation/canary_home_screen.dart';
 import '../../../help/domain/help_topic.dart';
 import '../../../help/presentation/screens/help_screen.dart';
 import '../../../help/presentation/screens/help_topic_screen.dart';
 import '../../../share/presentation/screens/burn_file_creator_screen.dart';
 import '../../../share/presentation/screens/burn_note_creator_screen.dart';
 import '../../../share/presentation/screens/redeem_code_screen.dart';
-import '../../../analytics/data/analytics_service.dart';
 import '../providers/onboarding_providers.dart';
 
 /// What a signed-out visitor sees instead of a login form.
@@ -63,29 +61,6 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
       properties: {'tool': tool},
     );
     Navigator.of(context).push(MaterialPageRoute(builder: (_) => builder()));
-  }
-
-  void _openAuth(BuildContext context, WidgetRef ref, {required bool signUp}) {
-    HapticFeedback.lightImpact();
-    ref.read(welcomeSeenProvider.notifier).markSeen();
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => AuthScreen(startOnSignUp: signUp)),
-    );
-  }
-
-  /// Records what the user was reaching for before sending them to sign in, so
-  /// they land back on it afterwards instead of on Home.
-  void _authWall(
-    BuildContext context,
-    WidgetRef ref, {
-    required PendingIntentKind intent,
-  }) {
-    ref.read(pendingIntentProvider.notifier).set(PendingIntent(intent));
-    AnalyticsService.instance.log(
-      AnalyticsEvent.authWallHit,
-      properties: {'action': intent.name},
-    );
-    _openAuth(context, ref, signUp: true);
   }
 
   @override
@@ -186,12 +161,23 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                 ),
                 const SizedBox(height: NoSusTheme.s32),
 
-                const CanaryEntryCard(),
                 // ── Usable right now, no account ─────────────────────────────
                 _SectionLabel(
                   text: 'TRY IT NOW — NO ACCOUNT NEEDED',
                   color: subtle,
                 ),
+                const SizedBox(height: NoSusTheme.s12),
+                CanaryEntryCard(
+                      onOpen: () => _openGuestTool(
+                        context,
+                        ref,
+                        tool: 'canary',
+                        builder: CanaryHomeScreen.new,
+                      ),
+                    )
+                    .animate()
+                    .fadeIn(duration: 260.ms)
+                    .slideY(begin: 0.04, end: 0),
                 const SizedBox(height: NoSusTheme.s12),
                 _ActionCard(
                       icon: Icons.local_fire_department_outlined,
@@ -238,8 +224,8 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
 
                 const SizedBox(height: NoSusTheme.s32),
 
-                // ── What an account adds ─────────────────────────────────────
-                _SectionLabel(text: 'WITH A FREE ACCOUNT', color: subtle),
+                // ── Account features as a static mockup (sign-in is off) ─────
+                _SectionLabel(text: 'COMING LATER — MOCKUP', color: subtle),
                 const SizedBox(height: NoSusTheme.s12),
                 Container(
                   padding: const EdgeInsets.all(NoSusTheme.s24),
@@ -247,89 +233,40 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _Benefit(
+                      Text(
+                        'Sign-in is off for this demo. These are preview-only.',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: subtle,
+                          fontSize: 12,
+                          height: 1.45,
+                        ),
+                      ),
+                      const SizedBox(height: NoSusTheme.s16),
+                      const _Benefit(
                         icon: Icons.group_outlined,
                         title: 'Study groups',
                         body:
                             'A private space with its own members, files and activity log.',
-                        onTap: () => _authWall(
-                          context,
-                          ref,
-                          intent: PendingIntentKind.browseGroups,
-                        ),
                       ),
                       const SizedBox(height: NoSusTheme.s16),
-                      _Benefit(
+                      const _Benefit(
                         icon: Icons.description_outlined,
                         title: 'Secure documents',
                         body:
                             'Shared files open in a watermarked reader instead of downloading.',
-                        onTap: () => _authWall(
-                          context,
-                          ref,
-                          intent: PendingIntentKind.shareDocument,
-                        ),
                       ),
                       const SizedBox(height: NoSusTheme.s16),
-                      _Benefit(
+                      const _Benefit(
                         icon: Icons.history_edu_outlined,
                         title: 'Activity log',
                         body:
                             'Who opened what, and when — visible to every member, including you.',
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const HelpTopicScreen(
-                              topicId: HelpCatalog.auditLog,
-                            ),
-                          ),
-                        ),
                       ),
                     ],
                   ),
                 ).animate().fadeIn(duration: 420.ms),
 
-                const SizedBox(height: NoSusTheme.s24),
-
-                // ── Primary actions ──────────────────────────────────────────
-                Semantics(
-                  button: true,
-                  label: 'Create a free account',
-                  child: GestureDetector(
-                    onTap: () => _openAuth(context, ref, signUp: true),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        color: fg,
-                        borderRadius: BorderRadius.circular(NoSusTheme.r12),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'CREATE A FREE ACCOUNT',
-                          style: TextStyle(
-                            color: isDark ? Colors.black : Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: NoSusTheme.s12),
-                TextButton(
-                  onPressed: () => _openAuth(context, ref, signUp: false),
-                  child: Text(
-                    'I ALREADY HAVE AN ACCOUNT',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.2,
-                      color: subtle,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: NoSusTheme.s8),
+                const SizedBox(height: NoSusTheme.s16),
                 Center(
                   child: TextButton.icon(
                     onPressed: () => Navigator.of(context).push(
@@ -456,13 +393,11 @@ class _Benefit extends StatelessWidget {
   final IconData icon;
   final String title;
   final String body;
-  final VoidCallback onTap;
 
   const _Benefit({
     required this.icon,
     required this.title,
     required this.body,
-    required this.onTap,
   });
 
   @override
@@ -470,45 +405,35 @@ class _Benefit extends StatelessWidget {
     final theme = Theme.of(context);
     final fg = theme.colorScheme.onSurface;
 
-    return Semantics(
-      button: true,
-      label: '$title. $body',
-      child: InkWell(
-        borderRadius: BorderRadius.circular(NoSusTheme.r12),
-        onTap: onTap,
-        child: ExcludeSemantics(
-          child: Row(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: fg.withValues(alpha: 0.75)),
+        const SizedBox(width: NoSusTheme.s16),
+        Expanded(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, size: 18, color: fg.withValues(alpha: 0.75)),
-              const SizedBox(width: NoSusTheme.s16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      body,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontSize: 12,
-                        height: 1.45,
-                        color: fg.withValues(alpha: 0.55),
-                      ),
-                    ),
-                  ],
+              Text(
+                title,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                body,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontSize: 12,
+                  height: 1.45,
+                  color: fg.withValues(alpha: 0.55),
                 ),
               ),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 }
