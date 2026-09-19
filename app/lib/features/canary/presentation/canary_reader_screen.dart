@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/layout/app_breakpoints.dart';
 import '../../../theme.dart';
-import '../../monad/presentation/experiment_frame.dart';
 import '../data/canary_api.dart';
 import '../domain/canary_models.dart';
 import 'canary_providers.dart';
@@ -13,6 +12,7 @@ import 'ui/chain_chip.dart';
 import 'ui/copy_badge.dart';
 import 'ui/glow_card.dart';
 import 'ui/liquid_carve_button.dart';
+import 'ui/canary_strip.dart';
 
 /// Standalone app for the web reader path (main.dart runs it directly for
 /// `#/canary/<id>?k=...` links, like the Burn viewers).
@@ -30,7 +30,7 @@ class CanaryReaderApp extends StatelessWidget {
     darkTheme: CanaryTokens.theme(),
     themeMode: ThemeMode.dark,
     builder: (context, child) =>
-        ExperimentFrame(child: child ?? const SizedBox.shrink()),
+        CanaryStrip(child: child ?? const SizedBox.shrink()),
     home: CanaryReaderScreen(noteId: noteId, keyHex: keyHex),
   );
 }

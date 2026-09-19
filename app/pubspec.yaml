@@ -85,6 +85,28 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  # The Canary UI names these families directly (lib/theme.dart CanaryTokens).
+  fonts:
+    - family: Outfit
+      fonts:
+        - asset: assets/google_fonts/Outfit-Regular.ttf
+        - asset: assets/google_fonts/Outfit-SemiBold.ttf
+          weight: 600
+        - asset: assets/google_fonts/Outfit-Bold.ttf
+          weight: 700
+    - family: Inter
+      fonts:
+        - asset: assets/google_fonts/Inter-Regular.ttf
+        - asset: assets/google_fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/google_fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/google_fonts/Inter-Bold.ttf
+          weight: 700
+    - family: VT323
+      fonts:
+        - asset: assets/google_fonts/VT323-Regular.ttf
+
   assets:
     - assets/images/
     - assets/icon/LuxandNox.png

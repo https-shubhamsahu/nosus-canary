@@ -129,7 +129,7 @@ class _CanaryLeakPanelState extends ConsumerState<CanaryLeakPanel> {
             maxLines: 12,
             style: const TextStyle(
               fontFamily: CanaryTokens.monoFont,
-              fontSize: 16,
+              fontSize: 21,
               color: CanaryTokens.text,
             ),
             decoration: const InputDecoration(

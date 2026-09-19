@@ -68,7 +68,7 @@ class ChainChip extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontFamily: CanaryTokens.monoFont,
-                  fontSize: 15,
+                  fontSize: 20,
                   color: CanaryTokens.text,
                   height: 1.2,
                 ),

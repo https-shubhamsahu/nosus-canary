@@ -237,7 +237,7 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
                     labelStyle: const TextStyle(
                       fontFamily: CanaryTokens.monoFont,
                       color: CanaryTokens.text,
-                      fontSize: 13,
+                      fontSize: 17,
                     ),
                   ),
               ],
