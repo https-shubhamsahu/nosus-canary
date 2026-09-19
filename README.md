@@ -15,7 +15,7 @@
 |---|---|
 | **1. Live Public App** | **[http://shubham-sahu.me/nosus-canary/](http://shubham-sahu.me/nosus-canary/#/canary)** *(HTTPS mirror: [https://https-shubhamsahu.github.io/nosus-canary/#/canary](https://https-shubhamsahu.github.io/nosus-canary/#/canary))* |
 | **2. Public GitHub Repo** | **[https://github.com/https-shubhamsahu/nosus-monad](https://github.com/https-shubhamsahu/nosus-monad)** |
-| **3. Smart Contract** | `NoSusCanary` on Monad Testnet (Chain ID `10143`) |
+| **3. Smart Contract** | [`0xb1a1858866122c84cf97861ca815fb070e010e68`](https://testnet.monadscan.com/address/0xb1a1858866122c84cf97861ca815fb070e010e68) on Monad Testnet (Chain ID `10143`) · [Verified on Sourcify](https://sourcify.dev/server/repo-ui/10143/0xb1a1858866122c84cf97861ca815fb070e010e68) |
 | **4. Live Deployment** | Standalone Flutter Web + Android APK (`foo.nosus.canary`) |
 
 ---
@@ -45,15 +45,15 @@ Canary trapping in high-stakes environments requires:
 ## 📋 Judge & Rubrics Checklist (Monad Blitz Mumbai V4)
 
 ### Basic Points (100 / 100)
-- [x] **Public GitHub repo**: Source code fully available with Flutter app, contracts, and Edge Functions.
+- [x] **Public GitHub repo**: [https://github.com/https-shubhamsahu/nosus-monad](https://github.com/https-shubhamsahu/nosus-monad)
 - [x] **Proper README**: Complete pitch, live URL, contract address, architecture, and reproducible instructions.
-- [x] **Smart contracts deployed on Monad Testnet**: `NoSusCanary.sol` deployed on Chain ID `10143`.
+- [x] **Smart contracts deployed on Monad Testnet**: [`0xb1a1858866122c84cf97861ca815fb070e010e68`](https://testnet.monadscan.com/address/0xb1a1858866122c84cf97861ca815fb070e010e68) on Chain ID `10143`.
 - [x] **Project publicly hosted**: Live on custom domain `shubham-sahu.me` and GitHub Pages.
 
 ### Advance Points — Project Working (100 / 100)
 - [x] **All announced functions working**: Note generation, AES encryption, unique copy distribution, Monad transaction logging, and local leak fingerprint matching.
 - [x] **Live transaction on-chain during demo**: Every `sealNote` and `openCopy` records live transactions visible on [Monadscan](https://testnet.monadscan.com).
-- [x] **Contract verified on explorer**: Source published and verified on Monadscan.
+- [x] **Contract verified on explorer**: Source verified on [Sourcify / Monadscan](https://sourcify.dev/server/repo-ui/10143/0xb1a1858866122c84cf97861ca815fb070e010e68).
 - [x] **Someone else can run it from README**: Zero-friction setup instructions below.
 
 ### Advance Points — Build in Public (100 / 100)
