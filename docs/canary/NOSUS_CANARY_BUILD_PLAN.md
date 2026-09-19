@@ -549,7 +549,7 @@ laptop web app plus phone browsers. **Never cut:** the reader flow, Seen by, the
 - Relayers: <count>, funded <amount> MON each
 - Migration 20260919090000_nosus_canary.sql applied to ffidvfguojalzpclipzi: <yes/date>
 - Edge function `canary` deployed: <yes/date>
-- Web: https://https-shubhamsahu.github.io/nosus-canary/
+- Web: https://shubham-sahu.me/nosus-canary/#/canary
 - APK: NO-SUS-Canary.apk (foo.nosus.canary, debug-signed, sideload only)
 - Acceptance (Phase 7): steps 1–10 <pass/fail notes>
 ```
@@ -574,7 +574,7 @@ laptop web app plus phone browsers. **Never cut:** the reader flow, Seen by, the
 - [ ] 4.3 function deployed
 - [ ] 4.4 smoke tests pass
 - [x] 5.1 web built, CNAME removed
-- [x] 5.3 Pages live at https://https-shubhamsahu.github.io/nosus-canary/
+- [x] 5.3 Pages live at https://shubham-sahu.me/nosus-canary/#/canary
 - [x] 6.1 APK built → NO-SUS-Canary.apk
 - [ ] 6.2 installed on demo phone
 - [ ] 7 acceptance 1–10 passed

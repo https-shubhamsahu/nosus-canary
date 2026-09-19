@@ -4,7 +4,7 @@
 - Feature: NO SUS Canary (server-gated copy delivery, client-side AES + local fingerprint matching)
 - Contract NoSusCanary: Unit tests passing (5/5 NoSusCanary, 11/11 total). Deployment awaiting testnet wallet configuration.
 - Migration `20260919090000_nosus_canary.sql` applied to ffidvfguojalzpclipzi: Yes (tables `canary_notes`, `canary_copies`, `canary_relayer_leases` verified with RLS active).
-- Web app: Live on GitHub Pages at [https://https-shubhamsahu.github.io/nosus-canary/](https://https-shubhamsahu.github.io/nosus-canary/) (HTTP 200).
+- Web app: Demo at [https://shubham-sahu.me/nosus-canary/#/canary](https://shubham-sahu.me/nosus-canary/#/canary). HTTPS origin also live at [https://https-shubhamsahu.github.io/nosus-canary/#/canary](https://https-shubhamsahu.github.io/nosus-canary/#/canary). Signed-out visitors enter the five-tab workspace (no login). Canary is the hero entry; Monad receipts stay on `/monad` only.
 - APK: Built `NO-SUS-Canary.apk` (34.4 MB, package `foo.nosus.canary`, `--target-platform android-arm64`, screen capture allowed for demo mirroring).
 - Flutter app tests: 129 passed, 1 skipped, analyze 0 issues.
 

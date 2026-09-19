@@ -161,11 +161,11 @@ class _ResultCard extends StatelessWidget {
 
     final (String headline, String detail) = switch (match.kind) {
       CanaryMatchKind.exactMarker => (
-        '🐤 The canary sang. $who',
+        'The canary sang. $who',
         'Matched by the hidden marker in the text.',
       ),
       CanaryMatchKind.confident => (
-        '🐤 The canary sang. $who',
+        'The canary sang. $who',
         '${match.agreeing} of ${match.known} fingerprints match.',
       ),
       CanaryMatchKind.likely => (

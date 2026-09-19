@@ -12,6 +12,12 @@ deployment, credentials, and product decision process.
 2. Complete the threshold-gate technical spike before marketing or demo claims.
 3. Use only harmless, personally owned test notes on Monad testnet.
 
+## NO SUS Canary demo
+
+Live app: [https://shubham-sahu.me/nosus-canary/#/canary](https://shubham-sahu.me/nosus-canary/#/canary)
+
+Until custom-domain HTTPS is enforced, the GitHub Pages origin is also HTTPS: [https://https-shubhamsahu.github.io/nosus-canary/#/canary](https://https-shubhamsahu.github.io/nosus-canary/#/canary)
+
 ## Layout
 
 - `web/` — Next.js recipient, creator, verifier, and live-wall experience.
