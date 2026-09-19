@@ -67,6 +67,36 @@ class CanaryUi {
     );
   }
 
+  static Widget frame({
+    required String title,
+    required Widget Function(BuildContext context) body,
+    List<Widget>? actions,
+  }) {
+    return Theme(
+      data: CanaryTokens.theme(),
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            backgroundColor: CanaryTokens.bg,
+            appBar: AppBar(
+              title: Row(
+                children: [
+                  const CanaryMark(size: 28),
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: Text(title, overflow: TextOverflow.ellipsis),
+                  ),
+                ],
+              ),
+              actions: actions,
+            ),
+            body: CanaryBackdrop(child: body(context)),
+          );
+        },
+      ),
+    );
+  }
+
   static Widget missing({required String message}) {
     return Theme(
       data: CanaryTokens.theme(),
