@@ -12,6 +12,7 @@ import 'ui/chain_chip.dart';
 import 'ui/copy_badge.dart';
 import 'ui/glow_card.dart';
 import 'ui/liquid_carve_button.dart';
+import 'ui/pixel_canary.dart';
 import 'ui/canary_strip.dart';
 
 /// Standalone app for the web reader path (main.dart runs it directly for
@@ -108,30 +109,44 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
     final expanded = AppBreakpoints.isExpanded(context);
     if (!expanded) {
       return ListView(
-        padding: const EdgeInsets.all(20),
-        children: [card],
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+        children: [
+          const Center(child: PixelCanary(size: 96, sing: true)),
+          const SizedBox(height: 20),
+          card,
+        ],
       );
     }
-    return Padding(
-      padding: const EdgeInsets.all(32),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Expanded(flex: 2, child: _BrandSide()),
-          const SizedBox(width: 32),
-          Expanded(
-            flex: 3,
-            child: SingleChildScrollView(
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 640),
-                  child: card,
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1360),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 40),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Expanded(flex: 9, child: _BrandSide()),
+                    const SizedBox(width: 72),
+                    Expanded(
+                      flex: 10,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 640),
+                          child: card,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -149,24 +164,57 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
   Widget _gate(BuildContext context) {
     final theme = Theme.of(context);
     final focused = _nameFocus.hasFocus;
+    final expanded = AppBreakpoints.isExpanded(context);
     return GlowCard(
+      padding: EdgeInsets.all(expanded ? 36 : 24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Center(child: BobbingCanaryMark(size: 64)),
-          const SizedBox(height: 16),
-          Text(
-            'Someone shared a private note with you.',
-            style: theme.textTheme.headlineSmall,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Every reader gets their own numbered copy. Type your name to open yours.',
-            textAlign: TextAlign.center,
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(10, 5, 10, 3),
+              decoration: BoxDecoration(
+                color: CanaryTokens.canary,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: CanaryTokens.text, width: 2),
+              ),
+              child: const Text(
+                'PRIVATE NOTE',
+                style: TextStyle(
+                  fontFamily: CanaryTokens.monoFont,
+                  fontSize: 22,
+                  letterSpacing: 2,
+                  height: 1,
+                  color: CanaryTokens.text,
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 20),
+          Text(
+            'Someone shared a private note with you.',
+            style: TextStyle(
+              fontFamily: CanaryTokens.displayFont,
+              fontSize: expanded ? 38 : 28,
+              fontWeight: FontWeight.w700,
+              height: 1.1,
+              letterSpacing: -0.8,
+              color: CanaryTokens.text,
+            ),
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            'Every reader gets their own numbered copy. Type your name to open '
+            'yours.',
+            style: TextStyle(
+              fontSize: 17,
+              height: 1.55,
+              color: CanaryTokens.textDim,
+            ),
+          ),
+          const SizedBox(height: 28),
           AnimatedContainer(
             duration: CanaryTokens.reduceMotion(context)
                 ? Duration.zero
@@ -182,14 +230,15 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
               maxLength: 40,
               textInputAction: TextInputAction.go,
               onSubmitted: (_) => _busy ? null : _open(),
+              style: const TextStyle(fontSize: 18, color: CanaryTokens.text),
               decoration: const InputDecoration(
                 labelText: 'Your name',
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Align(
-            alignment: Alignment.center,
+            alignment: Alignment.centerLeft,
             child: LiquidCarveButton(
               label: 'Open my copy',
               icon: Icons.lock_open,
@@ -208,11 +257,17 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
                 ),
               ),
             ),
-          const SizedBox(height: 24),
-          Text(
-            'The sender sees your name and when you opened your copy. Monad testnet '
-            'records that a copy was opened, without your name.',
-            style: theme.textTheme.bodySmall,
+          const SizedBox(height: 28),
+          Container(height: 2, color: CanaryTokens.text.withValues(alpha: 0.15)),
+          const SizedBox(height: 16),
+          const Text(
+            'The sender sees your name and when you opened your copy. Monad '
+            'testnet records that a copy was opened, without your name.',
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.55,
+              color: CanaryTokens.textDim,
+            ),
           ),
         ],
       ),
@@ -222,6 +277,7 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
   Widget _copyView(BuildContext context, CanaryOpenedCopy copy) {
     final theme = Theme.of(context);
     return GlowCard(
+      padding: const EdgeInsets.all(32),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,9 +287,12 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
             copyCount: copy.copyCount,
             readerName: copy.readerName,
           ),
-          const SizedBox(height: 16),
-          SelectableText(copy.text, style: theme.textTheme.bodyLarge),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
+          SelectableText(
+            copy.text,
+            style: theme.textTheme.bodyLarge?.copyWith(fontSize: 19, height: 1.7),
+          ),
+          const SizedBox(height: 24),
           Text(
             'This copy is unique to you. If it gets shared, NO SUS can tell it was '
             'this copy.',
@@ -261,36 +320,74 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
 class _BrandSide extends StatelessWidget {
   const _BrandSide();
 
+  static const _facts = [
+    'YOUR COPY IS UNIQUE TO YOU',
+    'OPENING IT = 1 MONAD TRANSACTION',
+    'NO WALLET, NO APP, NO SIGN-UP',
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    final wide = MediaQuery.sizeOf(context).width >= 1500;
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        BobbingCanaryMark(size: 160),
-        SizedBox(height: 20),
+        PixelCanary(size: wide ? 220 : 180, sing: true),
+        const SizedBox(height: 32),
         Text(
           'NO SUS',
           style: TextStyle(
             fontFamily: CanaryTokens.displayFont,
-            fontSize: 40,
+            fontSize: wide ? 88 : 72,
             fontWeight: FontWeight.w700,
+            height: 0.95,
+            letterSpacing: -2,
             color: CanaryTokens.text,
           ),
         ),
-        Text(
-          '× MONAD',
+        const SizedBox(height: 14),
+        const Text(
+          ' Your own copy. Recorded on Monad. ',
           style: TextStyle(
-            fontFamily: CanaryTokens.monoFont,
-            fontSize: 22,
-            color: CanaryTokens.monad,
-            letterSpacing: 1.4,
+            fontFamily: CanaryTokens.displayFont,
+            fontSize: 26,
+            fontWeight: FontWeight.w700,
+            height: 1.3,
+            color: CanaryTokens.text,
+            backgroundColor: CanaryTokens.canary,
           ),
         ),
-        SizedBox(height: 12),
-        Text(
-          'A unique copy, recorded on testnet.',
-          style: TextStyle(color: CanaryTokens.textDim),
-        ),
+        const SizedBox(height: 32),
+        for (final fact in _facts)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 14,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: CanaryTokens.canary,
+                    border: Border.all(color: CanaryTokens.text, width: 2),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Flexible(
+                  child: Text(
+                    fact,
+                    style: const TextStyle(
+                      fontFamily: CanaryTokens.monoFont,
+                      fontSize: 24,
+                      letterSpacing: 1,
+                      height: 1.1,
+                      color: CanaryTokens.text,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }

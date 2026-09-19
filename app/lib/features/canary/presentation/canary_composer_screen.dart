@@ -13,6 +13,8 @@ import 'canary_ui.dart';
 import 'ui/fingerprint_meter.dart';
 import 'ui/glow_card.dart';
 import 'ui/liquid_carve_button.dart';
+import 'ui/pixel_canary.dart';
+import 'ui/quest_steps.dart';
 
 /// A demo note that has 15 swappable words (checked by the test harness), so
 /// it supports up to 100 readers.
@@ -112,80 +114,185 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
       body: (context) {
         final theme = Theme.of(context);
         final expanded = AppBreakpoints.isExpanded(context);
-        final pad = expanded ? 32.0 : 20.0;
         final plan = length == 0 ? null : buildCanaryPlan(_text.text.trim());
-        final editor = _editor(theme);
         final panel = _sidePanel(theme, required, strongEnough, length, plan);
-        if (!expanded) {
-          return ListView(
-            padding: EdgeInsets.all(pad),
-            children: [
-              editor,
-              const SizedBox(height: 20),
-              panel,
-            ],
-          );
-        }
-        return Padding(
-          padding: EdgeInsets.fromLTRB(pad, pad, pad, pad),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 6,
-                child: SingleChildScrollView(child: editor),
+
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            // Desktop with enough height: the editor stretches to fill the
+            // screen. Otherwise everything scrolls as one column.
+            final fill = expanded && constraints.maxHeight >= 700;
+            final pad = expanded ? 48.0 : 20.0;
+
+            final header = _header(expanded);
+
+            if (!fill) {
+              return ListView(
+                padding: EdgeInsets.all(pad),
+                children: [
+                  header,
+                  const SizedBox(height: 24),
+                  const QuestSteps(current: 0),
+                  const SizedBox(height: 24),
+                  _editorCard(theme, expand: false),
+                  const SizedBox(height: 24),
+                  panel,
+                ],
+              );
+            }
+
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1360),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(pad, 32, pad, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      header,
+                      const SizedBox(height: 24),
+                      const QuestSteps(current: 0),
+                      const SizedBox(height: 28),
+                      Expanded(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(child: _editorCard(theme, expand: true)),
+                            const SizedBox(width: 32),
+                            SizedBox(
+                              width: 460,
+                              child: SingleChildScrollView(
+                                padding: const EdgeInsets.only(
+                                  right: 8,
+                                  bottom: 8,
+                                ),
+                                child: panel,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              const SizedBox(width: 24),
-              Expanded(
-                flex: 4,
-                child: SingleChildScrollView(child: panel),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
   }
 
-  Widget _editor(ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _header(bool expanded) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        TextField(
-          controller: _text,
-          enabled: !_busy,
-          minLines: 10,
-          maxLines: 18,
-          maxLength: CanaryRepository.maxNoteLength,
-          onChanged: _onTextChanged,
-          style: const TextStyle(
-            fontFamily: CanaryTokens.bodyFont,
-            fontSize: 18,
-            color: CanaryTokens.text,
-            height: 1.5,
-          ),
-          cursorColor: CanaryTokens.canary,
-          decoration: const InputDecoration(
-            labelText: 'Your note',
-            hintText: 'Write it the way you normally would.',
-            alignLabelWithHint: true,
-            filled: true,
-            fillColor: CanaryTokens.surfaceHi,
-          ),
-        ),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: TextButton(
-            onPressed: _busy
-                ? null
-                : () {
-                    _text.text = kCanaryDemoNote;
-                    _onTextChanged(kCanaryDemoNote);
-                  },
-            child: const Text('Use the demo note'),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Write it once.',
+                style: TextStyle(
+                  fontFamily: CanaryTokens.displayFont,
+                  fontSize: expanded ? 52 : 34,
+                  fontWeight: FontWeight.w700,
+                  height: 1.05,
+                  letterSpacing: expanded ? -1.5 : -0.5,
+                  color: CanaryTokens.text,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Canary swaps tiny everyday words, so every reader gets a copy '
+                'that reads the same but is secretly unique.',
+                style: TextStyle(
+                  fontSize: expanded ? 18 : 16,
+                  height: 1.55,
+                  color: CanaryTokens.textDim,
+                ),
+              ),
+            ],
           ),
         ),
+        if (expanded) ...[
+          const SizedBox(width: 24),
+          const PixelCanary(size: 96, sing: true),
+          const SizedBox(width: 24),
+        ],
       ],
+    );
+  }
+
+  Widget _editorCard(ThemeData theme, {required bool expand}) {
+    final field = TextField(
+      controller: _text,
+      enabled: !_busy,
+      minLines: expand ? null : 10,
+      maxLines: expand ? null : 18,
+      expands: expand,
+      textAlignVertical: TextAlignVertical.top,
+      maxLength: CanaryRepository.maxNoteLength,
+      onChanged: _onTextChanged,
+      style: const TextStyle(
+        fontFamily: CanaryTokens.bodyFont,
+        fontSize: 19,
+        color: CanaryTokens.text,
+        height: 1.65,
+      ),
+      cursorColor: CanaryTokens.text,
+      cursorWidth: 3,
+      decoration: const InputDecoration(
+        hintText: 'Write your note the way you normally would…',
+        border: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
+        filled: false,
+        contentPadding: EdgeInsets.zero,
+      ),
+    );
+
+    return GlowCard(
+      padding: const EdgeInsets.fromLTRB(28, 22, 28, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const RetroLabel('Your note'),
+              const Spacer(),
+              OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: CanaryTokens.text,
+                  backgroundColor: CanaryTokens.canary,
+                  side: const BorderSide(color: CanaryTokens.text, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  textStyle: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                onPressed: _busy
+                    ? null
+                    : () {
+                        _text.text = kCanaryDemoNote;
+                        _onTextChanged(kCanaryDemoNote);
+                      },
+                icon: const Icon(Icons.auto_awesome, size: 18),
+                label: const Text('Use the demo note'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Container(height: 2, color: CanaryTokens.text),
+          const SizedBox(height: 16),
+          if (expand) Expanded(child: field) else field,
+        ],
+      ),
     );
   }
 
@@ -196,14 +303,38 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
     int length,
     CanaryPlan? plan,
   ) {
+    final ready = length > 0 && strongEnough;
     return GlowCard(
+      padding: const EdgeInsets.all(26),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Fingerprint', style: theme.textTheme.titleSmall),
-          const SizedBox(height: 12),
+          Row(
+            children: [
+              const RetroLabel('Fingerprint'),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.fromLTRB(8, 4, 8, 2),
+                decoration: BoxDecoration(
+                  color: ready ? CanaryTokens.canary : CanaryTokens.surfaceHi,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: CanaryTokens.text, width: 1.5),
+                ),
+                child: Text(
+                  ready ? 'READY' : '$_slots / $required',
+                  style: const TextStyle(
+                    fontFamily: CanaryTokens.monoFont,
+                    fontSize: 20,
+                    height: 1,
+                    color: CanaryTokens.text,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
           FingerprintMeter(found: _slots, requiredSlots: required),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Semantics(
             liveRegion: true,
             child: Text(
@@ -211,42 +342,50 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
                   ? 'Canary needs at least $required everyday words it can swap '
                         '(like "don\'t", "okay", "until", numbers).'
                   : strongEnough
-                  ? 'Fingerprint strength: $_slots swappable words '
-                        '(needs $required for $_copies readers)'
+                  ? '$_slots swappable words found. Enough for $_copies readers.'
                   : 'Found $_slots of the $required swappable words needed for '
                         '$_copies readers. Add a sentence or two.',
-              style: theme.textTheme.bodyMedium?.copyWith(
+              style: TextStyle(
+                fontSize: 15,
+                height: 1.5,
                 color: length > 0 && !strongEnough
                     ? theme.colorScheme.error
-                    : null,
+                    : CanaryTokens.textDim,
               ),
             ),
           ),
           if (plan != null && plan.slots.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
                 for (final slot in plan.slots.take(8))
-                  Chip(
-                    label: Text('${slot.original} / ${slot.alternate}'),
-                    visualDensity: VisualDensity.compact,
-                    backgroundColor: CanaryTokens.surfaceHi,
-                    side: const BorderSide(color: CanaryTokens.border),
-                    labelStyle: const TextStyle(
-                      fontFamily: CanaryTokens.monoFont,
-                      color: CanaryTokens.text,
-                      fontSize: 17,
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(8, 4, 8, 2),
+                    decoration: BoxDecoration(
+                      color: CanaryTokens.surfaceHi,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: CanaryTokens.text, width: 1.5),
+                    ),
+                    child: Text(
+                      '${slot.original} / ${slot.alternate}',
+                      style: const TextStyle(
+                        fontFamily: CanaryTokens.monoFont,
+                        color: CanaryTokens.text,
+                        fontSize: 19,
+                        height: 1,
+                      ),
                     ),
                   ),
               ],
             ),
           ],
-          const SizedBox(height: 20),
-          Text('How many readers?', style: theme.textTheme.titleSmall),
-          const SizedBox(height: 8),
+          const SizedBox(height: 28),
+          const RetroLabel('How many readers?'),
+          const SizedBox(height: 12),
           SegmentedButton<int>(
+            showSelectedIcon: false,
             segments: [
               for (final c in _copyChoices)
                 ButtonSegment<int>(
@@ -263,10 +402,11 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
                 ? null
                 : (value) => setState(() => _copies = value.first),
           ),
-          const SizedBox(height: 20),
-          Text('Link works for', style: theme.textTheme.titleSmall),
-          const SizedBox(height: 8),
+          const SizedBox(height: 24),
+          const RetroLabel('Link works for'),
+          const SizedBox(height: 12),
           SegmentedButton<int>(
+            showSelectedIcon: false,
             segments: const [
               ButtonSegment<int>(value: 1, label: Text('1 hour')),
               ButtonSegment<int>(value: 24, label: Text('1 day')),
@@ -277,17 +417,16 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
                 ? null
                 : (value) => setState(() => _hours = value.first),
           ),
-          const SizedBox(height: 28),
-          if (_busy)
-            Text(_stage ?? 'Working…', style: theme.textTheme.titleSmall),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: LiquidCarveButton(
-              label: _busy ? (_stage ?? 'Working…') : 'Create Canary link',
-              icon: Icons.link,
-              busy: _busy,
-              onPressed: _busy || !strongEnough ? null : _create,
-            ),
+          const SizedBox(height: 32),
+          if (_busy) ...[
+            RetroLabel(_stage ?? 'Working…'),
+            const SizedBox(height: 12),
+          ],
+          LiquidCarveButton(
+            label: _busy ? (_stage ?? 'Working…') : 'Create Canary link',
+            icon: Icons.link,
+            busy: _busy,
+            onPressed: _busy || !strongEnough ? null : _create,
           ),
           if (_error != null)
             Padding(
@@ -301,12 +440,18 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
               ),
             ),
           const SizedBox(height: 24),
-          Text(
+          Container(height: 2, color: CanaryTokens.text.withValues(alpha: 0.15)),
+          const SizedBox(height: 16),
+          const Text(
             'Your note is encrypted on this device. NO SUS stores only the '
             'encrypted copies; the key travels inside the link. Monad testnet '
             'receives only a hash of the copies and an anonymous tag per '
             'reader, never the text or names.',
-            style: theme.textTheme.bodySmall,
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.55,
+              color: CanaryTokens.textDim,
+            ),
           ),
         ],
       ),
