@@ -8,8 +8,8 @@ import '../domain/canary_models.dart';
 import '../ocr/canary_ocr.dart';
 import 'canary_providers.dart';
 import 'canary_ui.dart';
-import 'ui/canary_mark.dart';
-import 'ui/chain_chip.dart';
+import 'ui/canary_confetti.dart';
+import 'ui/canary_reveal.dart';
 import 'ui/glow_card.dart';
 import 'ui/liquid_carve_button.dart';
 
@@ -51,6 +51,7 @@ class _CanaryLeakPanelState extends ConsumerState<CanaryLeakPanel> {
   CanaryMatch? _match;
   CanaryNoteStatus? _status;
   bool _busy = false;
+  bool _scanning = false;
   String? _error;
 
   @override
@@ -82,24 +83,36 @@ class _CanaryLeakPanelState extends ConsumerState<CanaryLeakPanel> {
       setState(() => _error = 'This note is not on this device.');
       return;
     }
+    final match = repository.checkLeak(record, _leak.text);
     setState(() {
       _busy = true;
+      _scanning = true;
       _error = null;
-      _match = repository.checkLeak(record, _leak.text);
+      _match = null;
     });
+    final statusFuture = repository.fetchStatus(record);
+    if (!CanaryTokens.reduceMotion(context)) {
+      await Future<void>.delayed(const Duration(milliseconds: 900));
+    }
+    CanaryNoteStatus? status;
     try {
-      final status = await repository.fetchStatus(record);
-      if (mounted) setState(() => _status = status);
+      status = await statusFuture;
     } catch (_) {
       // Names are a bonus; the copy number alone is still useful.
-    } finally {
-      if (mounted) setState(() => _busy = false);
     }
+    if (!mounted) return;
+    setState(() {
+      _match = match;
+      _status = status;
+      _busy = false;
+      _scanning = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final record = ref.read(canaryRepositoryProvider).findNote(widget.noteId);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -108,20 +121,31 @@ class _CanaryLeakPanelState extends ConsumerState<CanaryLeakPanel> {
           'screenshot. Even part of it helps.',
         ),
         const SizedBox(height: 12),
-        TextField(
-          controller: _leak,
-          minLines: 5,
-          maxLines: 12,
-          style: const TextStyle(
-            fontFamily: CanaryTokens.monoFont,
-            fontSize: 16,
-            color: CanaryTokens.text,
-          ),
-          decoration: const InputDecoration(
-            labelText: 'Leaked text',
-            alignLabelWithHint: true,
+        LeakScanOverlay(
+          active: _scanning,
+          child: TextField(
+            controller: _leak,
+            minLines: 5,
+            maxLines: 12,
+            style: const TextStyle(
+              fontFamily: CanaryTokens.monoFont,
+              fontSize: 16,
+              color: CanaryTokens.text,
+            ),
+            decoration: const InputDecoration(
+              labelText: 'Leaked text',
+              alignLabelWithHint: true,
+            ),
           ),
         ),
+        if (record != null && (_scanning || _match != null)) ...[
+          const SizedBox(height: 12),
+          ScanHitChips(
+            plan: record.plan,
+            leak: _leak.text,
+            active: _scanning,
+          ),
+        ],
         const SizedBox(height: 12),
         Wrap(
           spacing: 12,
@@ -178,36 +202,29 @@ class _ResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final index = match.copyIndex;
-    final copy = index == null ? null : status?.copy(index);
-    final String who;
-    if (index == null) {
-      who = '';
-    } else if (copy == null) {
-      who = 'Copy #${index + 1}';
-    } else {
-      who = 'Copy #${index + 1} — ${copy.readerName}';
-    }
-
-    final sang = match.kind == CanaryMatchKind.exactMarker ||
+    final reveal = match.kind == CanaryMatchKind.exactMarker ||
         match.kind == CanaryMatchKind.confident ||
         match.kind == CanaryMatchKind.likely;
+    final celebrate = match.kind == CanaryMatchKind.exactMarker ||
+        match.kind == CanaryMatchKind.confident;
+
+    if (reveal) {
+      final revealCard = CanaryReveal(
+        match: match,
+        status: status,
+        likely: match.kind == CanaryMatchKind.likely,
+      );
+      if (!celebrate) return revealCard;
+      return Stack(
+        clipBehavior: Clip.none,
+        children: [
+          revealCard,
+          const Positioned.fill(child: CanaryConfetti()),
+        ],
+      );
+    }
 
     final (String headline, String detail) = switch (match.kind) {
-      CanaryMatchKind.exactMarker => (
-        'The canary sang. $who',
-        'Matched by the hidden marker in the text.',
-      ),
-      CanaryMatchKind.confident => (
-        'The canary sang. $who',
-        '${match.agreeing} of ${match.known} fingerprints match.',
-      ),
-      CanaryMatchKind.likely => (
-        'Most likely $who',
-        '${match.agreeing} of ${match.known} fingerprints match. Treat this '
-            'as a strong hint, not proof.',
-      ),
       CanaryMatchKind.senderOriginal => (
         'This is your own original text',
         'It matches the version on this device, not any reader\'s copy.',
@@ -225,36 +242,22 @@ class _ResultCard extends StatelessWidget {
         'The text may have been edited, or mixed from more than one copy. '
             'Canary will not name anyone in this case.',
       ),
+      _ => ('', ''),
     };
 
     return GlowCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (sang) ...[
-            const CanaryMark(size: 48),
-            const SizedBox(height: 12),
-          ],
           Semantics(
             liveRegion: true,
-            child: Text(headline, style: theme.textTheme.titleLarge),
+            child: Text(
+              headline,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
           ),
           const SizedBox(height: 8),
           Text(detail),
-          if (copy != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              'Opened ${CanaryUi.clock(copy.openedAt)}',
-              style: const TextStyle(fontFamily: CanaryTokens.monoFont),
-            ),
-            if (copy.openTxHash != null) ...[
-              const SizedBox(height: 8),
-              ChainChip(
-                label: 'Proof on Monad',
-                txHash: copy.openTxHash,
-              ),
-            ],
-          ],
         ],
       ),
     );
