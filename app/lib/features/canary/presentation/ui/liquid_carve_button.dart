@@ -270,11 +270,24 @@ class _LiquidCarveButtonState extends State<LiquidCarveButton>
               onExit: (_) => _leave(),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
+                curve: Curves.easeOutCubic,
+                transform: Matrix4.translationValues(
+                  _hovering ? -2 : 0,
+                  _hovering ? -2 : 0,
+                  0,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(CanaryTokens.rChip),
-                  border: _focused
-                      ? Border.all(color: CanaryTokens.canaryHi, width: 2)
-                      : null,
+                  border: Border.all(
+                    color: CanaryTokens.text,
+                    width: _focused ? 3.5 : 2.5,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: CanaryTokens.text,
+                      offset: _hovering ? const Offset(6, 6) : const Offset(4, 4),
+                    ),
+                  ],
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(CanaryTokens.rChip),
@@ -382,9 +395,16 @@ class _LiquidCarveButtonState extends State<LiquidCarveButton>
             decoration: BoxDecoration(
               color: _enabled ? bg : bg.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(CanaryTokens.rChip),
-              border: _focused
-                  ? Border.all(color: CanaryTokens.canaryHi, width: 2)
-                  : null,
+              border: Border.all(
+                color: CanaryTokens.text,
+                width: _focused ? 3.5 : 2.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: CanaryTokens.text,
+                  offset: _pressedFallback ? Offset.zero : const Offset(4, 4),
+                ),
+              ],
             ),
             child: _Label(
               icon: widget.icon,

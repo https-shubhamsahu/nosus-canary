@@ -213,18 +213,14 @@ class _ScanPainter extends CustomPainter {
     final t = progress.value;
     if (t <= 0 || t >= 1) return;
     final y = size.height * t;
-    final rect = Rect.fromLTWH(0, y - 18, size.width, 36);
-    final paint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          CanaryTokens.canary.withValues(alpha: 0),
-          CanaryTokens.canary.withValues(alpha: 0.55),
-          CanaryTokens.canary.withValues(alpha: 0),
-        ],
-      ).createShader(rect);
-    canvas.drawRect(rect, paint);
+    canvas.drawRect(
+      Rect.fromLTWH(0, y - 8, size.width, 16),
+      Paint()..color = CanaryTokens.canary.withValues(alpha: 0.45),
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(0, y - 1.5, size.width, 3),
+      Paint()..color = CanaryTokens.text,
+    );
   }
 
   @override

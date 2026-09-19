@@ -97,7 +97,10 @@ class CanaryEntryCard extends StatelessWidget {
                         Text(
                           'Open Canary →',
                           style: TextStyle(
-                            color: CanaryTokens.canary,
+                            color: CanaryTokens.text,
+                            decoration: TextDecoration.underline,
+                            decorationColor: CanaryTokens.canary,
+                            decorationThickness: 3,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),

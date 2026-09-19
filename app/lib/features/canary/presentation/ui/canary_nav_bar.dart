@@ -139,7 +139,7 @@ class CanaryTopBar extends StatelessWidget implements PreferredSizeWidget {
                                 tooltip: 'Open the NO SUS app',
                                 icon: const Icon(
                                   Icons.open_in_new,
-                                  color: CanaryTokens.canary,
+                                  color: CanaryTokens.text,
                                   size: 20,
                                 ),
                                 style: IconButton.styleFrom(

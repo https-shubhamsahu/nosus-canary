@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../theme.dart';
 
-/// Surface card. Hover lifts 2 px and swaps the border to the chain gradient.
+/// Paper card with an ink outline and a hard ink shadow. Hover lifts it and
+/// turns the shadow orange.
 class GlowCard extends StatefulWidget {
   const GlowCard({
     super.key,
@@ -35,24 +36,24 @@ class _GlowCardState extends State<GlowCard> {
     final inner = AnimatedContainer(
       duration: duration,
       curve: Curves.easeOutCubic,
-      transform: Matrix4.translationValues(0, hovered ? -2 : 0, 0),
-      padding: const EdgeInsets.all(1),
+      transform: Matrix4.translationValues(
+        hovered ? -3 : 0,
+        hovered ? -3 : 0,
+        0,
+      ),
+      padding: widget.padding,
       decoration: BoxDecoration(
+        color: CanaryTokens.surface,
         borderRadius: BorderRadius.circular(CanaryTokens.rCard),
-        gradient: hovered ? CanaryTokens.chain : null,
-        border: hovered
-            ? null
-            : Border.all(color: CanaryTokens.border),
-        color: hovered ? null : CanaryTokens.surface,
+        border: Border.all(color: CanaryTokens.text, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: hovered ? CanaryTokens.canary : CanaryTokens.text,
+            offset: hovered ? const Offset(8, 8) : const Offset(5, 5),
+          ),
+        ],
       ),
-      child: Container(
-        padding: widget.padding,
-        decoration: BoxDecoration(
-          color: CanaryTokens.surface,
-          borderRadius: BorderRadius.circular(CanaryTokens.rCard - 1),
-        ),
-        child: widget.child,
-      ),
+      child: widget.child,
     );
 
     Widget card = MouseRegion(
