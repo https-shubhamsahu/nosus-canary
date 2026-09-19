@@ -25,7 +25,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
-    expect(find.textContaining('Every reader gets their own copy.'), findsOneWidget);
+    expect(find.text('Every reader gets their own copy.'), findsOneWidget);
     expect(find.byType(BackButton), findsNothing);
 
     await tester.pumpWidget(const SizedBox());
