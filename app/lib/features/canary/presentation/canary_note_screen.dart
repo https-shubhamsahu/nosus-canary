@@ -3,11 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../theme.dart';
 import '../domain/canary_models.dart';
 import 'canary_created_screen.dart';
 import 'canary_leak_check_screen.dart';
 import 'canary_providers.dart';
 import 'canary_ui.dart';
+import 'ui/chain_chip.dart';
+import 'ui/glow_card.dart';
 
 /// Owner dashboard: live "Seen by" list plus the leak check.
 class CanaryNoteScreen extends ConsumerStatefulWidget {
@@ -65,21 +68,20 @@ class _CanaryNoteScreenState extends ConsumerState<CanaryNoteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final record = _record;
     if (record == null) {
-      return Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: Text('This note is not on this device.')),
+      return CanaryUi.missing(
+        message: 'This note is not on this device.',
       );
     }
     final status = _status;
     final opened = status?.copies.length ?? 0;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Canary note')),
-      body: CanaryUi.page(
-        children: [
+    return CanaryUi.scaffold(
+      title: 'Canary note',
+      builder: (context) {
+        final theme = Theme.of(context);
+        return [
           Text(record.preview, style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           Semantics(
@@ -92,8 +94,11 @@ class _CanaryNoteScreenState extends ConsumerState<CanaryNoteScreen> {
             ),
           ),
           const SizedBox(height: 4),
-          Text('Link works until ${CanaryUi.clock(record.expiresAt)} '
-              '(${record.expiresAt.toLocal().day}/${record.expiresAt.toLocal().month})'),
+          Text(
+            'Link works until ${CanaryUi.clock(record.expiresAt)} '
+            '(${record.expiresAt.toLocal().day}/${record.expiresAt.toLocal().month})',
+            style: const TextStyle(fontFamily: CanaryTokens.monoFont),
+          ),
           const SizedBox(height: 16),
           Wrap(
             spacing: 12,
@@ -134,29 +139,59 @@ class _CanaryNoteScreenState extends ConsumerState<CanaryNoteScreen> {
             const Text('Nobody has opened it yet.'),
           if (status != null)
             for (final copy in status.copies)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: CircleAvatar(child: Text('${copy.copyIndex + 1}')),
-                title: Text(copy.readerName),
-                subtitle: Text(
-                  'Copy ${copy.copyIndex + 1} · opened ${CanaryUi.clock(copy.openedAt)}',
-                ),
-                trailing: copy.openTxHash == null
-                    ? const Tooltip(
-                        message: 'Recording on Monad…',
-                        child: Icon(Icons.hourglass_empty),
-                      )
-                    : IconButton(
-                        tooltip: 'Recorded on Monad testnet — view proof',
-                        icon: const Icon(Icons.verified_outlined),
-                        onPressed: () =>
-                            CanaryUi.openTx(context, copy.openTxHash!),
+              GlowCard(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: CanaryTokens.surfaceHi,
+                      foregroundColor: CanaryTokens.canary,
+                      child: Text('${copy.copyIndex + 1}'),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            copy.readerName,
+                            style: theme.textTheme.titleSmall,
+                          ),
+                          Text(
+                            'Copy ${copy.copyIndex + 1} · opened ${CanaryUi.clock(copy.openedAt)}',
+                            style: const TextStyle(
+                              fontFamily: CanaryTokens.monoFont,
+                              color: CanaryTokens.textDim,
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
+                    if (copy.openTxHash == null)
+                      const Tooltip(
+                        message: 'Recording on Monad…',
+                        child: Icon(
+                          Icons.hourglass_empty,
+                          color: CanaryTokens.monad,
+                        ),
+                      )
+                    else
+                      Flexible(
+                        child: ChainChip(
+                          label: 'Monad',
+                          txHash: copy.openTxHash,
+                          compact: true,
+                        ),
+                      ),
+                  ],
+                ),
               ),
           const SizedBox(height: 24),
-          Text(CanaryUi.honestyNote, style: theme.textTheme.bodySmall),
-        ],
-      ),
+          const Text(CanaryUi.honestyNote),
+        ];
+      },
     );
   }
 }

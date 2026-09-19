@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../theme.dart';
 import '../domain/canary_fingerprint.dart';
 import '../domain/canary_models.dart';
 import '../ocr/canary_ocr.dart';
 import 'canary_providers.dart';
 import 'canary_ui.dart';
+import 'ui/canary_mark.dart';
+import 'ui/chain_chip.dart';
+import 'ui/glow_card.dart';
 
 /// Paste a leaked text (or read a screenshot on Android) and find the copy.
 /// Matching runs on this device; the leak is never uploaded.
@@ -73,11 +77,11 @@ class _CanaryLeakCheckScreenState extends ConsumerState<CanaryLeakCheckScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      appBar: AppBar(title: const Text('Check a leak')),
-      body: CanaryUi.page(
-        children: [
+    return CanaryUi.scaffold(
+      title: 'Check a leak',
+      builder: (context) {
+        final theme = Theme.of(context);
+        return [
           const Text(
             'Paste the text that leaked — from a forward, a post, or a '
             'screenshot. Even part of it helps.',
@@ -87,9 +91,13 @@ class _CanaryLeakCheckScreenState extends ConsumerState<CanaryLeakCheckScreen> {
             controller: _leak,
             minLines: 5,
             maxLines: 12,
+            style: const TextStyle(
+              fontFamily: CanaryTokens.monoFont,
+              fontSize: 16,
+              color: CanaryTokens.text,
+            ),
             decoration: const InputDecoration(
               labelText: 'Leaked text',
-              border: OutlineInputBorder(),
               alignLabelWithHint: true,
             ),
           ),
@@ -132,9 +140,9 @@ class _CanaryLeakCheckScreenState extends ConsumerState<CanaryLeakCheckScreen> {
             _ResultCard(match: _match!, status: _status),
           ],
           const SizedBox(height: 24),
-          Text(CanaryUi.honestyNote, style: theme.textTheme.bodySmall),
-        ],
-      ),
+          const Text(CanaryUi.honestyNote),
+        ];
+      },
     );
   }
 }
@@ -158,6 +166,10 @@ class _ResultCard extends StatelessWidget {
     } else {
       who = 'Copy #${index + 1} — ${copy.readerName}';
     }
+
+    final sang = match.kind == CanaryMatchKind.exactMarker ||
+        match.kind == CanaryMatchKind.confident ||
+        match.kind == CanaryMatchKind.likely;
 
     final (String headline, String detail) = switch (match.kind) {
       CanaryMatchKind.exactMarker => (
@@ -192,31 +204,35 @@ class _ResultCard extends StatelessWidget {
       ),
     };
 
-    return Card.outlined(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Semantics(
-              liveRegion: true,
-              child: Text(headline, style: theme.textTheme.titleLarge),
-            ),
+    return GlowCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (sang) ...[
+            const CanaryMark(size: 48),
+            const SizedBox(height: 12),
+          ],
+          Semantics(
+            liveRegion: true,
+            child: Text(headline, style: theme.textTheme.titleLarge),
+          ),
+          const SizedBox(height: 8),
+          Text(detail),
+          if (copy != null) ...[
             const SizedBox(height: 8),
-            Text(detail),
-            if (copy != null) ...[
+            Text(
+              'Opened ${CanaryUi.clock(copy.openedAt)}',
+              style: const TextStyle(fontFamily: CanaryTokens.monoFont),
+            ),
+            if (copy.openTxHash != null) ...[
               const SizedBox(height: 8),
-              Text('Opened ${CanaryUi.clock(copy.openedAt)}'),
-              if (copy.openTxHash != null)
-                TextButton.icon(
-                  style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                  icon: const Icon(Icons.verified_outlined, size: 18),
-                  label: const Text('Proof on Monad testnet'),
-                  onPressed: () => CanaryUi.openTx(context, copy.openTxHash!),
-                ),
+              ChainChip(
+                label: 'Proof on Monad',
+                txHash: copy.openTxHash,
+              ),
             ],
           ],
-        ),
+        ],
       ),
     );
   }

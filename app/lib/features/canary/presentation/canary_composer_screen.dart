@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../theme.dart';
 import '../data/canary_api.dart';
 import '../data/canary_repository.dart';
 import '../domain/canary_fingerprint.dart';
@@ -98,15 +99,15 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final required = canaryRequiredSlots(_copies);
     final strongEnough = _slots >= required;
     final length = _text.text.trim().length;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('New Canary note')),
-      body: CanaryUi.page(
-        children: [
+    return CanaryUi.scaffold(
+      title: 'New Canary note',
+      builder: (context) {
+        final theme = Theme.of(context);
+        return [
           TextField(
             controller: _text,
             enabled: !_busy,
@@ -117,7 +118,6 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
             decoration: const InputDecoration(
               labelText: 'Your note',
               hintText: 'Write it the way you normally would.',
-              border: OutlineInputBorder(),
               alignLabelWithHint: true,
             ),
           ),
@@ -142,7 +142,7 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
                         '(like "don\'t", "okay", "until", numbers).'
                   : strongEnough
                   ? 'Fingerprint strength: $_slots swappable words '
-                        '(needs $required for $_copies readers) ✓'
+                        '(needs $required for $_copies readers)'
                   : 'Found $_slots of the $required swappable words needed for '
                         '$_copies readers. Add a sentence or two.',
               style: theme.textTheme.bodyMedium?.copyWith(
@@ -190,7 +190,10 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
                 ? const SizedBox(
                     width: 16,
                     height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: CanaryTokens.onCanary,
+                    ),
                   )
                 : const Icon(Icons.link),
             label: Text(_busy ? (_stage ?? 'Working…') : 'Create Canary link'),
@@ -214,8 +217,8 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
             'reader, never the text or names.',
             style: theme.textTheme.bodySmall,
           ),
-        ],
-      ),
+        ];
+      },
     );
   }
 }

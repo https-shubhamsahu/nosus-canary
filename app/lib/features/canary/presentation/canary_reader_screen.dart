@@ -7,6 +7,9 @@ import '../data/canary_api.dart';
 import '../domain/canary_models.dart';
 import 'canary_providers.dart';
 import 'canary_ui.dart';
+import 'ui/canary_mark.dart';
+import 'ui/chain_chip.dart';
+import 'ui/glow_card.dart';
 
 /// Standalone app for the web reader path (main.dart runs it directly for
 /// `#/canary/<id>?k=...` links, like the Burn viewers).
@@ -20,8 +23,9 @@ class CanaryReaderApp extends StatelessWidget {
   Widget build(BuildContext context) => MaterialApp(
     title: 'NO SUS',
     debugShowCheckedModeBanner: false,
-    theme: NoSusTheme.lightTheme,
-    darkTheme: NoSusTheme.darkTheme,
+    theme: CanaryTokens.theme(),
+    darkTheme: CanaryTokens.theme(),
+    themeMode: ThemeMode.dark,
     builder: (context, child) =>
         ExperimentFrame(child: child ?? const SizedBox.shrink()),
     home: CanaryReaderScreen(noteId: noteId, keyHex: keyHex),
@@ -87,24 +91,26 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
   @override
   Widget build(BuildContext context) {
     final copy = _copy;
-    return Scaffold(
-      appBar: AppBar(title: const Text(CanaryUi.featureName)),
-      body: CanaryUi.page(
-        children: copy == null ? _gate(context) : _copyView(context, copy),
-      ),
+    return CanaryUi.scaffold(
+      title: CanaryUi.featureName,
+      builder: (context) => copy == null ? _gate(context) : _copyView(context, copy),
     );
   }
 
   List<Widget> _gate(BuildContext context) {
     final theme = Theme.of(context);
     return [
+      const Center(child: CanaryMark(size: 64)),
+      const SizedBox(height: 16),
       Text(
         'Someone shared a private note with you.',
         style: theme.textTheme.headlineSmall,
+        textAlign: TextAlign.center,
       ),
       const SizedBox(height: 8),
       const Text(
         'Every reader gets their own numbered copy. Type your name to open yours.',
+        textAlign: TextAlign.center,
       ),
       const SizedBox(height: 20),
       TextField(
@@ -115,7 +121,6 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
         onSubmitted: (_) => _busy ? null : _open(),
         decoration: const InputDecoration(
           labelText: 'Your name',
-          border: OutlineInputBorder(),
         ),
       ),
       const SizedBox(height: 8),
@@ -125,7 +130,10 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
             ? const SizedBox(
                 width: 16,
                 height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: CanaryTokens.onCanary,
+                ),
               )
             : const Icon(Icons.lock_open),
         label: Text(_busy ? 'Making your copy…' : 'Open my copy'),
@@ -153,13 +161,11 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
   List<Widget> _copyView(BuildContext context, CanaryOpenedCopy copy) {
     final theme = Theme.of(context);
     return [
-      Card.outlined(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Text(
-            'Copy ${copy.copyIndex + 1} of ${copy.copyCount} · made for ${copy.readerName}',
-            style: theme.textTheme.titleSmall,
-          ),
+      GlowCard(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Text(
+          'Copy ${copy.copyIndex + 1} of ${copy.copyCount} · made for ${copy.readerName}',
+          style: theme.textTheme.titleSmall,
         ),
       ),
       const SizedBox(height: 16),
@@ -172,17 +178,16 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
       ),
       const SizedBox(height: 8),
       if (copy.openTxHash == null)
-        Text('Recorded on Monad testnet at ${CanaryUi.clock(copy.openedAt)}')
+        Text(
+          'Recorded on Monad testnet at ${CanaryUi.clock(copy.openedAt)}',
+          style: const TextStyle(fontFamily: CanaryTokens.monoFont),
+        )
       else
         Align(
           alignment: Alignment.centerLeft,
-          child: TextButton.icon(
-            style: TextButton.styleFrom(padding: EdgeInsets.zero),
-            icon: const Icon(Icons.verified_outlined, size: 18),
-            label: Text(
-              'Recorded on Monad testnet at ${CanaryUi.clock(copy.openedAt)} · view proof',
-            ),
-            onPressed: () => CanaryUi.openTx(context, copy.openTxHash!),
+          child: ChainChip(
+            label: 'Recorded on Monad',
+            txHash: copy.openTxHash,
           ),
         ),
     ];
