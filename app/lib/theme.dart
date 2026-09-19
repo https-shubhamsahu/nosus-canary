@@ -192,3 +192,224 @@ class NoSusTheme {
     return const BouncingScrollPhysics();
   }
 }
+
+/// Canary-only tokens. Do not reuse these on the rest of NO SUS.
+class CanaryTokens {
+  const CanaryTokens._();
+
+  static const Color bg = Color(0xFFFAF6EC);
+  static const Color surface = Color(0xFFFFFDF7);
+  static const Color surfaceHi = Color(0xFFF3ECDC);
+  static const Color border = Color(0xFF141414);
+  static const Color text = Color(0xFF141414);
+  static const Color textDim = Color(0xFF4A4740);
+  static const Color canary = Color(0xFFF28C28);
+  static const Color canaryHi = Color(0xFFFFB066);
+  static const Color canaryDeep = Color(0xFFC9690F);
+  static const Color onCanary = Color(0xFF141414);
+  static const Color monad = Color(0xFF141414);
+  static const Color ok = Color(0xFF141414);
+  static const Color bad = Color(0xFFB3261E);
+  static const Color warn = Color(0xFFC9690F);
+
+  static const double rChip = 14;
+  static const double rCard = 20;
+  static const double rHero = 28;
+
+  static const String displayFont = 'Outfit';
+  static const String bodyFont = 'Inter';
+  static const String monoFont = 'VT323';
+
+  static const LinearGradient brand = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [canary, canary],
+  );
+
+  static const LinearGradient chain = LinearGradient(
+    colors: [canary, monad],
+  );
+
+  static List<BoxShadow> get glow => const [
+    BoxShadow(color: Color(0xFF141414), offset: Offset(5, 5)),
+  ];
+
+  static bool reduceMotion(BuildContext context) =>
+      MediaQuery.disableAnimationsOf(context);
+
+  static ThemeData theme() {
+    const scheme = ColorScheme.light(
+      surface: surface,
+      onSurface: text,
+      primary: canary,
+      onPrimary: onCanary,
+      secondary: monad,
+      onSecondary: bg,
+      error: bad,
+      onError: text,
+      outline: border,
+      outlineVariant: border,
+    );
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: bg,
+      colorScheme: scheme,
+      fontFamily: bodyFont,
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(
+          fontFamily: displayFont,
+          fontSize: 56,
+          fontWeight: FontWeight.w700,
+          color: text,
+          height: 1.05,
+          letterSpacing: -1.2,
+        ),
+        displayMedium: TextStyle(
+          fontFamily: displayFont,
+          fontSize: 40,
+          fontWeight: FontWeight.w700,
+          color: text,
+          height: 1.1,
+          letterSpacing: -0.8,
+        ),
+        headlineSmall: TextStyle(
+          fontFamily: displayFont,
+          fontSize: 28,
+          fontWeight: FontWeight.w600,
+          color: text,
+          height: 1.2,
+        ),
+        titleLarge: TextStyle(
+          fontFamily: displayFont,
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          color: text,
+        ),
+        titleMedium: TextStyle(
+          fontFamily: displayFont,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: text,
+        ),
+        titleSmall: TextStyle(
+          fontFamily: displayFont,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: text,
+        ),
+        bodyLarge: TextStyle(
+          fontFamily: bodyFont,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: text,
+          height: 1.5,
+        ),
+        bodyMedium: TextStyle(
+          fontFamily: bodyFont,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+          color: textDim,
+          height: 1.5,
+        ),
+        bodySmall: TextStyle(
+          fontFamily: bodyFont,
+          fontSize: 13,
+          fontWeight: FontWeight.w400,
+          color: textDim,
+          height: 1.45,
+        ),
+        labelLarge: TextStyle(
+          fontFamily: displayFont,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: text,
+          letterSpacing: 1.2,
+        ),
+        labelSmall: TextStyle(
+          fontFamily: monoFont,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: text,
+          letterSpacing: 0.4,
+        ),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: text,
+        iconTheme: IconThemeData(color: text),
+        centerTitle: false,
+      ),
+      cardTheme: CardThemeData(
+        color: surface,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(rCard),
+          side: const BorderSide(color: border),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: surfaceHi,
+        labelStyle: const TextStyle(color: textDim),
+        hintStyle: const TextStyle(color: textDim),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(rCard),
+          borderSide: const BorderSide(color: border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(rCard),
+          borderSide: const BorderSide(color: border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(rCard),
+          borderSide: const BorderSide(color: canary, width: 2),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: canary,
+          foregroundColor: onCanary,
+          disabledBackgroundColor: canaryDeep,
+          disabledForegroundColor: onCanary.withValues(alpha: 0.5),
+          minimumSize: const Size(48, 48),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(rChip),
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: text,
+          minimumSize: const Size(48, 48),
+          side: const BorderSide(color: border),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(rChip),
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: monad,
+          minimumSize: const Size(48, 48),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: const Color(0x33836EF9),
+        labelStyle: const TextStyle(
+          fontFamily: monoFont,
+          color: text,
+          fontSize: 14,
+        ),
+        side: const BorderSide(color: monad),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(rChip),
+        ),
+      ),
+      dividerColor: border,
+      focusColor: canaryHi.withValues(alpha: 0.35),
+    );
+  }
+}

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/layout/app_breakpoints.dart';
+import '../../../theme.dart';
 import '../data/canary_api.dart';
 import '../data/canary_repository.dart';
 import '../domain/canary_fingerprint.dart';
@@ -8,6 +10,9 @@ import '../domain/canary_models.dart';
 import 'canary_created_screen.dart';
 import 'canary_providers.dart';
 import 'canary_ui.dart';
+import 'ui/fingerprint_meter.dart';
+import 'ui/glow_card.dart';
+import 'ui/liquid_carve_button.dart';
 
 /// A demo note that has 15 swappable words (checked by the test harness), so
 /// it supports up to 100 readers.
@@ -98,41 +103,106 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final required = canaryRequiredSlots(_copies);
     final strongEnough = _slots >= required;
     final length = _text.text.trim().length;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('New Canary note')),
-      body: CanaryUi.page(
+    return CanaryUi.frame(
+      title: 'New Canary note',
+      body: (context) {
+        final theme = Theme.of(context);
+        final expanded = AppBreakpoints.isExpanded(context);
+        final pad = expanded ? 32.0 : 20.0;
+        final plan = length == 0 ? null : buildCanaryPlan(_text.text.trim());
+        final editor = _editor(theme);
+        final panel = _sidePanel(theme, required, strongEnough, length, plan);
+        if (!expanded) {
+          return ListView(
+            padding: EdgeInsets.all(pad),
+            children: [
+              editor,
+              const SizedBox(height: 20),
+              panel,
+            ],
+          );
+        }
+        return Padding(
+          padding: EdgeInsets.fromLTRB(pad, pad, pad, pad),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 6,
+                child: SingleChildScrollView(child: editor),
+              ),
+              const SizedBox(width: 24),
+              Expanded(
+                flex: 4,
+                child: SingleChildScrollView(child: panel),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _editor(ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          controller: _text,
+          enabled: !_busy,
+          minLines: 10,
+          maxLines: 18,
+          maxLength: CanaryRepository.maxNoteLength,
+          onChanged: _onTextChanged,
+          style: const TextStyle(
+            fontFamily: CanaryTokens.bodyFont,
+            fontSize: 18,
+            color: CanaryTokens.text,
+            height: 1.5,
+          ),
+          cursorColor: CanaryTokens.canary,
+          decoration: const InputDecoration(
+            labelText: 'Your note',
+            hintText: 'Write it the way you normally would.',
+            alignLabelWithHint: true,
+            filled: true,
+            fillColor: CanaryTokens.surfaceHi,
+          ),
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton(
+            onPressed: _busy
+                ? null
+                : () {
+                    _text.text = kCanaryDemoNote;
+                    _onTextChanged(kCanaryDemoNote);
+                  },
+            child: const Text('Use the demo note'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _sidePanel(
+    ThemeData theme,
+    int required,
+    bool strongEnough,
+    int length,
+    CanaryPlan? plan,
+  ) {
+    return GlowCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextField(
-            controller: _text,
-            enabled: !_busy,
-            minLines: 6,
-            maxLines: 14,
-            maxLength: CanaryRepository.maxNoteLength,
-            onChanged: _onTextChanged,
-            decoration: const InputDecoration(
-              labelText: 'Your note',
-              hintText: 'Write it the way you normally would.',
-              border: OutlineInputBorder(),
-              alignLabelWithHint: true,
-            ),
-          ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton(
-              onPressed: _busy
-                  ? null
-                  : () {
-                      _text.text = kCanaryDemoNote;
-                      _onTextChanged(kCanaryDemoNote);
-                    },
-              child: const Text('Use the demo note'),
-            ),
-          ),
+          Text('Fingerprint', style: theme.textTheme.titleSmall),
+          const SizedBox(height: 12),
+          FingerprintMeter(found: _slots, requiredSlots: required),
           const SizedBox(height: 8),
           Semantics(
             liveRegion: true,
@@ -142,7 +212,7 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
                         '(like "don\'t", "okay", "until", numbers).'
                   : strongEnough
                   ? 'Fingerprint strength: $_slots swappable words '
-                        '(needs $required for $_copies readers) ✓'
+                        '(needs $required for $_copies readers)'
                   : 'Found $_slots of the $required swappable words needed for '
                         '$_copies readers. Add a sentence or two.',
               style: theme.textTheme.bodyMedium?.copyWith(
@@ -152,6 +222,27 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
               ),
             ),
           ),
+          if (plan != null && plan.slots.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final slot in plan.slots.take(8))
+                  Chip(
+                    label: Text('${slot.original} / ${slot.alternate}'),
+                    visualDensity: VisualDensity.compact,
+                    backgroundColor: CanaryTokens.surfaceHi,
+                    side: const BorderSide(color: CanaryTokens.border),
+                    labelStyle: const TextStyle(
+                      fontFamily: CanaryTokens.monoFont,
+                      color: CanaryTokens.text,
+                      fontSize: 13,
+                    ),
+                  ),
+              ],
+            ),
+          ],
           const SizedBox(height: 20),
           Text('How many readers?', style: theme.textTheme.titleSmall),
           const SizedBox(height: 8),
@@ -162,6 +253,9 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
                   value: c,
                   label: Text('$c'),
                   enabled: canaryRequiredSlots(c) <= _slots || length == 0,
+                  tooltip: canaryRequiredSlots(c) > _slots && length > 0
+                      ? 'Needs ${canaryRequiredSlots(c)} swappable words'
+                      : null,
                 ),
             ],
             selected: {_copies},
@@ -184,16 +278,16 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
                 : (value) => setState(() => _hours = value.first),
           ),
           const SizedBox(height: 28),
-          FilledButton.icon(
-            onPressed: _busy || !strongEnough ? null : _create,
-            icon: _busy
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.link),
-            label: Text(_busy ? (_stage ?? 'Working…') : 'Create Canary link'),
+          if (_busy)
+            Text(_stage ?? 'Working…', style: theme.textTheme.titleSmall),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: LiquidCarveButton(
+              label: _busy ? (_stage ?? 'Working…') : 'Create Canary link',
+              icon: Icons.link,
+              busy: _busy,
+              onPressed: _busy || !strongEnough ? null : _create,
+            ),
           ),
           if (_error != null)
             Padding(
