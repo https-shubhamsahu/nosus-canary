@@ -29,6 +29,9 @@ class CanaryCreatedScreen extends ConsumerStatefulWidget {
 }
 
 class _CanaryCreatedScreenState extends ConsumerState<CanaryCreatedScreen> {
+  late final CanaryOwnerRecord? _record = ref
+      .read(canaryRepositoryProvider)
+      .findNote(widget.noteId);
   Timer? _poll;
   CanaryNoteStatus? _status;
   bool _copied = false;
@@ -37,8 +40,10 @@ class _CanaryCreatedScreenState extends ConsumerState<CanaryCreatedScreen> {
   @override
   void initState() {
     super.initState();
-    _refresh();
-    _poll = Timer.periodic(const Duration(seconds: 3), (_) => _refresh());
+    if (_record != null) {
+      _refresh();
+      _poll = Timer.periodic(const Duration(seconds: 3), (_) => _refresh());
+    }
   }
 
   @override
@@ -48,13 +53,15 @@ class _CanaryCreatedScreenState extends ConsumerState<CanaryCreatedScreen> {
   }
 
   Future<void> _refresh() async {
-    final record = ref.read(canaryRepositoryProvider).findNote(widget.noteId);
+    final record = _record;
     if (record == null) return;
     try {
       final status = await ref
           .read(canaryRepositoryProvider)
           .fetchStatus(record);
-      if (mounted) setState(() => _status = status);
+      if (!mounted) return;
+      setState(() => _status = status);
+      if (status.isSettled) _poll?.cancel();
     } catch (_) {
       // The QR still works without a live open count.
     }
@@ -64,16 +71,16 @@ class _CanaryCreatedScreenState extends ConsumerState<CanaryCreatedScreen> {
     await Clipboard.setData(ClipboardData(text: link));
     if (!mounted) return;
     setState(() => _copied = true);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Canary link copied')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Canary link copied')));
     await Future<void>.delayed(const Duration(seconds: 2));
     if (mounted) setState(() => _copied = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final record = ref.read(canaryRepositoryProvider).findNote(widget.noteId);
+    final record = _record;
     if (record == null) {
       return CanaryUi.missing(message: 'This note is not on this device.');
     }
@@ -190,7 +197,8 @@ class _CanaryCreatedScreenState extends ConsumerState<CanaryCreatedScreen> {
               label: const Text('Share'),
               onPressed: () => SharePlus.instance.share(
                 ShareParams(
-                  text: 'A private note for the group (your copy is yours '
+                  text:
+                      'A private note for the group (your copy is yours '
                       'only): ${record.readerLink}',
                 ),
               ),
@@ -213,10 +221,7 @@ class _CanaryCreatedScreenState extends ConsumerState<CanaryCreatedScreen> {
         ),
         if (record.sealTxHash != null) ...[
           const SizedBox(height: 12),
-          ChainChip(
-            label: 'Sealed on Monad',
-            txHash: record.sealTxHash,
-          ),
+          ChainChip(label: 'Sealed on Monad', txHash: record.sealTxHash),
         ],
       ],
     );
@@ -289,10 +294,7 @@ class _FloatingQrState extends State<_FloatingQr>
   @override
   void initState() {
     super.initState();
-    _c = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 4),
-    );
+    _c = AnimationController(vsync: this, duration: const Duration(seconds: 4));
   }
 
   @override
@@ -359,9 +361,7 @@ class _PresentMode extends StatelessWidget {
     return Theme(
       data: CanaryTokens.theme(),
       child: CallbackShortcuts(
-        bindings: {
-          const SingleActivator(LogicalKeyboardKey.escape): onClose,
-        },
+        bindings: {const SingleActivator(LogicalKeyboardKey.escape): onClose},
         child: Focus(
           autofocus: true,
           child: Scaffold(
@@ -373,7 +373,10 @@ class _PresentMode extends StatelessWidget {
                     child: LayoutBuilder(
                       builder: (context, constraints) {
                         final qr = math.min(
-                          math.min(constraints.maxWidth, constraints.maxHeight) *
+                          math.min(
+                                constraints.maxWidth,
+                                constraints.maxHeight,
+                              ) *
                               0.62,
                           480.0,
                         );

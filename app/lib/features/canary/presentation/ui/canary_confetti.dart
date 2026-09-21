@@ -105,7 +105,7 @@ class _CanaryConfettiState extends State<CanaryConfetti>
 
 class _ConfettiPainter extends CustomPainter {
   _ConfettiPainter({required this.progress, required this.particles})
-      : super(repaint: progress);
+    : super(repaint: progress);
 
   final ValueNotifier<double> progress;
   final List<_Particle> particles;
@@ -124,7 +124,11 @@ class _ConfettiPainter extends CustomPainter {
       canvas.translate(pos.dx, pos.dy);
       canvas.rotate(p.spin * t);
       canvas.drawRect(
-        Rect.fromCenter(center: Offset.zero, width: p.size, height: p.size * 0.45),
+        Rect.fromCenter(
+          center: Offset.zero,
+          width: p.size,
+          height: p.size * 0.45,
+        ),
         paint,
       );
       canvas.restore();

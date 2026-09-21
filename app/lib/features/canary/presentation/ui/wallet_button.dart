@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,11 +19,16 @@ void _toast(BuildContext context, String message) {
 }
 
 String _friendly(Object e) {
-  if (e is WalletError && e.code == 4001) return 'Request rejected in your wallet.';
-  if (e is WalletError && e.code == -32002) {
-    return 'Your wallet already has a request open. Check the wallet window.';
+  if (e is WalletError) {
+    if (e.code == 4001) return 'Request rejected in your wallet.';
+    if (e.code == -32002) {
+      return 'Your wallet already has a request open. Check the wallet window.';
+    }
+    return e.message;
   }
-  return e.toString();
+  if (e is TimeoutException) return 'Monad did not answer in time. Try again.';
+  if (e is StateError) return e.message;
+  return 'Something went wrong. Try again.';
 }
 
 /// "Connect wallet" for Monad testnet: connect, switch or add the network,
@@ -229,19 +236,22 @@ class _WalletPanel extends StatelessWidget {
       builder: (context, state, _) {
         final wallet = MonadWallet.instance;
         final address = state.address;
-        Widget action(IconData icon, String label, Future<void> Function() run) =>
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  alignment: Alignment.centerLeft,
-                  minimumSize: const Size.fromHeight(48),
-                ),
-                icon: Icon(icon, size: 18),
-                label: Text(label),
-                onPressed: run,
-              ),
-            );
+        Widget action(
+          IconData icon,
+          String label,
+          Future<void> Function() run,
+        ) => Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              alignment: Alignment.centerLeft,
+              minimumSize: const Size.fromHeight(48),
+            ),
+            icon: Icon(icon, size: 18),
+            label: Text(label),
+            onPressed: run,
+          ),
+        );
         return AlertDialog(
           title: const Text('Your wallet'),
           content: SizedBox(
@@ -256,8 +266,13 @@ class _WalletPanel extends StatelessWidget {
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: CanaryTokens.canary,
-                          borderRadius: BorderRadius.circular(CanaryTokens.rChip),
-                          border: Border.all(color: CanaryTokens.text, width: 2),
+                          borderRadius: BorderRadius.circular(
+                            CanaryTokens.rChip,
+                          ),
+                          border: Border.all(
+                            color: CanaryTokens.text,
+                            width: 2,
+                          ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,24 +307,39 @@ class _WalletPanel extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       if (!state.onMonad)
-                        action(Icons.swap_horiz, 'Switch to Monad testnet', () async {
-                          try {
-                            await wallet.switchToMonad();
-                          } catch (e) {
-                            if (context.mounted) _toast(context, _friendly(e));
-                          }
-                        }),
+                        action(
+                          Icons.swap_horiz,
+                          'Switch to Monad testnet',
+                          () async {
+                            try {
+                              await wallet.switchToMonad();
+                            } catch (e) {
+                              if (context.mounted) {
+                                _toast(context, _friendly(e));
+                              }
+                            }
+                          },
+                        ),
                       action(Icons.copy, 'Copy address', () async {
                         await Clipboard.setData(ClipboardData(text: address));
                         if (context.mounted) _toast(context, 'Address copied.');
                       }),
-                      action(Icons.open_in_new, 'My wallet on Monadscan',
-                          () => _open(monadAddressUrl(address))),
+                      action(
+                        Icons.open_in_new,
+                        'My wallet on Monadscan',
+                        () => _open(monadAddressUrl(address)),
+                      ),
                       if (canaryContractAddress.isNotEmpty)
-                        action(Icons.description_outlined, 'Canary contract on Monadscan',
-                            () => _open(monadAddressUrl(canaryContractAddress))),
-                      action(Icons.water_drop_outlined, 'Get testnet MON',
-                          () => _open('https://faucet.monad.xyz/')),
+                        action(
+                          Icons.description_outlined,
+                          'Canary contract on Monadscan',
+                          () => _open(monadAddressUrl(canaryContractAddress)),
+                        ),
+                      action(
+                        Icons.water_drop_outlined,
+                        'Get testnet MON',
+                        () => _open('https://faucet.monad.xyz/'),
+                      ),
                       action(Icons.refresh, 'Refresh balance', wallet.refresh),
                     ],
                   ),
@@ -338,7 +368,11 @@ class _WalletPanel extends StatelessWidget {
 
 /// Reads this note's seal straight from the NoSusCanary contract and shows it.
 class VerifyOnMonadButton extends StatelessWidget {
-  const VerifyOnMonadButton({super.key, required this.noteId, this.localOpened});
+  const VerifyOnMonadButton({
+    super.key,
+    required this.noteId,
+    this.localOpened,
+  });
 
   final String noteId;
 
@@ -353,26 +387,38 @@ class VerifyOnMonadButton extends StatelessWidget {
       label: const Text('Verify on Monad'),
       onPressed: () => showDialog<void>(
         context: context,
-        builder: (context) => _VerifyDialog(noteId: noteId, localOpened: localOpened),
+        builder: (context) =>
+            _VerifyDialog(noteId: noteId, localOpened: localOpened),
       ),
     );
   }
 }
 
-class _VerifyDialog extends StatelessWidget {
+class _VerifyDialog extends StatefulWidget {
   const _VerifyDialog({required this.noteId, this.localOpened});
 
   final String noteId;
   final int? localOpened;
 
   @override
+  State<_VerifyDialog> createState() => _VerifyDialogState();
+}
+
+class _VerifyDialogState extends State<_VerifyDialog> {
+  // Read once: a resize or keyboard rebuild must not re-query Monad.
+  late final Future<CanaryChainNote> _note = readCanaryNoteOnChain(
+    widget.noteId,
+  );
+
+  @override
   Widget build(BuildContext context) {
+    final localOpened = widget.localOpened;
     return AlertDialog(
       title: const Text('On-chain seal'),
       content: SizedBox(
         width: 440,
         child: FutureBuilder<CanaryChainNote>(
-          future: readCanaryNoteOnChain(noteId),
+          future: _note,
           builder: (context, snap) {
             if (snap.connectionState != ConnectionState.done) {
               return const Padding(
@@ -391,7 +437,7 @@ class _VerifyDialog extends StatelessWidget {
               );
             }
             if (snap.hasError) {
-              return Text('Could not read Monad: ${snap.error}');
+              return Text('Could not read Monad: ${_friendly(snap.error!)}');
             }
             final n = snap.data!;
             if (!n.exists) {
@@ -407,12 +453,18 @@ class _VerifyDialog extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: 130,
-                    child: Text(k, style: const TextStyle(fontWeight: FontWeight.w700)),
+                    child: Text(
+                      k,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
                   ),
                   Expanded(
                     child: SelectableText(
                       v,
-                      style: const TextStyle(fontFamily: CanaryTokens.monoFont, fontSize: 23),
+                      style: const TextStyle(
+                        fontFamily: CanaryTokens.monoFont,
+                        fontSize: 23,
+                      ),
                     ),
                   ),
                 ],
@@ -424,11 +476,17 @@ class _VerifyDialog extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   color: CanaryTokens.canary,
                   child: const Text(
                     'SEALED ON MONAD',
-                    style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -440,8 +498,12 @@ class _VerifyDialog extends StatelessWidget {
                       ? '${n.openedCount}'
                       : '${n.openedCount} on-chain · $localOpened on NO SUS',
                 ),
-                if (n.expiresAt != null) row('Expires', CanaryUi.clock(n.expiresAt!)),
-                row('Copies hash', '${hash.substring(0, 10)}…${hash.substring(hash.length - 6)}'),
+                if (n.expiresAt != null)
+                  row('Expires', CanaryUi.clock(n.expiresAt!)),
+                row(
+                  'Copies hash',
+                  '${hash.substring(0, 10)}…${hash.substring(hash.length - 6)}',
+                ),
                 row('Read via', n.readVia),
               ],
             );

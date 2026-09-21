@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/providers/theme_provider.dart' show sharedPreferencesProvider;
+import '../../../core/providers/theme_provider.dart'
+    show sharedPreferencesProvider;
 import '../data/canary_repository.dart';
 import '../data/canary_store.dart';
 

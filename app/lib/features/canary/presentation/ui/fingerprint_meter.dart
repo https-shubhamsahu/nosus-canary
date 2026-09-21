@@ -29,7 +29,7 @@ class FingerprintMeter extends StatelessWidget {
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(left: i == 0 ? 0 : 3),
-                    child: AnimatedContainer(
+                  child: AnimatedContainer(
                     duration: reduce
                         ? Duration.zero
                         : const Duration(milliseconds: 180),

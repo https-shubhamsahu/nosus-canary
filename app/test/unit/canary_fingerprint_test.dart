@@ -55,10 +55,9 @@ void main() {
   });
 
   test('OCR-like text (caps, no punctuation, line breaks) still matches', () {
-    final ocr = _stripMarkers(copies[30])
-        .replaceAll(RegExp(r'[,.!?]'), '')
-        .replaceAll(' ', '\n')
-        .toUpperCase();
+    final ocr = _stripMarkers(
+      copies[30],
+    ).replaceAll(RegExp(r'[,.!?]'), '').replaceAll(' ', '\n').toUpperCase();
     final match = matchCanaryLeak(ocr, plan, codewords);
     expect(match.kind, CanaryMatchKind.confident);
     expect(match.copyIndex, 30);
@@ -94,10 +93,7 @@ void main() {
   test('too-short notes are rejected for large reader counts', () {
     final short = buildCanaryPlan("Hi, please don't share this. Okay?");
     expect(short.bitCount, lessThan(canaryRequiredSlots(10)));
-    expect(
-      () => generateCanaryCodewords(10, short.bitCount),
-      throwsStateError,
-    );
+    expect(() => generateCanaryCodewords(10, short.bitCount), throwsStateError);
   });
 
   test('plan survives a JSON round trip', () {
@@ -106,9 +102,6 @@ void main() {
     );
     expect(restored.tokens, plan.tokens);
     expect(restored.bitCount, plan.bitCount);
-    expect(
-      renderCanaryCopy(restored, codewords[3], copyIndex: 3),
-      copies[3],
-    );
+    expect(renderCanaryCopy(restored, codewords[3], copyIndex: 3), copies[3]);
   });
 }

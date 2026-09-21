@@ -86,9 +86,9 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
       webOnlyWindowName: '_blank',
     );
     if (!ok && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open $url')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not open $url')));
     }
   }
 
@@ -292,7 +292,11 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
       bubble = bubble
           .animate(delay: 700.ms)
           .fadeIn(duration: 300.ms)
-          .scale(begin: const Offset(0.85, 0.85), duration: 300.ms, curve: Curves.easeOutBack);
+          .scale(
+            begin: const Offset(0.85, 0.85),
+            duration: 300.ms,
+            curve: Curves.easeOutBack,
+          );
     }
     return Stack(
       clipBehavior: Clip.none,
@@ -336,10 +340,7 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
             const SizedBox(height: 6),
             const Text(
               'Make one with the demo note. It takes 20 seconds.',
-              style: TextStyle(
-                color: CanaryTokens.textDim,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: CanaryTokens.textDim, fontSize: 14),
             ),
             const SizedBox(height: 16),
             OutlinedButton(
@@ -413,10 +414,7 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
               ],
             ),
           ),
-          const Icon(
-            Icons.chevron_right,
-            color: CanaryTokens.textDim,
-          ),
+          const Icon(Icons.chevron_right, color: CanaryTokens.textDim),
         ],
       ),
     );
@@ -432,7 +430,12 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
       return child
           .animate(delay: Duration(milliseconds: 70 * index))
           .fadeIn(duration: 420.ms, curve: Curves.easeOutCubic)
-          .slideY(begin: 0.08, end: 0, duration: 420.ms, curve: Curves.easeOutCubic);
+          .slideY(
+            begin: 0.08,
+            end: 0,
+            duration: 420.ms,
+            curve: Curves.easeOutCubic,
+          );
     }
 
     const stat = TextStyle(
@@ -636,10 +639,7 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
     final children = [
       for (var i = 0; i < cards.length; i++)
         GlowCard(
-          margin: EdgeInsets.only(
-            bottom: expanded ? 0 : 16,
-            right: 0,
-          ),
+          margin: EdgeInsets.only(bottom: expanded ? 0 : 16, right: 0),
           padding: const EdgeInsets.all(26),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -699,20 +699,20 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
     }
     return IntrinsicHeight(
       child: Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (var i = 0; i < children.length; i++) ...[
-          if (i > 0) const SizedBox(width: 24),
-          Expanded(
-            child: reduce
-                ? children[i]
-                : children[i]
-                    .animate(delay: Duration(milliseconds: 60 * i))
-                    .fadeIn(duration: 400.ms, curve: Curves.easeOutCubic)
-                    .slideY(begin: 0.05, end: 0, duration: 400.ms),
-          ),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < children.length; i++) ...[
+            if (i > 0) const SizedBox(width: 24),
+            Expanded(
+              child: reduce
+                  ? children[i]
+                  : children[i]
+                        .animate(delay: Duration(milliseconds: 60 * i))
+                        .fadeIn(duration: 400.ms, curve: Curves.easeOutCubic)
+                        .slideY(begin: 0.05, end: 0, duration: 400.ms),
+            ),
+          ],
         ],
-      ],
       ),
     );
   }

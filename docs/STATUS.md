@@ -9,6 +9,13 @@
 - HTTPS status: Custom domain `shubham-sahu.me` certificate pending in GitHub Pages; GitHub Pages origin `https://https-shubhamsahu.github.io/nosus-canary/` 301-redirects to `http://shubham-sahu.me/nosus-canary/`. Clipboard copy has browser fallback for HTTP.
 - APK: Built `NO-SUS-Canary.apk` (34.4 MB, package `foo.nosus.canary`, `--target-platform android-arm64`, screen capture allowed for demo mirroring).
 - Flutter app tests: 129 passed, 1 skipped, analyze 0 issues.
+- Hardening pass (22 Sep 2026, local only, not deployed):
+  - Codeword generation is about 4× faster, with byte-identical output.
+  - Dashboard polling stops once every copy is opened or the link expires.
+  - Errors from async work after a screen closes are guarded, and raw exception text is no longer shown to users.
+  - The Verify-on-Monad RPC has a 15 s timeout.
+  - `docs/canary/reference/` was removed after being merged. The fingerprint harness is now `app/tool/canary_fingerprint_harness.dart` (FAILURES: 0).
+  - Checks: 133 passed, 1 skipped; analyze 0 issues.
 
 ## Current state
 

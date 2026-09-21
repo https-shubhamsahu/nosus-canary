@@ -36,12 +36,14 @@ class _CopyBadgeState extends State<CopyBadge>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _scale = Tween<double>(begin: 1.3, end: 1).animate(
-      CurvedAnimation(parent: _c, curve: Curves.easeOutCubic),
-    );
-    _rotate = Tween<double>(begin: -6 * math.pi / 180, end: 0).animate(
-      CurvedAnimation(parent: _c, curve: Curves.easeOutCubic),
-    );
+    _scale = Tween<double>(
+      begin: 1.3,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _c, curve: Curves.easeOutCubic));
+    _rotate = Tween<double>(
+      begin: -6 * math.pi / 180,
+      end: 0,
+    ).animate(CurvedAnimation(parent: _c, curve: Curves.easeOutCubic));
   }
 
   @override
@@ -111,9 +113,7 @@ class _TicketPainter extends CustomPainter {
       ..addRRect(RRect.fromRectAndRadius(rect, const Radius.circular(r)));
     final holes = Path();
     for (var y = notch * 2; y < size.height - notch; y += notch * 2) {
-      holes.addOval(
-        Rect.fromCircle(center: Offset(0, y), radius: notch),
-      );
+      holes.addOval(Rect.fromCircle(center: Offset(0, y), radius: notch));
       holes.addOval(
         Rect.fromCircle(center: Offset(size.width, y), radius: notch),
       );

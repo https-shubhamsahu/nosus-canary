@@ -1,5 +1,11 @@
+// Accuracy sweep for the Canary fingerprint engine. Run from app/:
+//   dart run tool/canary_fingerprint_harness.dart
+// It must end with "FAILURES: 0". Its printed report is its output.
+// ignore_for_file: avoid_print
+
 import 'dart:math';
-import '../app/lib/features/canary/domain/canary_fingerprint.dart';
+
+import 'package:no_sus/features/canary/domain/canary_fingerprint.dart';
 
 const demoNote =
     "Hey everyone, please don't share this outside the group. We're launching "
@@ -21,10 +27,9 @@ final zwChars = RegExp(
 
 String stripZw(String s) => s.replaceAll(zwChars, '');
 
-String ocrLike(String s) => stripZw(s)
-    .replaceAll(RegExp(r'[,.!?]'), '')
-    .replaceAll(' ', '\n')
-    .toUpperCase();
+String ocrLike(String s) => stripZw(
+  s,
+).replaceAll(RegExp(r'[,.!?]'), '').replaceAll(' ', '\n').toUpperCase();
 
 String noisy(String s, Random rng, double rate) {
   final chars = stripZw(s).split('');
@@ -46,9 +51,16 @@ String excerpt(String s, double from, double to) {
 
 var failures = 0;
 
-void expectKind(String label, CanaryMatch m, Set<CanaryMatchKind> kinds, {int? copy}) {
+void expectKind(
+  String label,
+  CanaryMatch m,
+  Set<CanaryMatchKind> kinds, {
+  int? copy,
+}) {
   final ok = kinds.contains(m.kind) && (copy == null || m.copyIndex == copy);
-  print('${ok ? "PASS" : "FAIL"}  $label -> ${m.kind.name} copy=${m.copyIndex} cand=${m.candidates} ${m.agreeing}/${m.known}');
+  print(
+    '${ok ? "PASS" : "FAIL"}  $label -> ${m.kind.name} copy=${m.copyIndex} cand=${m.candidates} ${m.agreeing}/${m.known}',
+  );
   if (!ok) failures++;
 }
 
@@ -61,7 +73,9 @@ void runFor(String title, String note, int copyCount) {
   print('');
   print('==================== $title ($copyCount copies)');
   final plan = buildCanaryPlan(note);
-  print('slots=${plan.bitCount} required=${canaryRequiredSlots(copyCount)} maxCopies=${canaryMaxCopiesFor(plan)}');
+  print(
+    'slots=${plan.bitCount} required=${canaryRequiredSlots(copyCount)} maxCopies=${canaryMaxCopiesFor(plan)}',
+  );
   for (final s in plan.slots) {
     print('  slot "${s.original}" -> "${s.alternate}"');
   }
@@ -69,18 +83,43 @@ void runFor(String title, String note, int copyCount) {
     print('REJECTED (as designed): note too short for $copyCount copies');
     return;
   }
-  final codes = generateCanaryCodewords(copyCount, plan.bitCount, random: Random(42));
+  final codes = generateCanaryCodewords(
+    copyCount,
+    plan.bitCount,
+    random: Random(42),
+  );
   final copies = [
-    for (var i = 0; i < codes.length; i++) renderCanaryCopy(plan, codes[i], copyIndex: i),
+    for (var i = 0; i < codes.length; i++)
+      renderCanaryCopy(plan, codes[i], copyIndex: i),
   ];
   print('sample copy 1: ${stripZw(copies[0])}');
-  print('original == zero render: ${renderCanaryCopy(plan, List.filled(plan.bitCount, 0)) == note}');
+  print(
+    'original == zero render: ${renderCanaryCopy(plan, List.filled(plan.bitCount, 0)) == note}',
+  );
 
-  expectKind('exact marker copy 7', matchCanaryLeak(copies[7], plan, codes), {CanaryMatchKind.exactMarker}, copy: 7);
-  expectKind('zw stripped copy 7', matchCanaryLeak(stripZw(copies[7]), plan, codes), {CanaryMatchKind.confident}, copy: 7);
-  expectKind('ocr formatting copy 12', matchCanaryLeak(ocrLike(copies[12]), plan, codes), {CanaryMatchKind.confident}, copy: 12);
-  expectKind('sender original', matchCanaryLeak(note, plan, codes), {CanaryMatchKind.senderOriginal});
-  expectKind('unrelated text', matchCanaryLeak('the quick brown fox jumps over the lazy dog', plan, codes), {CanaryMatchKind.notEnough, CanaryMatchKind.noMatch});
+  expectKind('exact marker copy 7', matchCanaryLeak(copies[7], plan, codes), {
+    CanaryMatchKind.exactMarker,
+  }, copy: 7);
+  expectKind(
+    'zw stripped copy 7',
+    matchCanaryLeak(stripZw(copies[7]), plan, codes),
+    {CanaryMatchKind.confident},
+    copy: 7,
+  );
+  expectKind(
+    'ocr formatting copy 12',
+    matchCanaryLeak(ocrLike(copies[12]), plan, codes),
+    {CanaryMatchKind.confident},
+    copy: 12,
+  );
+  expectKind('sender original', matchCanaryLeak(note, plan, codes), {
+    CanaryMatchKind.senderOriginal,
+  });
+  expectKind(
+    'unrelated text',
+    matchCanaryLeak('the quick brown fox jumps over the lazy dog', plan, codes),
+    {CanaryMatchKind.notEnough, CanaryMatchKind.noMatch},
+  );
 
   final rng = Random(7);
   var okStrip = 0, okOcr = 0, okNoise = 0, wrongNoise = 0;
@@ -95,7 +134,9 @@ void runFor(String title, String note, int copyCount) {
     if (named(c) && c.copyIndex == i) okNoise++;
     if (named(c) && c.copyIndex != i) wrongNoise++;
   }
-  print('sweep: stripped $okStrip/$trials, ocr $okOcr/$trials, 2% noise right $okNoise/$trials, WRONG $wrongNoise/$trials');
+  print(
+    'sweep: stripped $okStrip/$trials, ocr $okOcr/$trials, 2% noise right $okNoise/$trials, WRONG $wrongNoise/$trials',
+  );
   if (wrongNoise > 0) failures++;
 
   var exRight = 0, exWrong = 0, colluder = 0, innocent = 0;
@@ -112,7 +153,10 @@ void runFor(String title, String note, int copyCount) {
       }
     }
     final j = (i + 1 + rng.nextInt(codes.length - 1)) % codes.length;
-    final mix = [for (var k = 0; k < plan.bitCount; k++) rng.nextBool() ? codes[i][k] : codes[j][k]];
+    final mix = [
+      for (var k = 0; k < plan.bitCount; k++)
+        rng.nextBool() ? codes[i][k] : codes[j][k],
+    ];
     final bm = matchCanaryLeak(renderCanaryCopy(plan, mix), plan, codes);
     if (named(bm)) {
       if (bm.copyIndex == i || bm.copyIndex == j) {
@@ -123,7 +167,9 @@ void runFor(String title, String note, int copyCount) {
     }
   }
   print('excerpts: named right $exRight/600, WRONG $exWrong/600');
-  print('two-copy blends: named a colluder $colluder/600, named an INNOCENT $innocent/600');
+  print(
+    'two-copy blends: named a colluder $colluder/600, named an INNOCENT $innocent/600',
+  );
   if (exWrong > 0) failures++;
 
   final distinct = copies.map(stripZw).toSet().length;

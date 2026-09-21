@@ -46,12 +46,7 @@ class _BitePaint extends ChangeNotifier {
   double angle = 0;
   double scale = 0;
 
-  void set({
-    Offset? pos,
-    double? squash,
-    double? angle,
-    double? scale,
-  }) {
+  void set({Offset? pos, double? squash, double? angle, double? scale}) {
     var changed = false;
     if (pos != null && pos != this.pos) {
       this.pos = pos;
@@ -229,8 +224,9 @@ class _LiquidCarveButtonState extends State<LiquidCarveButton>
       child: FocusableActionDetector(
         focusNode: _focus,
         enabled: _enabled,
-        mouseCursor:
-            _enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        mouseCursor: _enabled
+            ? SystemMouseCursors.click
+            : SystemMouseCursors.basic,
         onShowFocusHighlight: (v) {
           if (_focused != v) setState(() => _focused = v);
         },
@@ -285,7 +281,9 @@ class _LiquidCarveButtonState extends State<LiquidCarveButton>
                   boxShadow: [
                     BoxShadow(
                       color: CanaryTokens.text,
-                      offset: _hovering ? const Offset(6, 6) : const Offset(4, 4),
+                      offset: _hovering
+                          ? const Offset(6, 6)
+                          : const Offset(4, 4),
                     ),
                   ],
                 ),
@@ -342,13 +340,33 @@ class _LiquidCarveButtonState extends State<LiquidCarveButton>
     if (!widget.enableGoo) return blob;
     return ColorFiltered(
       colorFilter: const ColorFilter.matrix(<double>[
-        1, 0, 0, 0, 0,
-        0, 1, 0, 0, 0,
-        0, 0, 1, 0, 0,
-        0, 0, 0, 19, -2295,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        19,
+        -2295,
       ]),
       child: ImageFiltered(
-        imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8, tileMode: TileMode.decal),
+        imageFilter: ImageFilter.blur(
+          sigmaX: 8,
+          sigmaY: 8,
+          tileMode: TileMode.decal,
+        ),
         child: blob,
       ),
     );
@@ -363,8 +381,9 @@ class _LiquidCarveButtonState extends State<LiquidCarveButton>
       child: FocusableActionDetector(
         focusNode: _focus,
         enabled: _enabled,
-        mouseCursor:
-            _enabled ? SystemMouseCursors.click : SystemMouseCursors.basic,
+        mouseCursor: _enabled
+            ? SystemMouseCursors.click
+            : SystemMouseCursors.basic,
         onShowFocusHighlight: (v) {
           if (_focused != v) setState(() => _focused = v);
         },

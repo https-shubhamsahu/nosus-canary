@@ -54,9 +54,7 @@ class CanaryUi {
                 children: [
                   const CanaryMark(size: 28),
                   const SizedBox(width: 12),
-                  Flexible(
-                    child: Text(title, overflow: TextOverflow.ellipsis),
-                  ),
+                  Flexible(child: Text(title, overflow: TextOverflow.ellipsis)),
                 ],
               ),
               actions: actions,
@@ -84,22 +82,25 @@ class CanaryUi {
             appBar: !showAppBar
                 ? null
                 : customAppBar ??
-                    AppBar(
-                      title: Row(
-                        children: [
-                          const CanaryMark(size: 28),
-                          const SizedBox(width: 12),
-                          Flexible(
-                            child: Text(title, overflow: TextOverflow.ellipsis),
-                          ),
+                      AppBar(
+                        title: Row(
+                          children: [
+                            const CanaryMark(size: 28),
+                            const SizedBox(width: 12),
+                            Flexible(
+                              child: Text(
+                                title,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          ...?actions,
+                          const WalletButton(compact: true),
+                          const SizedBox(width: 8),
                         ],
                       ),
-                      actions: [
-                        ...?actions,
-                        const WalletButton(compact: true),
-                        const SizedBox(width: 8),
-                      ],
-                    ),
             body: CanaryBackdrop(child: body(context)),
           );
         },

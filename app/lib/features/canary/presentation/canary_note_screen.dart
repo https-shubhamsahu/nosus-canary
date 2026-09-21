@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/layout/app_breakpoints.dart';
 import '../../../theme.dart';
+import '../data/canary_api.dart';
 import '../domain/canary_models.dart';
 import 'canary_created_screen.dart';
 import 'canary_leak_check_screen.dart';
@@ -54,15 +55,19 @@ class _CanaryNoteScreenState extends ConsumerState<CanaryNoteScreen> {
     if (record == null || _loading) return;
     _loading = true;
     try {
-      final status = await ref.read(canaryRepositoryProvider).fetchStatus(record);
-      if (mounted) {
-        setState(() {
-          _status = status;
-          _error = null;
-        });
-      }
-    } catch (e) {
-      if (mounted) setState(() => _error = e.toString());
+      final status = await ref
+          .read(canaryRepositoryProvider)
+          .fetchStatus(record);
+      if (!mounted) return;
+      setState(() {
+        _status = status;
+        _error = null;
+      });
+      if (status.isSettled) _poll?.cancel();
+    } on CanaryApiException catch (e) {
+      if (mounted) setState(() => _error = e.message);
+    } catch (_) {
+      if (mounted) setState(() => _error = 'Could not load who opened it.');
     } finally {
       _loading = false;
     }
@@ -72,9 +77,7 @@ class _CanaryNoteScreenState extends ConsumerState<CanaryNoteScreen> {
   Widget build(BuildContext context) {
     final record = _record;
     if (record == null) {
-      return CanaryUi.missing(
-        message: 'This note is not on this device.',
-      );
+      return CanaryUi.missing(message: 'This note is not on this device.');
     }
     final status = _status;
     final opened = status?.copies.length ?? 0;
@@ -85,7 +88,14 @@ class _CanaryNoteScreenState extends ConsumerState<CanaryNoteScreen> {
         final theme = Theme.of(context);
         final expanded = AppBreakpoints.isExpanded(context);
         final pad = expanded ? 32.0 : 20.0;
-        final left = _leftColumn(context, theme, record, status, opened, expanded);
+        final left = _leftColumn(
+          context,
+          theme,
+          record,
+          status,
+          opened,
+          expanded,
+        );
         if (!expanded) {
           return ListView(
             padding: EdgeInsets.all(pad),
@@ -118,9 +128,7 @@ class _CanaryNoteScreenState extends ConsumerState<CanaryNoteScreen> {
                   children: [
                     Text('Check a leak', style: theme.textTheme.titleMedium),
                     const SizedBox(height: 12),
-                    GlowCard(
-                      child: CanaryLeakPanel(noteId: record.noteId),
-                    ),
+                    GlowCard(child: CanaryLeakPanel(noteId: record.noteId)),
                   ],
                 ),
               ),

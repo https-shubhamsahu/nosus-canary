@@ -34,9 +34,9 @@ class CanaryTopBar extends StatelessWidget implements PreferredSizeWidget {
       webOnlyWindowName: '_blank',
     );
     if (!ok && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open nosus.foo')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Could not open nosus.foo')));
     }
   }
 
@@ -54,9 +54,7 @@ class CanaryTopBar extends StatelessWidget implements PreferredSizeWidget {
       height: expanded ? 72 : 64,
       decoration: BoxDecoration(
         color: CanaryTokens.bg.withValues(alpha: 0.95),
-        border: const Border(
-          bottom: BorderSide(color: CanaryTokens.border),
-        ),
+        border: const Border(bottom: BorderSide(color: CanaryTokens.border)),
       ),
       child: Center(
         child: ConstrainedBox(
@@ -425,9 +423,9 @@ class CanaryFooter extends StatelessWidget {
       webOnlyWindowName: '_blank',
     );
     if (!ok && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open $url')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not open $url')));
     }
   }
 

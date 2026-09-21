@@ -60,9 +60,12 @@ class _PixelCanaryState extends State<PixelCanary>
           builder: (context, _) {
             final t = _c.value * _cycleMs;
             // Flap in bursts: wings beat for the first 900 ms of every 2 s.
-            final flap = !_still && (t % 2000) < 900 && ((t / 150).floor() % 2 == 1);
+            final flap =
+                !_still && (t % 2000) < 900 && ((t / 150).floor() % 2 == 1);
             final blink = !_still && t > 3650 && t < 3800;
-            final bob = _still ? 0.0 : -math.sin(_c.value * 4 * math.pi).abs() * w * 0.06;
+            final bob = _still
+                ? 0.0
+                : -math.sin(_c.value * 4 * math.pi).abs() * w * 0.06;
             return Stack(
               clipBehavior: Clip.none,
               children: [
@@ -134,7 +137,12 @@ const _frameB = [
   '...KK..KK.......',
 ];
 
-void _paintSprite(Canvas canvas, List<String> rows, double cell, Map<String, Color> colors) {
+void _paintSprite(
+  Canvas canvas,
+  List<String> rows,
+  double cell,
+  Map<String, Color> colors,
+) {
   for (var y = 0; y < rows.length; y++) {
     final row = rows[y];
     var x = 0;
