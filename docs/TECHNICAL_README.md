@@ -14,7 +14,7 @@
 | Item | Link / Value |
 |---|---|
 | **1. Live Public App** | **[http://shubham-sahu.me/nosus-canary/](http://shubham-sahu.me/nosus-canary/#/canary)** *(HTTPS mirror: [https://https-shubhamsahu.github.io/nosus-canary/#/canary](https://https-shubhamsahu.github.io/nosus-canary/#/canary))* |
-| **2. Public GitHub Repo** | **[https://github.com/https-shubhamsahu/nosus-monad](https://github.com/https-shubhamsahu/nosus-monad)** |
+| **2. Public GitHub Repo** | **[https://github.com/https-shubhamsahu/nosus-canary](https://github.com/https-shubhamsahu/nosus-canary)** |
 | **3. Smart Contract** | [`0xb1a1858866122c84cf97861ca815fb070e010e68`](https://testnet.monadscan.com/address/0xb1a1858866122c84cf97861ca815fb070e010e68) on Monad Testnet (Chain ID `10143`) · [Verified on Sourcify](https://sourcify.dev/server/repo-ui/10143/0xb1a1858866122c84cf97861ca815fb070e010e68) |
 | **4. Live Deployment** | Standalone Flutter Web + Android APK (`foo.nosus.canary`) |
 
@@ -45,7 +45,7 @@ Canary trapping in high-stakes environments requires:
 ## 📋 Judge & Rubrics Checklist (Monad Blitz Mumbai V4)
 
 ### Basic Points (100 / 100)
-- [x] **Public GitHub repo**: [https://github.com/https-shubhamsahu/nosus-monad](https://github.com/https-shubhamsahu/nosus-monad)
+- [x] **Public GitHub repo**: [https://github.com/https-shubhamsahu/nosus-canary](https://github.com/https-shubhamsahu/nosus-canary)
 - [x] **Proper README**: Complete pitch, live URL, contract address, architecture, and reproducible instructions.
 - [x] **Smart contracts deployed on Monad Testnet**: [`0xb1a1858866122c84cf97861ca815fb070e010e68`](https://testnet.monadscan.com/address/0xb1a1858866122c84cf97861ca815fb070e010e68) on Chain ID `10143`.
 - [x] **Project publicly hosted**: Live on custom domain `shubham-sahu.me` and GitHub Pages.
@@ -78,8 +78,8 @@ Canary trapping in high-stakes environments requires:
 ### 1. Run the Web App
 ```bash
 # Clone the repository
-git clone https://github.com/https-shubhamsahu/nosus-monad.git
-cd nosus-monad/app
+git clone https://github.com/https-shubhamsahu/nosus-canary.git
+cd nosus-canary/app
 
 # Install Flutter dependencies
 flutter pub get

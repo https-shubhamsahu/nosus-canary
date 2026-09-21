@@ -16,6 +16,9 @@
   - The Verify-on-Monad RPC has a 15 s timeout.
   - `docs/canary/reference/` was removed after being merged. The fingerprint harness is now `app/tool/canary_fingerprint_harness.dart` (FAILURES: 0).
   - Checks: 133 passed, 1 skipped; analyze 0 issues.
+- Hosting (22 Sep 2026): this repo, renamed from `nosus-monad` (old URLs redirect), now also hosts the site. Source is on `main`; the built site is on `gh-pages` and served at http://shubham-sahu.me/nosus-canary/ (`app/` = the Flutter build, `hub/` + `index.html` = landing).
+  - To deploy: from `app/`, run `flutter build web --release --base-href /nosus-canary/app/ --dart-define=NOSUS_CANARY_ONLY=true` in PowerShell, copy `build/web/.` into `app/` on `gh-pages`, then commit and push.
+  - The separate site repo was retired.
 
 ## Current state
 
