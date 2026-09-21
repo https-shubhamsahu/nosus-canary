@@ -64,8 +64,8 @@
 You need Flutter 3.44+ and Node 22+.
 
 ```bash
-git clone https://github.com/https-shubhamsahu/nosus-monad.git
-cd nosus-monad
+git clone https://github.com/https-shubhamsahu/nosus-canary.git
+cd nosus-canary
 
 # App (web)
 cd app
