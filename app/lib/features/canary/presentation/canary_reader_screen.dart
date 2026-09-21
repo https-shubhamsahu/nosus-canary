@@ -18,7 +18,11 @@ import 'ui/canary_strip.dart';
 /// Standalone app for the web reader path (main.dart runs it directly for
 /// `#/canary/<id>?k=...` links, like the Burn viewers).
 class CanaryReaderApp extends StatelessWidget {
-  const CanaryReaderApp({super.key, required this.noteId, required this.keyHex});
+  const CanaryReaderApp({
+    super.key,
+    required this.noteId,
+    required this.keyHex,
+  });
 
   final String noteId;
   final String keyHex;
@@ -80,18 +84,22 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
       _error = null;
     });
     try {
-      final copy = await ref.read(canaryRepositoryProvider).openCopy(
-        noteId: widget.noteId,
-        keyHex: widget.keyHex,
-        readerName: _name.text,
-      );
+      final copy = await ref
+          .read(canaryRepositoryProvider)
+          .openCopy(
+            noteId: widget.noteId,
+            keyHex: widget.keyHex,
+            readerName: _name.text,
+          );
       if (mounted) setState(() => _copy = copy);
     } on CanaryUserException catch (e) {
       if (mounted) setState(() => _error = e.message);
     } on CanaryApiException catch (e) {
       if (mounted) setState(() => _error = e.message);
-    } catch (e) {
-      if (mounted) setState(() => _error = 'Could not open the note: $e');
+    } catch (_) {
+      if (mounted) {
+        setState(() => _error = 'Could not open the note. Try again.');
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -125,7 +133,10 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1360),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 40),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 48,
+                  vertical: 40,
+                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -231,9 +242,7 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
               textInputAction: TextInputAction.go,
               onSubmitted: (_) => _busy ? null : _open(),
               style: const TextStyle(fontSize: 18, color: CanaryTokens.text),
-              decoration: const InputDecoration(
-                labelText: 'Your name',
-              ),
+              decoration: const InputDecoration(labelText: 'Your name'),
             ),
           ),
           const SizedBox(height: 12),
@@ -258,7 +267,10 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
               ),
             ),
           const SizedBox(height: 28),
-          Container(height: 2, color: CanaryTokens.text.withValues(alpha: 0.15)),
+          Container(
+            height: 2,
+            color: CanaryTokens.text.withValues(alpha: 0.15),
+          ),
           const SizedBox(height: 16),
           const Text(
             'The sender sees your name and when you opened your copy. Monad '
@@ -290,7 +302,10 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
           const SizedBox(height: 24),
           SelectableText(
             copy.text,
-            style: theme.textTheme.bodyLarge?.copyWith(fontSize: 19, height: 1.7),
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontSize: 19,
+              height: 1.7,
+            ),
           ),
           const SizedBox(height: 24),
           Text(

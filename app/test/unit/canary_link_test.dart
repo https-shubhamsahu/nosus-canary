@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:no_sus/features/canary/domain/canary_link.dart';
-import 'package:no_sus/main.dart'
-    show extractBurnNoteToken, extractCanaryToken;
+import 'package:no_sus/main.dart' show extractBurnNoteToken, extractCanaryToken;
 
 const _noteId = '1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed';
 final _key = 'ab' * 32;
@@ -26,15 +25,31 @@ void main() {
 
   test('rejects wrong shapes', () {
     expect(parseCanaryReaderLink('https://x.y/#/canary/$_noteId'), isNull);
-    expect(parseCanaryReaderLink('https://x.y/#/canary/$_noteId?k=abc'), isNull);
-    expect(parseCanaryReaderLink('https://x.y/#/canary/not-a-uuid?k=$_key'), isNull);
-    expect(parseCanaryReaderLink('https://x.y/canary/$_noteId?k=$_key'), isNull);
-    expect(parseCanaryReaderLink('https://x.y/#/burn/$_noteId?k=$_key&v=${'cd' * 16}'), isNull);
+    expect(
+      parseCanaryReaderLink('https://x.y/#/canary/$_noteId?k=abc'),
+      isNull,
+    );
+    expect(
+      parseCanaryReaderLink('https://x.y/#/canary/not-a-uuid?k=$_key'),
+      isNull,
+    );
+    expect(
+      parseCanaryReaderLink('https://x.y/canary/$_noteId?k=$_key'),
+      isNull,
+    );
+    expect(
+      parseCanaryReaderLink(
+        'https://x.y/#/burn/$_noteId?k=$_key&v=${'cd' * 16}',
+      ),
+      isNull,
+    );
   });
 
   test('Canary and Burn extractors never claim each other\'s links', () {
     final canary = Uri.parse('https://x.y/#/canary/$_noteId?k=$_key');
-    final burn = Uri.parse('https://x.y/#/burn/$_noteId?k=$_key&v=${'cd' * 16}');
+    final burn = Uri.parse(
+      'https://x.y/#/burn/$_noteId?k=$_key&v=${'cd' * 16}',
+    );
     expect(extractCanaryToken(canary)?.noteId, _noteId);
     expect(extractBurnNoteToken(canary), isNull);
     expect(extractCanaryToken(burn), isNull);

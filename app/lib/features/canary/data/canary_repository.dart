@@ -59,7 +59,12 @@ class CanaryRepository {
     }
 
     onStage?.call('Making $copyCount unique copies…');
-    final codewords = generateCanaryCodewords(copyCount, plan.bitCount);
+    final List<List<int>> codewords;
+    try {
+      codewords = generateCanaryCodewords(copyCount, plan.bitCount);
+    } on StateError catch (e) {
+      throw CanaryUserException(e.message);
+    }
     final noteId = const Uuid().v4();
     final keyHex = CanaryCrypto.randomHex(32);
     final saltHex = CanaryCrypto.randomHex(32);
@@ -79,7 +84,11 @@ class CanaryRepository {
           '$trim characters and try again.',
         );
       }
-      encrypted.add((index: i, ciphertext: sealed.ciphertextB64, iv: sealed.ivHex));
+      encrypted.add((
+        index: i,
+        ciphertext: sealed.ciphertextB64,
+        iv: sealed.ivHex,
+      ));
       digests.add(CanaryCrypto.copyDigest(saltHex, i, copyText));
     }
 

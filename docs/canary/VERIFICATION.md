@@ -1,7 +1,12 @@
-# How the reference files were verified (19 Sep 2026)
+# How NO SUS Canary was verified (19 Sep 2026)
+
+The reference sources this log describes were merged into `app/` and `contracts/`, and the
+`docs/canary/reference/` copies were removed on 22 Sep 2026. The fingerprint harness now lives at
+`app/tool/canary_fingerprint_harness.dart`: run `dart run tool/canary_fingerprint_harness.dart` from
+`app/` after changing the word list; it must end with `FAILURES: 0`.
 
 All checks ran on the owner's machine, in a scratch copy of `nosus-monad/app` (the real repo was
-not modified). The steps were: copy `app/`, copy these reference files in, run
+not modified). The steps were: copy `app/`, copy the reference files in, run
 `tools/canary_edits.js` once, run `flutter pub add qr_flutter image_picker google_mlkit_text_recognition`,
 then run the checks below.
 
@@ -14,7 +19,7 @@ then run the checks below.
 | Edit script | `node tools/canary_edits.js` on fresh copies of the 11 target files | `ALL EDITS APPLIED` (tested twice from pristine files) |
 | Contract | `npx hardhat test` (Hardhat 3, viem) | **5 passing** for NoSusCanary. Gas: `sealNote` 73,833, `openCopy` 78,403 |
 | Edge function | `npx -y deno@2 check index.ts` | **OK**. Resolves `npm:viem@2.56.5` and `esm.sh supabase-js@2.39.8` |
-| Fingerprint engine | `dart tools/canary_fingerprint_harness.dart` | **FAILURES: 0**. With the 15-slot demo note: full, stripped and OCR-style copies 300/300; 2% character noise 300/300 with 0 wrong names; excerpts 0 wrong out of 600; two-copy blends named an innocent in 1/600 (20 copies), 8/600 (50) and 23/600 (100). A 9-slot note is rejected on purpose |
+| Fingerprint engine | `dart run tool/canary_fingerprint_harness.dart` (from `app/`) | **FAILURES: 0**. With the 15-slot demo note: full, stripped and OCR-style copies 300/300; 2% character noise 300/300 with 0 wrong names; excerpts 0 wrong out of 600; two-copy blends named an innocent in 1/600 (20 copies), 8/600 (50) and 23/600 (100). A 9-slot note is rejected on purpose |
 
 **Not verified here** (these need owner-approved live services, so they are done in the plan's
 Phases 2–7): deploying to Monad testnet, applying the SQL to `ffidvfguojalzpclipzi`, deploying the

@@ -76,10 +76,7 @@ class _CanaryRevealState extends State<CanaryReveal>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ScaleTransition(
-            scale: _pop,
-            child: const CanaryMark(size: 72),
-          ),
+          ScaleTransition(scale: _pop, child: const CanaryMark(size: 72)),
           const SizedBox(height: 12),
           Semantics(
             liveRegion: true,
@@ -99,7 +96,10 @@ class _CanaryRevealState extends State<CanaryReveal>
             AnimatedBuilder(
               animation: _type,
               builder: (context, _) {
-                final n = (who.length * _type.value).ceil().clamp(0, who.length);
+                final n = (who.length * _type.value).ceil().clamp(
+                  0,
+                  who.length,
+                );
                 return Text(
                   who.substring(0, n),
                   style: TextStyle(
@@ -136,8 +136,8 @@ class _CanaryRevealState extends State<CanaryReveal>
             widget.likely
                 ? '${widget.match.agreeing} of ${widget.match.known} fingerprints match. Treat this as a strong hint, not proof.'
                 : widget.match.kind == CanaryMatchKind.exactMarker
-                    ? 'Matched by the hidden marker in the text.'
-                    : '${widget.match.agreeing} of ${widget.match.known} fingerprints match.',
+                ? 'Matched by the hidden marker in the text.'
+                : '${widget.match.agreeing} of ${widget.match.known} fingerprints match.',
             style: const TextStyle(color: CanaryTokens.textDim),
           ),
         ],
@@ -148,11 +148,7 @@ class _CanaryRevealState extends State<CanaryReveal>
 
 /// Orange scan line over pasted text. Completes in 900 ms.
 class LeakScanOverlay extends StatefulWidget {
-  const LeakScanOverlay({
-    super.key,
-    required this.child,
-    required this.active,
-  });
+  const LeakScanOverlay({super.key, required this.child, required this.active});
 
   final Widget child;
   final bool active;

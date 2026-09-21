@@ -48,6 +48,11 @@ class CanaryLeakPanel extends ConsumerStatefulWidget {
 
 class _CanaryLeakPanelState extends ConsumerState<CanaryLeakPanel> {
   final _leak = TextEditingController();
+
+  /// Read once: the dashboard rebuilds this panel on every status poll.
+  late final CanaryOwnerRecord? _record = ref
+      .read(canaryRepositoryProvider)
+      .findNote(widget.noteId);
   CanaryMatch? _match;
   CanaryNoteStatus? _status;
   bool _busy = false;
@@ -62,23 +67,31 @@ class _CanaryLeakPanelState extends ConsumerState<CanaryLeakPanel> {
 
   Future<void> _readScreenshot() async {
     setState(() => _error = null);
+    final String? text;
     try {
-      final text = await canaryPickScreenshotText();
-      if (text == null) return;
-      if (text.trim().isEmpty) {
-        setState(() => _error = 'No text found in that picture.');
-        return;
-      }
-      _leak.text = text;
-      await _check();
-    } catch (e) {
-      if (mounted) setState(() => _error = 'Could not read that picture: $e');
+      text = await canaryPickScreenshotText();
+    } catch (_) {
+      if (mounted) setState(() => _error = 'Could not read that picture.');
+      return;
     }
+    if (!mounted || text == null) return;
+    if (text.trim().isEmpty) {
+      setState(() => _error = 'No text found in that picture.');
+      return;
+    }
+    _leak.text = text;
+    await _check();
+  }
+
+  Future<void> _paste() async {
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = data?.text;
+    if (mounted && text != null) _leak.text = text;
   }
 
   Future<void> _check() async {
     final repository = ref.read(canaryRepositoryProvider);
-    final record = repository.findNote(widget.noteId);
+    final record = _record;
     if (record == null) {
       setState(() => _error = 'This note is not on this device.');
       return;
@@ -90,16 +103,16 @@ class _CanaryLeakPanelState extends ConsumerState<CanaryLeakPanel> {
       _error = null;
       _match = null;
     });
-    final statusFuture = repository.fetchStatus(record);
+    // Started before the scan animation and awaited after it. Names are a
+    // bonus (the copy number alone is useful), so a failure becomes null
+    // here and can never surface as an unhandled error.
+    final statusFuture = repository
+        .fetchStatus(record)
+        .then<CanaryNoteStatus?>((s) => s, onError: (Object _) => null);
     if (!CanaryTokens.reduceMotion(context)) {
       await Future<void>.delayed(const Duration(milliseconds: 900));
     }
-    CanaryNoteStatus? status;
-    try {
-      status = await statusFuture;
-    } catch (_) {
-      // Names are a bonus; the copy number alone is still useful.
-    }
+    final status = await statusFuture;
     if (!mounted) return;
     setState(() {
       _match = match;
@@ -112,7 +125,7 @@ class _CanaryLeakPanelState extends ConsumerState<CanaryLeakPanel> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final record = ref.read(canaryRepositoryProvider).findNote(widget.noteId);
+    final record = _record;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -140,11 +153,7 @@ class _CanaryLeakPanelState extends ConsumerState<CanaryLeakPanel> {
         ),
         if (record != null && (_scanning || _match != null)) ...[
           const SizedBox(height: 12),
-          ScanHitChips(
-            plan: record.plan,
-            leak: _leak.text,
-            active: _scanning,
-          ),
+          ScanHitChips(plan: record.plan, leak: _leak.text, active: _scanning),
         ],
         const SizedBox(height: 12),
         Wrap(
@@ -160,10 +169,7 @@ class _CanaryLeakPanelState extends ConsumerState<CanaryLeakPanel> {
             OutlinedButton.icon(
               icon: const Icon(Icons.content_paste),
               label: const Text('Paste'),
-              onPressed: () async {
-                final data = await Clipboard.getData(Clipboard.kTextPlain);
-                if (data?.text != null) _leak.text = data!.text!;
-              },
+              onPressed: _paste,
             ),
             if (canaryOcrAvailable)
               OutlinedButton.icon(
@@ -202,10 +208,12 @@ class _ResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final reveal = match.kind == CanaryMatchKind.exactMarker ||
+    final reveal =
+        match.kind == CanaryMatchKind.exactMarker ||
         match.kind == CanaryMatchKind.confident ||
         match.kind == CanaryMatchKind.likely;
-    final celebrate = match.kind == CanaryMatchKind.exactMarker ||
+    final celebrate =
+        match.kind == CanaryMatchKind.exactMarker ||
         match.kind == CanaryMatchKind.confident;
 
     if (reveal) {

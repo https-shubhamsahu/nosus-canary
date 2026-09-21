@@ -38,7 +38,9 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
   final _text = TextEditingController();
   int _copies = 50;
   int _hours = 24;
-  int _slots = 0;
+
+  /// Plan for the current text, rebuilt once per edit (null while empty).
+  CanaryPlan? _plan;
   bool _busy = false;
   String? _stage;
   String? _error;
@@ -51,10 +53,14 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
     super.dispose();
   }
 
+  int get _slots => _plan?.bitCount ?? 0;
+
   void _onTextChanged(String value) {
-    final slots = value.trim().isEmpty ? 0 : buildCanaryPlan(value.trim()).bitCount;
+    final trimmed = value.trim();
+    final plan = trimmed.isEmpty ? null : buildCanaryPlan(trimmed);
+    final slots = plan?.bitCount ?? 0;
     setState(() {
-      _slots = slots;
+      _plan = plan;
       _error = null;
       // Drop to the largest reader count this text supports.
       if (canaryRequiredSlots(_copies) > slots) {
@@ -73,14 +79,16 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
       _stage = 'Starting…';
     });
     try {
-      final record = await ref.read(canaryRepositoryProvider).createNote(
-        text: _text.text,
-        copyCount: _copies,
-        expiresInHours: _hours,
-        onStage: (stage) {
-          if (mounted) setState(() => _stage = stage);
-        },
-      );
+      final record = await ref
+          .read(canaryRepositoryProvider)
+          .createNote(
+            text: _text.text,
+            copyCount: _copies,
+            expiresInHours: _hours,
+            onStage: (stage) {
+              if (mounted) setState(() => _stage = stage);
+            },
+          );
       if (!mounted) return;
       await Navigator.of(context).pushReplacement(
         MaterialPageRoute<void>(
@@ -91,8 +99,10 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
       if (mounted) setState(() => _error = e.message);
     } on CanaryApiException catch (e) {
       if (mounted) setState(() => _error = e.message);
-    } catch (e) {
-      if (mounted) setState(() => _error = 'Could not create the note: $e');
+    } catch (_) {
+      if (mounted) {
+        setState(() => _error = 'Could not create the note. Try again.');
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -114,8 +124,7 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
       body: (context) {
         final theme = Theme.of(context);
         final expanded = AppBreakpoints.isExpanded(context);
-        final plan = length == 0 ? null : buildCanaryPlan(_text.text.trim());
-        final panel = _sidePanel(theme, required, strongEnough, length, plan);
+        final panel = _sidePanel(theme, required, strongEnough, length, _plan);
 
         return LayoutBuilder(
           builder: (context, constraints) {
@@ -440,7 +449,10 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
               ),
             ),
           const SizedBox(height: 24),
-          Container(height: 2, color: CanaryTokens.text.withValues(alpha: 0.15)),
+          Container(
+            height: 2,
+            color: CanaryTokens.text.withValues(alpha: 0.15),
+          ),
           const SizedBox(height: 16),
           const Text(
             'Your note is encrypted on this device. NO SUS stores only the '

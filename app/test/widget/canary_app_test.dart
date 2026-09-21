@@ -37,29 +37,26 @@ void main() {
     Size(1440, 900),
     Size(1920, 1080),
   ]) {
-    testWidgets(
-      'CanaryApp opens Canary home with no back button at '
-      '${size.width.toInt()}x${size.height.toInt()}',
-      (tester) async {
-        tester.view.physicalSize = size;
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.reset);
+    testWidgets('CanaryApp opens Canary home with no back button at '
+        '${size.width.toInt()}x${size.height.toInt()}', (tester) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
 
-        final prefs = await SharedPreferences.getInstance();
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
-            child: const CanaryApp(),
-          ),
-        );
-        await tester.pump();
-        await tester.pump(const Duration(seconds: 1));
+      final prefs = await SharedPreferences.getInstance();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+          child: const CanaryApp(),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
 
-        expect(find.text('Every reader gets their own copy.'), findsOneWidget);
-        expect(find.byType(BackButton), findsNothing);
+      expect(find.text('Every reader gets their own copy.'), findsOneWidget);
+      expect(find.byType(BackButton), findsNothing);
 
-        await tester.pumpWidget(const SizedBox());
-      },
-    );
+      await tester.pumpWidget(const SizedBox());
+    });
   }
 }

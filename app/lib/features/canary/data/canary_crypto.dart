@@ -16,7 +16,9 @@ class CanaryCrypto {
   static String randomHex(int byteCount) {
     final random = Random.secure();
     return bytesToHex(
-      Uint8List.fromList(List<int>.generate(byteCount, (_) => random.nextInt(256))),
+      Uint8List.fromList(
+        List<int>.generate(byteCount, (_) => random.nextInt(256)),
+      ),
     );
   }
 

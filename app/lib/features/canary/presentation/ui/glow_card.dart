@@ -29,9 +29,7 @@ class _GlowCardState extends State<GlowCard> {
   Widget build(BuildContext context) {
     final reduce = CanaryTokens.reduceMotion(context);
     final hovered = _hover && !reduce;
-    final duration = reduce
-        ? Duration.zero
-        : const Duration(milliseconds: 180);
+    final duration = reduce ? Duration.zero : const Duration(milliseconds: 180);
 
     final inner = AnimatedContainer(
       duration: duration,

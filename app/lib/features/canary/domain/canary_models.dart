@@ -98,9 +98,7 @@ class CanaryOwnerRecord {
       expiresAt: DateTime.parse(json['expiresAt'] as String),
       readerLink: json['readerLink'] as String,
       preview: json['preview'] as String,
-      plan: CanaryPlan.fromJson(
-        (json['plan'] as Map).cast<String, dynamic>(),
-      ),
+      plan: CanaryPlan.fromJson((json['plan'] as Map).cast<String, dynamic>()),
       codewords: [
         for (final c in json['codewords'] as List)
           [for (final ch in (c as String).split('')) ch == '1' ? 1 : 0],
@@ -141,6 +139,12 @@ class CanaryNoteStatus {
 
   /// Only copies that have been opened, ordered by copy index.
   final List<CanaryCopyStatus> copies;
+
+  /// Nothing more can change: every copy is opened and on Monad, or the
+  /// link has expired. Screens stop polling at this point.
+  bool get isSettled =>
+      !expiresAt.isAfter(DateTime.now()) ||
+      (copies.length >= copyCount && copies.every((c) => c.openTxHash != null));
 
   CanaryCopyStatus? copy(int index) {
     for (final c in copies) {

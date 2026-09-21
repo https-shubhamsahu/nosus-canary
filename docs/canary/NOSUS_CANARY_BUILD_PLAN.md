@@ -1,5 +1,9 @@
 # NO SUS Canary — build plan for the Flutter app (Android APK + web)
 
+> **Status (22 Sep 2026): executed and shipped.** The `reference/` sources were merged into
+> `app/` and `contracts/` and the folder was removed, so the copy commands below are historical.
+> The live code is the source of truth. Verification log: [VERIFICATION.md](VERIFICATION.md).
+
 Owner decision (19 Sep 2026): the product is called **NO SUS**. The feature is **NO SUS Canary**.
 This plan lets any AI agent, including a less capable one, build and ship it without guessing.
 Every piece of code it needs is already written, and has been compiled, analyzed and tested on
@@ -88,7 +92,7 @@ Set-Alias FLUTTER "C:\Users\shubh\AppData\Local\flutter\bin\flutter.bat"
 | Contract gas (measured) | `sealNote` 73,833 and `openCopy` 78,403. The limit used is **150,000**. Monad charges the gas **limit**, so each write costs about **0.0153 MON** at 102 gwei. |
 | Fingerprint accuracy (measured, 20–100 copies, 15-slot demo note) | Full copy, marker stripped, OCR-style text: **300/300** correct. 2% character noise: 300/300 correct, **0 wrong names**. Partial excerpts: **0 wrong names** out of 600. Two copies mixed together: 1 wrong name in 600 (20 copies) to 23/600 (100 copies). This is why the UI says "strong hint, not proof" and why at least 10 swappable words are required. |
 | New packages (resolve cleanly) | `qr_flutter 4.1.0`, `image_picker 1.2.3` (already a transitive dependency), `google_mlkit_text_recognition 0.17.1` (Android only; kept out of web by a conditional export). |
-| Verification of the reference code | In a copy of `app/`: `flutter analyze` **no issues**; full `flutter test` **129 passed, 1 skipped**; `flutter build web --release --base-href /nosus-canary/` **OK**; release APK (arm64) **built, 34.4 MB, package `foo.nosus.canary`**; contract `hardhat test` **5 passing**; edge function `deno check` **OK**. Details: [reference/VERIFICATION.md](reference/VERIFICATION.md). The SQL and the live flow have **not** run yet (they need approvals). |
+| Verification of the reference code | In a copy of `app/`: `flutter analyze` **no issues**; full `flutter test` **129 passed, 1 skipped**; `flutter build web --release --base-href /nosus-canary/` **OK**; release APK (arm64) **built, 34.4 MB, package `foo.nosus.canary`**; contract `hardhat test` **5 passing**; edge function `deno check` **OK**. Details: [VERIFICATION.md](VERIFICATION.md). The SQL and the live flow have **not** run yet (they need approvals). |
 
 ---
 
@@ -582,4 +586,4 @@ laptop web app plus phone browsers. **Never cut:** the reader flow, Seen by, the
 
 Reference-code verification when this plan was written (19 Sep 2026): analyze clean; full test suite
 129 passed; web release build OK; arm64 release APK built (34.4 MB, `foo.nosus.canary`); hardhat 5/5
-for NoSusCanary; deno check OK for the edge function. See `reference/VERIFICATION.md`.
+for NoSusCanary; deno check OK for the edge function. See `VERIFICATION.md`.

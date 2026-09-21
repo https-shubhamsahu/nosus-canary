@@ -135,7 +135,15 @@ const Map<String, String> kCanaryAlternates = {
 
 /// Words that must not precede "please"/"kindly" (verb use: "to please").
 const Set<String> _kPleaseVerbGuards = {
-  'to', 'will', 'would', 'can', 'could', 'should', 'might', 'must', 'not',
+  'to',
+  'will',
+  'would',
+  'can',
+  'could',
+  'should',
+  'might',
+  'must',
+  'not',
 };
 
 /// Words after an "'s" contraction where "is" would be wrong ("it's been").
@@ -157,10 +165,17 @@ final String _kCurlyQuote = String.fromCharCode(0x2019);
 
 final RegExp _kZwMarker = RegExp('$_kZwEdge([$_kZwZero$_kZwOne]{12})$_kZwEdge');
 
-final RegExp _kTokenPattern = RegExp("[A-Za-z0-9'$_kCurlyQuote]+|[^A-Za-z0-9'$_kCurlyQuote]+");
-final RegExp _kWordPattern = RegExp("^[A-Za-z0-9'$_kCurlyQuote]+" r'$');
+final RegExp _kTokenPattern = RegExp(
+  "[A-Za-z0-9'$_kCurlyQuote]+|[^A-Za-z0-9'$_kCurlyQuote]+",
+);
+final RegExp _kWordPattern = RegExp(
+  "^[A-Za-z0-9'$_kCurlyQuote]+"
+  r'$',
+);
 final RegExp _kWhitespaceOnly = RegExp(r'^\s+$');
 final RegExp _kSafeAfter = RegExp(r'^(\s+|[,.!?;:]\s+|[,.!?;:]+$)');
+final RegExp _kNotWordChar = RegExp(r"[^a-z0-9']+");
+final RegExp _kSpaceRun = RegExp(r' +');
 
 /// One swappable word inside the original note.
 class CanarySlot {
@@ -234,16 +249,14 @@ String _canonicalWord(String word) =>
 /// and collapses runs of spaces. Used on both leaks and slot options.
 String canaryNormalize(String input) {
   final lower = input.replaceAll(_kCurlyQuote, "'").toLowerCase();
-  final spaced = lower.replaceAll(RegExp(r"[^a-z0-9']+"), ' ');
-  return spaced.trim().replaceAll(RegExp(r' +'), ' ');
+  final spaced = lower.replaceAll(_kNotWordChar, ' ');
+  return spaced.trim().replaceAll(_kSpaceRun, ' ');
 }
 
 /// Finds the swappable words in [text]. Slots are at least three words apart
 /// so that their context words are never slots themselves.
 CanaryPlan buildCanaryPlan(String text) {
-  final tokens = [
-    for (final m in _kTokenPattern.allMatches(text)) m.group(0)!,
-  ];
+  final tokens = [for (final m in _kTokenPattern.allMatches(text)) m.group(0)!];
   final wordIndexes = <int>[
     for (var i = 0; i < tokens.length; i++)
       if (_kWordPattern.hasMatch(tokens[i])) i,
@@ -263,7 +276,9 @@ CanaryPlan buildCanaryPlan(String text) {
     // Separator guards: the word must stand alone, not be glued to symbols
     // ("2.5", "10:30", "(please", "ok.com").
     final before = tokenIndex > 0 ? tokens[tokenIndex - 1] : null;
-    final after = tokenIndex + 1 < tokens.length ? tokens[tokenIndex + 1] : null;
+    final after = tokenIndex + 1 < tokens.length
+        ? tokens[tokenIndex + 1]
+        : null;
     if (before != null && !_kWhitespaceOnly.hasMatch(before)) continue;
     if (after != null && !_kSafeAfter.hasMatch(after)) continue;
 
@@ -326,7 +341,8 @@ String _applyCase(String template, String replacement) {
   if (letters.length >= 3 && letters == letters.toUpperCase()) {
     return replacement.toUpperCase();
   }
-  if (letters.isNotEmpty && letters[0] == letters[0].toUpperCase() &&
+  if (letters.isNotEmpty &&
+      letters[0] == letters[0].toUpperCase() &&
       letters[0] != letters[0].toLowerCase()) {
     return replacement.isEmpty
         ? replacement
@@ -351,7 +367,9 @@ String _zwMarker(int copyIndex) {
 int? decodeCanaryMarker(String text) {
   final counts = <int, int>{};
   for (final m in _kZwMarker.allMatches(text)) {
-    final bits = [for (final ch in m.group(1)!.split('')) ch == _kZwOne ? 1 : 0];
+    final bits = [
+      for (final ch in m.group(1)!.split('')) ch == _kZwOne ? 1 : 0,
+    ];
     var value = 0;
     for (var b = 0; b < 10; b++) {
       value = (value << 1) | bits[b];
@@ -401,12 +419,13 @@ String renderCanaryCopy(CanaryPlan plan, List<int> codeword, {int? copyIndex}) {
   return out.toString();
 }
 
-int _hamming(List<int> a, List<int> b) {
-  var d = 0;
-  for (var i = 0; i < a.length; i++) {
-    if (a[i] != b[i]) d++;
+/// Number of 1-bits in [value] (Hamming weight).
+int _bitCountOf(int value) {
+  var n = 0;
+  for (var v = value; v != 0; v &= v - 1) {
+    n++;
   }
-  return d;
+  return n;
 }
 
 /// Random, distinct, non-zero codewords, spread apart where the slot count
@@ -418,25 +437,40 @@ List<List<int>> generateCanaryCodewords(
   Random? random,
 }) {
   if (copyCount < kCanaryMinCopies || copyCount > kCanaryMaxCopies) {
-    throw ArgumentError('copyCount must be $kCanaryMinCopies..$kCanaryMaxCopies');
+    throw ArgumentError(
+      'copyCount must be $kCanaryMinCopies..$kCanaryMaxCopies',
+    );
+  }
+  if (bitCount > kCanaryMaxSlots) {
+    throw ArgumentError('bitCount must be at most $kCanaryMaxSlots');
   }
   if (bitCount < canaryRequiredSlots(copyCount)) {
     throw StateError('Not enough swappable words for $copyCount copies.');
   }
   final rng = random ?? Random.secure();
-  final zero = List<int>.filled(bitCount, 0);
+  // Codewords are packed into ints (slot 0 = most significant bit) so the
+  // distance check is one XOR and a bit count. Bits are drawn one at a time,
+  // exactly as before, so a seeded Random still gives the same codewords.
   for (var minDistance = 4; minDistance >= 1; minDistance--) {
-    final chosen = <List<int>>[];
+    final chosen = <int>[];
     var attempts = 0;
     while (chosen.length < copyCount && attempts < copyCount * 4000) {
       attempts++;
-      final candidate = List<int>.generate(bitCount, (_) => rng.nextInt(2));
-      if (_hamming(candidate, zero) < minDistance) continue;
-      if (chosen.every((c) => _hamming(c, candidate) >= minDistance)) {
+      var candidate = 0;
+      for (var b = 0; b < bitCount; b++) {
+        candidate = (candidate << 1) | rng.nextInt(2);
+      }
+      if (_bitCountOf(candidate) < minDistance) continue;
+      if (chosen.every((c) => _bitCountOf(c ^ candidate) >= minDistance)) {
         chosen.add(candidate);
       }
     }
-    if (chosen.length == copyCount) return chosen;
+    if (chosen.length == copyCount) {
+      return [
+        for (final c in chosen)
+          List<int>.generate(bitCount, (k) => (c >> (bitCount - 1 - k)) & 1),
+      ];
+    }
   }
   throw StateError('Could not spread copies apart. Add a few more words.');
 }

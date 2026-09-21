@@ -6,7 +6,8 @@ import 'package:http/http.dart' as http;
 import '../../../config/app_mode.dart';
 import '../domain/canary_link.dart';
 import 'eth_bridge.dart';
-import 'eth_bridge_stub.dart' if (dart.library.js_interop) 'eth_bridge_web.dart';
+import 'eth_bridge_stub.dart'
+    if (dart.library.js_interop) 'eth_bridge_web.dart';
 
 export 'eth_bridge.dart' show WalletError;
 
@@ -186,10 +187,7 @@ class MonadWallet extends ValueNotifier<WalletState> {
     });
     _bridge.on('chainChanged', (data) {
       if (value.connected) {
-        value = WalletState(
-          address: value.address,
-          chainId: _hexToInt(data),
-        );
+        value = WalletState(address: value.address, chainId: _hexToInt(data));
         refresh();
       }
     });
@@ -256,19 +254,26 @@ Future<CanaryChainNote> readCanaryNoteOnChain(String noteId) async {
     hex = await wallet.ethCall(contract, data);
     via = 'your wallet';
   } else {
-    final response = await http.post(
-      Uri.parse(kMonadRpcUrl),
-      headers: {'content-type': 'application/json'},
-      body: jsonEncode({
-        'jsonrpc': '2.0',
-        'id': 1,
-        'method': 'eth_call',
-        'params': [
-          {'to': contract, 'data': data},
-          'latest',
-        ],
-      }),
-    );
+    final response = await http
+        .post(
+          Uri.parse(kMonadRpcUrl),
+          headers: {'content-type': 'application/json'},
+          body: jsonEncode({
+            'jsonrpc': '2.0',
+            'id': 1,
+            'method': 'eth_call',
+            'params': [
+              {'to': contract, 'data': data},
+              'latest',
+            ],
+          }),
+        )
+        .timeout(const Duration(seconds: 15));
+    if (response.statusCode != 200) {
+      throw StateError(
+        'The Monad RPC is busy (${response.statusCode}). Try again.',
+      );
+    }
     final body = jsonDecode(response.body) as Map<String, dynamic>;
     if (body['error'] != null) {
       throw StateError('Monad RPC error: ${body['error']}');
@@ -278,8 +283,9 @@ Future<CanaryChainNote> readCanaryNoteOnChain(String noteId) async {
   }
 
   final words = hex.startsWith('0x') ? hex.substring(2) : hex;
-  String word(int i) =>
-      words.length >= (i + 1) * 64 ? words.substring(i * 64, (i + 1) * 64) : '0';
+  String word(int i) => words.length >= (i + 1) * 64
+      ? words.substring(i * 64, (i + 1) * 64)
+      : '0';
   int num(int i) => int.parse(word(i), radix: 16);
   DateTime? time(int i) {
     final s = num(i);

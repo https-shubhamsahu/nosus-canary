@@ -7,8 +7,9 @@ This repository is an isolated, **testnet-only** experiment. Read
 
 - Brand: **NO SUS**. Feature: **NO SUS Canary**. This supersedes the "NO SUS — Monad Experiment"
   naming rule below for user-facing text.
-- Build plan: [docs/canary/NOSUS_CANARY_BUILD_PLAN.md](docs/canary/NOSUS_CANARY_BUILD_PLAN.md).
-  Follow it step by step; its verified source files are in `docs/canary/reference/`.
+- Build plan: [docs/canary/NOSUS_CANARY_BUILD_PLAN.md](docs/canary/NOSUS_CANARY_BUILD_PLAN.md)
+  (executed; the live code in `app/` and `contracts/` is the source of truth). Verification log:
+  [docs/canary/VERIFICATION.md](docs/canary/VERIFICATION.md).
 - Canary is server-gated copy delivery and is described as such. It does not use Lit, does not
   change Gate T1, and does not change `monadThresholdVerified`.
 - Still requires explicit owner approval each time: contract deploys, funding wallets, applying
