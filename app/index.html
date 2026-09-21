@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/nosus-canary/app/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="NO SUS — secure document sharing with watermarking, blur-until-touch protection, and tamper-evident audit logs.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="NO SUS">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>NO SUS</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="manifest" href="manifest.json">
+
+  <!--
+    The first web frame is the NO SUS wordmark itself. This has no image,
+    external font, or startup work: Flutter removes it as soon as its first
+    real frame is ready, so branding never creates a minimum load time.
+  -->
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; min-height: 100%; background: #000000; }
+    #boot-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483647;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100svh;
+      box-sizing: border-box;
+      padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+      background: #000000;
+      transition: opacity 100ms linear;
+    }
+    #boot-loader.boot-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #boot-loader .boot-mark {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+      color: #FFFFFF;
+      font-size: clamp(34px, 9vw, 48px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    #boot-loader .boot-stop {
+      width: 0.21em;
+      height: 0.21em;
+      margin-left: 0.08em;
+      margin-bottom: 0.02em;
+      display: inline-block;
+      vertical-align: baseline;
+      background: #808080;
+      animation: boot-stop-settle 180ms cubic-bezier(.2, .7, .3, 1) 60ms both;
+    }
+    @keyframes boot-stop-settle {
+      from { opacity: 0; transform: translateY(-2px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #boot-loader, #boot-loader .boot-stop { transition: none; animation: none; }
+    }
+  </style>
+
+  <!--
+    supabase_flutter's Auth client wires up passkey/WebAuthn support by
+    default, which pulls in the `passkeys_web` plugin. That plugin's
+    registerWith() runs automatically on EVERY page load (Flutter Web plugin
+    registration is unconditional, independent of whether the app ever uses
+    passkeys) and calls `PasskeyAuthenticator.init()` unconditionally, even
+    when this script hasn't loaded — crashing with
+    "Cannot read properties of undefined (reading 'init')" on every page,
+    including the SecureSend anonymous share link. This script (vendored
+    locally instead of pointed at a GitHub releases URL, to avoid an external
+    runtime dependency) defines the global `PasskeyAuthenticator` the plugin
+    expects, so registration succeeds even though the app doesn't use passkeys.
+    Must load BEFORE flutter_bootstrap.js (no async/defer) — Flutter's plugin
+    registration runs during engine boot, not after DOMContentLoaded.
+  -->
+  <script src="passkeys-bundle.js"></script>
+</head>
+<body>
+  <div id="boot-loader">
+    <div class="boot-mark" role="status" aria-live="polite" aria-label="NO SUS opening application">NO SUS<span class="boot-stop" aria-hidden="true"></span></div>
+  </div>
+  <script>
+    (function() {
+      // Flutter Web dispatches this once the engine paints its first real
+      // frame — remove the boot loader then, with a generous timeout
+      // fallback so a missed event (older engine builds, unusual load
+      // paths) never leaves it stuck on screen forever.
+      function hideBootLoader() {
+        const el = document.getElementById('boot-loader');
+        if (!el) return;
+        el.classList.add('boot-hidden');
+        setTimeout(function() { el.remove(); }, 100);
+      }
+      window.addEventListener('flutter-first-frame', hideBootLoader, { once: true });
+      setTimeout(hideBootLoader, 12000);
+    })();
+  </script>
+  <script>
+    (function() {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const hasCode = window.location.search.includes('code=') || window.location.hash.includes('access_token=');
+      if (isMobile && hasCode) {
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100vw';
+        overlay.style.height = '100vh';
+        overlay.style.background = '#000000';
+        overlay.style.color = '#F5F5F5';
+        overlay.style.fontFamily = 'ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif';
+        overlay.style.zIndex = '999999';
+        overlay.style.display = 'flex';
+        overlay.style.flexDirection = 'column';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.padding = '30px';
+        overlay.style.boxSizing = 'border-box';
+        overlay.style.textAlign = 'center';
+
+        overlay.innerHTML = `
+          <div style="font-size: 27px; color: #FFFFFF; margin-bottom: 36px; font-weight: 800; letter-spacing: -0.5px;">NO SUS<span style="display: inline-block; width: 6px; height: 6px; margin-left: 3px; background: #808080;"></span></div>
+          <h2 style="font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 10px; color: #FFFFFF;">Finishing sign-in</h2>
+          <p style="color: #A0A0A0; font-size: 14px; max-width: 320px; line-height: 1.5; margin-bottom: 32px;">
+            Open NO SUS to continue.
+          </p>
+          <button id="open-app-btn" style="background-color: #FFFFFF; color: #0D0D0D; border: 1.5px solid #FFFFFF; padding: 15px 32px; border-radius: 12px; font-weight: 700; font-family: inherit; cursor: pointer; font-size: 15px; width: 100%; max-width: 260px;">
+            OPEN APP
+          </button>
+          <a id="continue-web-btn" href="#" style="color: #A0A0A0; font-size: 14px; margin-top: 24px; text-decoration: underline;">
+            Continue in browser
+          </a>
+        `;
+
+        document.body.appendChild(overlay);
+
+        document.getElementById('open-app-btn').addEventListener('click', function() {
+          const params = window.location.search + window.location.hash;
+          const redirectUri = 'io.supabase.nosus://login-callback' + params;
+          window.location.href = redirectUri;
+        });
+
+        document.getElementById('continue-web-btn').addEventListener('click', function(e) {
+          e.preventDefault();
+          document.body.removeChild(overlay);
+        });
+      }
+    })();
+  </script>
+  <!--
+    You can customize the "flutter_bootstrap.js" script.
+    This is useful to provide a custom configuration to the Flutter loader
+    or to give the user feedback during the initialization process.
+
+    For more details:
+    * https://docs.flutter.dev/platform-integration/web/initialization
+  -->
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
