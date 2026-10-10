@@ -13,7 +13,7 @@
   "team": [
     "Shubham Sahu"
   ],
-  "event": "MONAD BLITZ MUMBAI V4",
-  "eventName": "Monad Blitz Mumbai V4",
-  "verifiedUrl": "https://sourcify.dev/server/repo-ui/10143/0xb1a1858866122c84cf97861ca815fb070e010e68"
+  "event": "SOLANA DEVNET",
+  "verifiedUrl": "https://sourcify.dev/server/repo-ui/10143/0xb1a1858866122c84cf97861ca815fb070e010e68",
+  "solanaDevnetTxUrl": "https://explorer.solana.com/tx/2BHqnuCxYyemfegHkncgTsQyMPjpyB9boD1XqYfD1Wtbcf51Fpy3y264UwGhnvRKtcxFKCaSAzHxLrDwFRk512bQ?cluster=devnet"
 }

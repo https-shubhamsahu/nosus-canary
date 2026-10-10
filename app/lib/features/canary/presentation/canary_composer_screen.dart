@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../config/app_mode.dart';
 import '../../../core/layout/app_breakpoints.dart';
 import '../../../theme.dart';
 import '../data/canary_api.dart';
@@ -455,10 +456,15 @@ class _CanaryComposerScreenState extends ConsumerState<CanaryComposerScreen> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Your note is encrypted on this device. NO SUS stores only the '
-            'encrypted copies; the key travels inside the link. Monad testnet '
-            'receives only a hash of the copies and an anonymous tag per '
-            'reader, never the text or names.',
+            kCanaryMonad
+                ? 'Your note is encrypted on this device. NO SUS stores only the '
+                      'encrypted copies; the key travels inside the link. Monad testnet '
+                      'and Solana devnet receive only a hash of the copies and an '
+                      'anonymous tag per reader, never the text or names.'
+                : 'Your note is encrypted on this device. NO SUS stores only the '
+                      'encrypted copies; the key travels inside the link. Solana '
+                      'devnet receives only a hash of the copies and an anonymous '
+                      'tag per reader, never the text or names.',
             style: TextStyle(
               fontSize: 13,
               height: 1.55,

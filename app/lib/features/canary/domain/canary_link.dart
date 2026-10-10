@@ -50,7 +50,8 @@ CanaryLinkToken? parseCanaryReaderLink(String fullUrl) {
   return CanaryLinkToken(noteId: noteId, keyHex: key);
 }
 
-/// The bytes32 note id used on Monad: sha256("nosus-canary:" + noteId).
+/// The bytes32 note id used on chain (Solana memo, Monad contract):
+/// sha256("nosus-canary:" + noteId).
 /// The edge function computes the same value; keep them identical.
 String canaryChainNoteId(String noteId) =>
     '0x${sha256.convert(utf8.encode('nosus-canary:$noteId'))}';
@@ -58,3 +59,25 @@ String canaryChainNoteId(String noteId) =>
 /// Public block explorer page for a Monad testnet transaction.
 String canaryExplorerTxUrl(String txHash) =>
     'https://testnet.monadscan.com/tx/$txHash';
+
+/// Public block explorer page for a Solana devnet transaction signature.
+String canarySolanaExplorerTxUrl(String signature) =>
+    'https://explorer.solana.com/tx/$signature?cluster=devnet';
+
+/// Which public chain a Canary proof lives on.
+enum CanaryChain {
+  monad,
+  solana;
+
+  /// Short brand name for chips: 'Monad' / 'Solana'.
+  String get label => this == CanaryChain.monad ? 'Monad' : 'Solana';
+
+  /// Network name for sentences: 'Monad testnet' / 'Solana devnet'.
+  String get network =>
+      this == CanaryChain.monad ? 'Monad testnet' : 'Solana devnet';
+
+  /// Public explorer page for a transaction on this chain.
+  String txUrl(String hash) => this == CanaryChain.monad
+      ? canaryExplorerTxUrl(hash)
+      : canarySolanaExplorerTxUrl(hash);
+}

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../../../config/app_mode.dart';
 import '../../../../theme.dart';
 import 'canary_mark.dart';
 import 'glow_card.dart';
@@ -18,7 +19,7 @@ class BobbingCanaryMark extends StatelessWidget {
   Widget build(BuildContext context) => PixelCanary(size: size);
 }
 
-/// Sealed envelope shown while the copy is assigned on Monad.
+/// Sealed envelope shown while the copy is assigned and recorded on chain.
 class CanaryEnvelope extends StatefulWidget {
   const CanaryEnvelope({super.key});
 
@@ -67,7 +68,9 @@ class _CanaryEnvelopeState extends State<CanaryEnvelope>
             const CanaryMark(size: 56),
             const SizedBox(height: 16),
             Text(
-              'Making your copy… recording it on Monad',
+              kCanaryMonad
+                  ? 'Making your copy… recording it on Monad'
+                  : 'Making your copy… recording it on Solana',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleMedium,
             ),
