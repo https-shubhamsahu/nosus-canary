@@ -33,7 +33,7 @@
   3. `supabase secrets set --project-ref ffidvfguojalzpclipzi SOLANA_RELAYER_KEYS=… SOLANA_RPC_URL=https://api.devnet.solana.com` (read the key from a PowerShell variable; set `SOLANA_MEMO_PROGRAM` only if the default must change).
   4. Apply the migration: `supabase db query --linked --file app/supabase/migrations/20261010090000_nosus_canary_solana.sql`. **Never `supabase db push`**: build-plan rule 5 records that the remote migration history holds only the bootstrap entry, so `db push` would try to re-apply ~21 old migrations and break the database.
   5. `supabase functions deploy canary --project-ref ffidvfguojalzpclipzi --no-verify-jwt --use-api` (same flags as the build plan; without `--no-verify-jwt` the function returns 401).
-  6. Rebuild the web app: from `app/`, in PowerShell, `flutter build web --release --base-href /nosus-canary/app/ --dart-define=NOSUS_CANARY_ONLY=true` (Monad hidden by default; add `--dart-define=CANARY_MONAD=true` only to reproduce the Monad build); copy `build/web/.` into `app/` on `gh-pages`, then commit and push (see the 22 Sep hosting note below).
+  6. Rebuild the web app: from `app/`, in PowerShell, `flutter build web --release --base-href /nosus-canary/ --dart-define=NOSUS_CANARY_ONLY=true` (Monad hidden by default; add `--dart-define=CANARY_MONAD=true` only to reproduce the Monad build); copy `build/web/.` into the root of `gh-pages` (keep `hub/` and the `app/` redirect), then commit and push (see the 22 Sep hosting note below).
   7. Verify: create a Canary link, open a copy in a private window, and click the **Solana** chip. It must open `https://explorer.solana.com/tx/<sig>?cluster=devnet` showing one Memo instruction whose JSON starts `{"p":"nosus-canary","v":1,"t":"open"` and contains hashes only. Record the seal signature in "Evidence so far" and in `docs/canary/VERIFICATION.md`.
 
 ## NO SUS Canary — 19 Sep 2026
@@ -53,7 +53,7 @@
   - `docs/canary/reference/` was removed after being merged. The fingerprint harness is now `app/tool/canary_fingerprint_harness.dart` (FAILURES: 0).
   - Checks: 133 passed, 1 skipped; analyze 0 issues.
 - Hosting (22 Sep 2026): this repo, renamed from `nosus-monad` (old URLs redirect), now also hosts the site. Source is on `main`; the built site is on `gh-pages` and served at http://shubham-sahu.me/nosus-canary/ (`app/` = the Flutter build, `hub/` + `index.html` = landing).
-  - To deploy: from `app/`, run `flutter build web --release --base-href /nosus-canary/app/ --dart-define=NOSUS_CANARY_ONLY=true` in PowerShell, copy `build/web/.` into `app/` on `gh-pages`, then commit and push.
+  - To deploy: from `app/`, run `flutter build web --release --base-href /nosus-canary/ --dart-define=NOSUS_CANARY_ONLY=true` in PowerShell, copy `build/web/.` into the root of `gh-pages` (keep `hub/` and the `app/` redirect), then commit and push. Since 10 Oct 2026 the app is served at https://shubham-sahu.me/nosus-canary/; `/app/` redirects there keeping the hash, so older reader links still open.
   - The separate site repo was retired.
 
 ## Current state
