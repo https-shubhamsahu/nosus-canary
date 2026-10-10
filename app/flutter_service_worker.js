@@ -1,31 +1,14 @@
-'use strict';
-
-self.addEventListener('install', () => {
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
+// The app moved to /nosus-canary/. Retire the old /app/ service worker so
+// returning visitors stop getting a cached copy of the old build.
+self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
-      try {
-        await self.registration.unregister();
-      } catch (e) {
-        console.warn('Failed to unregister the service worker:', e);
-      }
-
-      try {
-        const clients = await self.clients.matchAll({
-          type: 'window',
-        });
-        // Reload clients to ensure they are not using the old service worker.
-        clients.forEach((client) => {
-          if (client.url && 'navigate' in client) {
-            client.navigate(client.url);
-          }
-        });
-      } catch (e) {
-        console.warn('Failed to navigate some service worker clients:', e);
-      }
-    })()
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k)));
+      await self.registration.unregister();
+      const clients = await self.clients.matchAll({ type: "window" });
+      for (const c of clients) c.navigate(c.url);
+    })(),
   );
 });
