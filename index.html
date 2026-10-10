@@ -1,379 +1,187 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NO SUS Arcade</title>
-<meta name="description" content="Choose your game: the NO SUS app, or NO SUS Canary with receipts on Solana.">
-<link rel="icon" href="app/favicon.png">
-<script>
-  // Older links pointed straight at the Canary app (/nosus-canary/#/canary/...).
-  // The app now lives in app/, so forward any in-app route there.
-  if (location.hash.length > 1) location.replace('app/' + location.search + location.hash);
-</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --paper: #FAF6EC;
-    --card: #FFFDF7;
-    --ink: #141414;
-    --ink-soft: #4A4740;
-    --orange: #F28C28;
-    --shadow: 8px;
-    --pixel: "Press Start 2P", ui-monospace, monospace;
-    --term: "VT323", ui-monospace, monospace;
-    --body: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; }
-  body {
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--body);
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    background-image: radial-gradient(var(--ink) 1px, transparent 1px);
-    background-size: 22px 22px;
-    background-position: -11px -11px;
-    background-color: var(--paper);
-  }
-  body::before {
-    content: "";
-    position: fixed; inset: 0;
-    background: var(--paper);
-    opacity: .9;
-    z-index: -1;
-  }
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
 
-  /* marquee strip */
-  .strip {
-    background: var(--orange);
-    border-bottom: 3px solid var(--ink);
-    overflow: hidden;
-    white-space: nowrap;
-    font-family: var(--term);
-    font-size: 22px;
-    line-height: 36px;
-  }
-  .strip span { display: inline-block; padding-left: 100%; animation: marquee 22s linear infinite; }
-  @keyframes marquee { to { transform: translateX(-100%); } }
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
 
-  main {
-    flex: 1;
-    width: 100%;
-    max-width: 1120px;
-    margin: 0 auto;
-    padding: 40px 20px 32px;
-  }
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
 
-  /* title */
-  .title { display: flex; align-items: center; gap: 24px; justify-content: center; flex-wrap: wrap; }
-  .bird { width: 96px; height: 84px; animation: bob 1.2s ease-in-out infinite alternate; }
-  .bird .b { display: none; }
-  .bird.flap .a { display: none; }
-  .bird.flap .b { display: inline; }
-  @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-8px); } }
-  h1 {
-    margin: 0;
-    font-family: var(--pixel);
-    font-size: clamp(34px, 6vw, 64px);
-    line-height: 1.1;
-    letter-spacing: 2px;
-    text-shadow: 5px 5px 0 var(--orange);
-    animation: drop .6s steps(6, end) both;
-  }
-  @keyframes drop { from { transform: translateY(-40px); opacity: 0; } to { transform: none; opacity: 1; } }
-  .sub {
-    text-align: center;
-    margin: 18px 0 10px;
-    font-family: var(--term);
-    font-size: 30px;
-    min-height: 36px;
-  }
-  .caret { display: inline-block; width: 12px; height: 24px; background: var(--ink); vertical-align: -3px; margin-left: 4px; animation: blink 1s steps(1) infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/nosus-canary/">
 
-  /* cartridges */
-  .games { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; }
-  @media (max-width: 760px) { .games { grid-template-columns: 1fr; gap: 28px; } }
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="NO SUS — secure document sharing with watermarking, blur-until-touch protection, and tamper-evident audit logs.">
 
-  .cart {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    background: var(--card);
-    border: 3px solid var(--ink);
-    border-radius: 18px 18px 14px 14px;
-    box-shadow: var(--shadow) var(--shadow) 0 var(--ink);
-    padding: 0 0 24px;
-    transition: transform .18s ease, box-shadow .18s ease;
-    animation: rise .5s ease-out both;
-  }
-  .cart:nth-child(2) { animation-delay: .12s; }
-  @keyframes rise { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
-  .cart.selected {
-    transform: translate(-3px, -3px);
-    box-shadow: calc(var(--shadow) + 4px) calc(var(--shadow) + 4px) 0 var(--orange);
-  }
-  .cart .cursor {
-    position: absolute; left: 50%; top: -30px;
-    font-family: var(--pixel); font-size: 18px;
-    opacity: 0;
-    transform: translateX(-50%);
-  }
-  .cart.selected .cursor { opacity: 1; animation: nudge .7s steps(2) infinite; }
-  @keyframes nudge { 50% { transform: translate(-50%, 5px); } }
-  .games { margin-top: 34px; }
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="NO SUS">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  /* cartridge label */
-  .label {
-    margin: 0 0 20px;
-    height: 150px;
-    border-bottom: 3px solid var(--ink);
-    border-radius: 15px 15px 0 0;
-    display: flex; align-items: center; justify-content: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .label.ink { background: var(--ink); }
-  .label.orange { background: var(--orange); }
-  .label .grip {
-    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-    width: 90px; height: 10px; border-radius: 5px;
-    background: repeating-linear-gradient(90deg, currentColor 0 6px, transparent 6px 12px);
-    opacity: .5;
-  }
-  .label.ink { color: var(--paper); }
-  .label.orange { color: var(--ink); }
-  .label .logo { font-family: var(--pixel); font-size: 30px; letter-spacing: 2px; }
-  .label.ink .logo { text-shadow: 4px 4px 0 var(--orange); }
-  .label.orange .logo { text-shadow: 4px 4px 0 var(--paper); }
-  .label svg { width: 78px; height: 68px; margin-right: 14px; }
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
 
-  .body { padding: 0 24px; display: flex; flex-direction: column; flex: 1; }
-  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-  .tag {
-    font-family: var(--term); font-size: 20px; line-height: 1;
-    padding: 5px 10px 3px;
-    border: 2px solid var(--ink); border-radius: 8px;
-    background: var(--card);
-  }
-  .tag.hot { background: var(--orange); }
-  h2 { margin: 0 0 6px; font-size: 28px; font-weight: 700; letter-spacing: -.5px; }
-  .pitch { margin: 0 0 14px; font-size: 17px; line-height: 1.5; color: var(--ink-soft); }
-  .perks { list-style: none; margin: 0 0 22px; padding: 0; font-family: var(--term); font-size: 22px; line-height: 1.25; }
-  .perks li { display: flex; gap: 10px; align-items: baseline; }
-  .perks li::before { content: ""; width: 10px; height: 10px; background: var(--orange); border: 2px solid var(--ink); flex: none; transform: translateY(1px); }
+  <title>NO SUS</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="manifest" href="manifest.json">
 
-  .start {
-    margin-top: auto;
-    display: flex; align-items: center; justify-content: center; gap: 12px;
-    min-height: 60px;
-    padding: 14px 20px;
-    font-family: var(--pixel); font-size: 15px; letter-spacing: 1px;
-    color: var(--ink); text-decoration: none;
-    background: var(--orange);
-    border: 3px solid var(--ink);
-    border-radius: 14px;
-    box-shadow: 5px 5px 0 var(--ink);
-    transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
-    cursor: pointer;
-  }
-  .start.alt { background: var(--card); }
-  .start:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink); }
-  .start:active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--ink); }
-  .start:focus-visible, .link:focus-visible { outline: 4px solid var(--orange); outline-offset: 4px; }
-  .start .tri { width: 0; height: 0; border-left: 12px solid var(--ink); border-top: 8px solid transparent; border-bottom: 8px solid transparent; }
+  <!--
+    The first web frame is the NO SUS wordmark itself. This has no image,
+    external font, or startup work: Flutter removes it as soon as its first
+    real frame is ready, so branding never creates a minimum load time.
+  -->
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; min-height: 100%; background: #000000; }
+    #boot-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483647;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100svh;
+      box-sizing: border-box;
+      padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+      background: #000000;
+      transition: opacity 100ms linear;
+    }
+    #boot-loader.boot-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #boot-loader .boot-mark {
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+      color: #FFFFFF;
+      font-size: clamp(34px, 9vw, 48px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    #boot-loader .boot-stop {
+      width: 0.21em;
+      height: 0.21em;
+      margin-left: 0.08em;
+      margin-bottom: 0.02em;
+      display: inline-block;
+      vertical-align: baseline;
+      background: #808080;
+      animation: boot-stop-settle 180ms cubic-bezier(.2, .7, .3, 1) 60ms both;
+    }
+    @keyframes boot-stop-settle {
+      from { opacity: 0; transform: translateY(-2px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #boot-loader, #boot-loader .boot-stop { transition: none; animation: none; }
+    }
+  </style>
 
-  /* hi-score bar */
-  .hiscore {
-    margin: 40px auto 0;
-    display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: center;
-    font-family: var(--term); font-size: 22px;
-  }
-  .hiscore b { font-weight: normal; background: var(--ink); color: var(--paper); padding: 2px 8px; border-radius: 6px; margin-right: 6px; }
-  .link { color: var(--ink); text-decoration: underline; text-decoration-color: var(--orange); text-decoration-thickness: 3px; text-underline-offset: 3px; }
-
-  footer {
-    border-top: 3px solid var(--ink);
-    background: var(--card);
-    text-align: center;
-    font-family: var(--term);
-    font-size: 22px;
-    padding: 12px 16px;
-  }
-  footer .keys kbd {
-    font-family: var(--term); font-size: 20px;
-    border: 2px solid var(--ink); border-bottom-width: 4px; border-radius: 6px;
-    padding: 0 7px; background: var(--paper);
-  }
-  .press { animation: blink 1.1s steps(1) infinite; }
-
-  /* launch overlay */
-  .boot {
-    position: fixed; inset: 0; z-index: 10;
-    background: var(--ink); color: var(--paper);
-    display: none; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
-    font-family: var(--pixel); font-size: 16px; letter-spacing: 1px;
-  }
-  .boot.on { display: flex; }
-  .bar { width: min(360px, 80vw); height: 26px; border: 3px solid var(--paper); padding: 3px; }
-  .bar i { display: block; height: 100%; width: 0; background: var(--orange); animation: load .55s steps(10, end) forwards; }
-  @keyframes load { to { width: 100%; } }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; }
-    .strip span { padding-left: 16px; }
-    .bar i { width: 100%; }
-  }
-</style>
+  <!--
+    supabase_flutter's Auth client wires up passkey/WebAuthn support by
+    default, which pulls in the `passkeys_web` plugin. That plugin's
+    registerWith() runs automatically on EVERY page load (Flutter Web plugin
+    registration is unconditional, independent of whether the app ever uses
+    passkeys) and calls `PasskeyAuthenticator.init()` unconditionally, even
+    when this script hasn't loaded — crashing with
+    "Cannot read properties of undefined (reading 'init')" on every page,
+    including the SecureSend anonymous share link. This script (vendored
+    locally instead of pointed at a GitHub releases URL, to avoid an external
+    runtime dependency) defines the global `PasskeyAuthenticator` the plugin
+    expects, so registration succeeds even though the app doesn't use passkeys.
+    Must load BEFORE flutter_bootstrap.js (no async/defer) — Flutter's plugin
+    registration runs during engine boot, not after DOMContentLoaded.
+  -->
+  <script src="passkeys-bundle.js"></script>
 </head>
 <body>
-  <div class="strip" aria-hidden="true"><span>INSERT COIN &nbsp;&#9670;&nbsp; NO SUS ARCADE &nbsp;&#9670;&nbsp; TWO GAMES, ONE MISSION: KNOW WHO LEAKED IT &nbsp;&#9670;&nbsp; EVERY OPEN RECEIPTED ON SOLANA &nbsp;&#9670;&nbsp; PRESS START</span></div>
-
-  <main>
-    <div class="title">
-      <svg class="bird" id="bird" viewBox="0 0 16 14" shape-rendering="crispEdges" aria-hidden="true"></svg>
-      <h1>NO SUS</h1>
-    </div>
-    <p class="sub"><span id="type">Choose your game.</span><span class="caret" aria-hidden="true"></span></p>
-
-    <div class="games" role="list">
-      <article class="cart selected" role="listitem" data-href="https://app.nosus.foo/">
-        <span class="cursor" aria-hidden="true">&#9660;</span>
-        <div class="label ink" aria-hidden="true"><span class="grip"></span><span class="logo">NO SUS</span></div>
-        <div class="body">
-          <div class="tags"><span class="tag">CLASSIC</span><span class="tag">PLAYER 1</span></div>
-          <h2>NO SUS app</h2>
-          <p class="pitch">Send a sensitive document and still see who opened it.</p>
-          <ul class="perks">
-            <li>Burn Notes and Burn Files</li>
-            <li>Private study groups and vault</li>
-            <li>Audit log of every open</li>
-          </ul>
-          <a class="start alt" href="https://app.nosus.foo/"><span class="tri" aria-hidden="true"></span>PLAY NO SUS</a>
-        </div>
-      </article>
-
-      <article class="cart" role="listitem" data-href="app/">
-        <span class="cursor" aria-hidden="true">&#9660;</span>
-        <div class="label orange" aria-hidden="true"><span class="grip"></span><svg id="bird2" viewBox="0 0 16 14" shape-rendering="crispEdges"></svg><span class="logo">CANARY</span></div>
-        <div class="body">
-          <div class="tags"><span class="tag hot">NEW</span><span class="tag">ON SOLANA</span><span class="tag">PLAYER 2</span></div>
-          <h2>NO SUS Canary</h2>
-          <p class="pitch">Every reader gets their own copy. If it leaks, the canary sings whose copy it was.</p>
-          <ul class="perks">
-            <li>One link, a unique copy per reader</li>
-            <li>Every open recorded on Solana devnet</li>
-            <li>Paste a leak, get the name</li>
-          </ul>
-          <a class="start" href="app/"><span class="tri" aria-hidden="true"></span>PLAY CANARY</a>
-        </div>
-      </article>
-    </div>
-
-    <div class="hiscore">
-      <span><b>RECEIPT</b><a class="link" href="https://explorer.solana.com/tx/2BHqnuCxYyemfegHkncgTsQyMPjpyB9boD1XqYfD1Wtbcf51Fpy3y264UwGhnvRKtcxFKCaSAzHxLrDwFRk512bQ?cluster=devnet" target="_blank" rel="noopener">Seal memo on Solana devnet</a></span>
-      <span><b>SOURCE</b><a class="link" href="https://github.com/https-shubhamsahu/nosus-canary" target="_blank" rel="noopener">GitHub</a></span>
-      <span><b>NETWORK</b>Solana devnet</span>
-    </div>
-  </main>
-
-  <footer>
-    <span class="keys"><kbd>&larr;</kbd> <kbd>&rarr;</kbd> choose &nbsp; <kbd>ENTER</kbd> start</span>
-    &nbsp;&middot;&nbsp; <span class="press">PRESS START</span>
-  </footer>
-
-  <div class="boot" id="boot" role="status" aria-live="polite">
-    <span id="bootText">LOADING</span>
-    <div class="bar"><i></i></div>
+  <div id="boot-loader">
+    <div class="boot-mark" role="status" aria-live="polite" aria-label="NO SUS opening application">NO SUS<span class="boot-stop" aria-hidden="true"></span></div>
   </div>
-
-<script>
-(function () {
-  // Pixel canary (same sprite as the README).
-  var PAL = { K: '#141414', Y: '#F28C28', y: '#FAF6EC', W: '#FAF6EC', O: '#141414' };
-  var A = ['.....KKKKK......','...KKYYYYYKK....','..KYYYYYYYWWK...','..KYYYYYYYWKK...','.KYYYYYYYYYYKOO.','.KYYYYYYYYYYKOOO','.KYyyyyYYYYYK...','KYYyyyyyYYYYK...','KYYYyyyyYYYK....','.KYYYyyYYYYK....','..KYYYYYYYK.....','...KKKKKKK......','....K...K.......','...KK..KK.......'];
-  var B = ['.....KKKKK......','...KKYYYYYKK....','..KYYYYYYYWWK...','..KYYYYYYYWKK...','.KYYyyYYYYYYKOO.','.KYyyyyYYYYYKOOO','.KYYyyyYYYYYK...','KYYYYYYYYYYYK...','KYYYYYYYYYYK....','.KYYYYYYYYYK....','..KYYYYYYYK.....','...KKKKKKK......','....K...K.......','...KK..KK.......'];
-  function frame(rows, cls, pal) {
-    pal = pal || PAL;
-    var out = '<g class="' + cls + '">';
-    rows.forEach(function (row, y) {
-      for (var x = 0; x < row.length;) {
-        var c = row[x];
-        if (c === '.') { x++; continue; }
-        var e = x; while (e < row.length && row[e] === c) e++;
-        out += '<rect x="' + x + '" y="' + y + '" width="' + (e - x) + '" height="1" fill="' + pal[c] + '"/>';
-        x = e;
+  <script>
+    (function() {
+      // Flutter Web dispatches this once the engine paints its first real
+      // frame — remove the boot loader then, with a generous timeout
+      // fallback so a missed event (older engine builds, unusual load
+      // paths) never leaves it stuck on screen forever.
+      function hideBootLoader() {
+        const el = document.getElementById('boot-loader');
+        if (!el) return;
+        el.classList.add('boot-hidden');
+        setTimeout(function() { el.remove(); }, 100);
       }
-    });
-    return out + '</g>';
-  }
-  var art = frame(A, 'a') + frame(B, 'b');
-  var bird = document.getElementById('bird');
-  bird.innerHTML = art;
-  document.getElementById('bird2').innerHTML = frame(A, '', { K: '#141414', Y: '#FAF6EC', y: '#F28C28', W: '#141414', O: '#141414' });
-
-  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!still) setInterval(function () { bird.classList.toggle('flap'); }, 260);
-
-  // Typewriter subtitle.
-  var lines = ['Choose your game.', 'Two games. One mission.', 'Know who leaked it.'];
-  var el = document.getElementById('type');
-  if (!still) {
-    var li = 0, ci = 0, dir = 1;
-    el.textContent = '';
-    (function tick() {
-      var s = lines[li];
-      ci += dir;
-      el.textContent = s.slice(0, ci);
-      var wait = 55;
-      if (dir === 1 && ci === s.length) { dir = -1; wait = 1600; }
-      else if (dir === -1 && ci === 0) { dir = 1; li = (li + 1) % lines.length; wait = 300; }
-      setTimeout(tick, wait);
+      window.addEventListener('flutter-first-frame', hideBootLoader, { once: true });
+      setTimeout(hideBootLoader, 12000);
     })();
-  }
+  </script>
+  <script>
+    (function() {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const hasCode = window.location.search.includes('code=') || window.location.hash.includes('access_token=');
+      if (isMobile && hasCode) {
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100vw';
+        overlay.style.height = '100vh';
+        overlay.style.background = '#000000';
+        overlay.style.color = '#F5F5F5';
+        overlay.style.fontFamily = 'ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif';
+        overlay.style.zIndex = '999999';
+        overlay.style.display = 'flex';
+        overlay.style.flexDirection = 'column';
+        overlay.style.alignItems = 'center';
+        overlay.style.justifyContent = 'center';
+        overlay.style.padding = '30px';
+        overlay.style.boxSizing = 'border-box';
+        overlay.style.textAlign = 'center';
 
-  // Cartridge selection: hover, focus or arrow keys; Enter starts.
-  var carts = Array.prototype.slice.call(document.querySelectorAll('.cart'));
-  var sel = 0;
-  function select(i) {
-    sel = (i + carts.length) % carts.length;
-    carts.forEach(function (c, j) { c.classList.toggle('selected', j === sel); });
-  }
-  carts.forEach(function (c, i) {
-    c.addEventListener('mouseenter', function () { select(i); });
-    c.addEventListener('focusin', function () { select(i); });
-  });
+        overlay.innerHTML = `
+          <div style="font-size: 27px; color: #FFFFFF; margin-bottom: 36px; font-weight: 800; letter-spacing: -0.5px;">NO SUS<span style="display: inline-block; width: 6px; height: 6px; margin-left: 3px; background: #808080;"></span></div>
+          <h2 style="font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 10px; color: #FFFFFF;">Finishing sign-in</h2>
+          <p style="color: #A0A0A0; font-size: 14px; max-width: 320px; line-height: 1.5; margin-bottom: 32px;">
+            Open NO SUS to continue.
+          </p>
+          <button id="open-app-btn" style="background-color: #FFFFFF; color: #0D0D0D; border: 1.5px solid #FFFFFF; padding: 15px 32px; border-radius: 12px; font-weight: 700; font-family: inherit; cursor: pointer; font-size: 15px; width: 100%; max-width: 260px;">
+            OPEN APP
+          </button>
+          <a id="continue-web-btn" href="#" style="color: #A0A0A0; font-size: 14px; margin-top: 24px; text-decoration: underline;">
+            Continue in browser
+          </a>
+        `;
 
-  var boot = document.getElementById('boot');
-  function launch(href, name) {
-    if (still) { location.href = href; return; }
-    document.getElementById('bootText').textContent = 'LOADING ' + name;
-    boot.classList.add('on');
-    setTimeout(function () { location.href = href; }, 600);
-  }
-  document.querySelectorAll('.start').forEach(function (a) {
-    a.addEventListener('click', function (e) {
-      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-      e.preventDefault();
-      launch(a.getAttribute('href'), a.textContent.replace('PLAY ', '').trim());
-    });
-  });
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { select(sel + 1); e.preventDefault(); }
-    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { select(sel - 1); e.preventDefault(); }
-    else if (e.key === 'Enter' && !(document.activeElement && document.activeElement.classList.contains('start'))) {
-      var a = carts[sel].querySelector('.start');
-      launch(a.getAttribute('href'), a.textContent.replace('PLAY ', '').trim());
-    }
-  });
-  // Coming back with the browser Back button: hide the loading screen.
-  window.addEventListener('pageshow', function () { boot.classList.remove('on'); });
-})();
-</script>
+        document.body.appendChild(overlay);
+
+        document.getElementById('open-app-btn').addEventListener('click', function() {
+          const params = window.location.search + window.location.hash;
+          const redirectUri = 'io.supabase.nosus://login-callback' + params;
+          window.location.href = redirectUri;
+        });
+
+        document.getElementById('continue-web-btn').addEventListener('click', function(e) {
+          e.preventDefault();
+          document.body.removeChild(overlay);
+        });
+      }
+    })();
+  </script>
+  <!--
+    You can customize the "flutter_bootstrap.js" script.
+    This is useful to provide a custom configuration to the Flutter loader
+    or to give the user feedback during the initialization process.
+
+    For more details:
+    * https://docs.flutter.dev/platform-integration/web/initialization
+  -->
+  <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
