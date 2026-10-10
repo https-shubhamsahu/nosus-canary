@@ -68,8 +68,12 @@ class CanaryApi {
     return decoded;
   }
 
-  /// Uploads every encrypted copy and seals the note on Monad.
-  Future<({String sealTxHash, DateTime expiresAt})> create({
+  /// Uploads every encrypted copy and seals the note: one memo on Solana
+  /// devnet ([sealSolanaSig]) and, only while the server has the Monad
+  /// prototype switched on, one Monad testnet transaction ([sealTxHash]).
+  /// The server answers 200 only once at least one of them exists.
+  Future<({String? sealTxHash, String? sealSolanaSig, DateTime expiresAt})>
+  create({
     required String noteId,
     required String ownerHash,
     required int copyCount,
@@ -89,8 +93,17 @@ class CanaryApi {
           {'index': c.index, 'ciphertext': c.ciphertext, 'iv': c.iv},
       ],
     }, timeout: const Duration(seconds: 60));
+    final sealTxHash = result['seal_tx_hash'] as String?;
+    final sealSolanaSig = result['seal_solana_sig'] as String?;
+    if (sealTxHash == null && sealSolanaSig == null) {
+      throw const CanaryApiException(
+        'The note was not sealed. Try again.',
+        retryable: true,
+      );
+    }
     return (
-      sealTxHash: result['seal_tx_hash'] as String,
+      sealTxHash: sealTxHash,
+      sealSolanaSig: sealSolanaSig,
       expiresAt: DateTime.parse(result['expires_at'] as String),
     );
   }
@@ -103,6 +116,7 @@ class CanaryApi {
       String ciphertext,
       String iv,
       String? openTxHash,
+      String? openSolanaSig,
       DateTime openedAt,
     })
   >
@@ -123,6 +137,7 @@ class CanaryApi {
       ciphertext: r['ciphertext'] as String,
       iv: r['iv'] as String,
       openTxHash: r['open_tx_hash'] as String?,
+      openSolanaSig: r['open_solana_sig'] as String?,
       openedAt: DateTime.parse(r['opened_at'] as String),
     );
   }
@@ -140,6 +155,7 @@ class CanaryApi {
     return CanaryNoteStatus(
       copyCount: r['copy_count'] as int,
       sealTxHash: r['seal_tx_hash'] as String?,
+      sealSolanaSig: r['seal_solana_sig'] as String?,
       expiresAt: DateTime.parse(r['expires_at'] as String),
       copies: [
         for (final c in r['copies'] as List)
@@ -148,6 +164,7 @@ class CanaryApi {
             readerName: c['reader_name'] as String,
             openedAt: DateTime.parse(c['opened_at'] as String),
             openTxHash: c['open_tx_hash'] as String?,
+            openSolanaSig: c['open_solana_sig'] as String?,
           ),
       ],
     );

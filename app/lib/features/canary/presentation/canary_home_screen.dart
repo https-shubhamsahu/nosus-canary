@@ -94,14 +94,23 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
 
   static const double _maxWide = 1360;
 
-  static const _tickerItems = [
-    'EVERY OPEN = 1 MONAD TRANSACTION',
-    '~0.015 MON PER READER',
-    'FINAL IN UNDER 1 SECOND',
-    'NO WALLET NEEDED TO READ',
-    'LEAK MATCHING STAYS ON YOUR DEVICE',
-    'IT CANNOT STOP SCREENSHOTS. IT MAKES THEM TRACEABLE.',
-  ];
+  static const _tickerItems = kCanaryMonad
+      ? [
+          'EVERY OPEN = 1 TX ON MONAD + 1 ON SOLANA',
+          '~0.015 MON PER READER',
+          'FINAL IN UNDER 1 SECOND',
+          'NO WALLET NEEDED TO READ',
+          'LEAK MATCHING STAYS ON YOUR DEVICE',
+          'IT CANNOT STOP SCREENSHOTS. IT MAKES THEM TRACEABLE.',
+        ]
+      : [
+          'EVERY OPEN = 1 MEMO ON SOLANA DEVNET',
+          '~0.000005 SOL PER READER',
+          'ONLY HASHES GO ON CHAIN, NEVER TEXT',
+          'NO WALLET NEEDED TO READ',
+          'LEAK MATCHING STAYS ON YOUR DEVICE',
+          'IT CANNOT STOP SCREENSHOTS. IT MAKES THEM TRACEABLE.',
+        ];
 
   Widget _sectionTitle(String title, String subtitle) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -456,14 +465,21 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: CanaryTokens.text, width: 2),
             ),
-            child: const Text(
-              'NO SUS  x  MONAD',
-              style: TextStyle(
+            // One line on wide screens; on a phone the three names of the
+            // Monad build would not fit in 320 px, so Solana takes a second
+            // line in the stamp.
+            child: Text(
+              !kCanaryMonad
+                  ? 'NO SUS  x  SOLANA'
+                  : expanded
+                  ? 'NO SUS  x  MONAD  x  SOLANA'
+                  : 'NO SUS  x  MONAD\nx  SOLANA',
+              style: const TextStyle(
                 color: CanaryTokens.text,
                 fontFamily: CanaryTokens.monoFont,
                 fontSize: 22,
                 letterSpacing: 2,
-                height: 1,
+                height: 1.1,
               ),
             ),
           ),
@@ -561,14 +577,19 @@ class _CanaryHomeScreenState extends ConsumerState<CanaryHomeScreen> {
             runSpacing: 12,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              if (kCanaryContract.isNotEmpty)
-                const ChainChip(
-                  label: 'Contract on Monad',
-                  txHash: kCanaryContract,
-                  compact: true,
-                ),
-              const Text('~0.015 MON / READER', style: stat),
-              const Text('FINAL < 1 S', style: stat),
+              if (kCanaryMonad) ...[
+                if (kCanaryContract.isNotEmpty)
+                  const ChainChip(
+                    label: 'Contract on Monad',
+                    txHash: kCanaryContract,
+                    compact: true,
+                  ),
+                const Text('~0.015 MON / READER', style: stat),
+                const Text('FINAL < 1 S', style: stat),
+              ] else ...[
+                const Text('SOLANA DEVNET', style: stat),
+                const Text('~0.000005 SOL / READER', style: stat),
+              ],
               InkWell(
                 onTap: () => _openUrl(kCanaryRepoUrl),
                 child: const Text(

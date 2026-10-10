@@ -14,7 +14,7 @@
 
 ## Step 1: Watch
 
-<p align="center"><img src="assets/readme/story.svg" width="100%" alt="Animation: the sender seals a note on Monad, five readers each receive a different copy, Priya's copy leaks, NO SUS scans it and the canary sings: copy 03 is Priya's."></p>
+<p align="center"><img src="assets/readme/story.svg" width="100%" alt="Animation: the sender seals a note on Solana, five readers each receive a different copy, Priya's copy leaks, NO SUS scans it and the canary sings: copy 03 is Priya's."></p>
 
 ## Step 2: Try it
 
@@ -26,24 +26,25 @@
 
 <p align="center"><img src="assets/readme/battle.svg" width="100%" alt="Battle text: A wild LEAK appeared! Canary used FINGERPRINT! It's super effective! It was Priya's copy, number 03."></p>
 
-## Step 3: Why Monad
+## Step 3: Why Solana
 
-- **One transaction per reader.** Every **Open my copy** is recorded on-chain.
-- **Final in under a second.** About **0.015 MON** each.
-- **Parallel execution.** A whole room can open the link at once.
+- **One memo per seal and per open.** Sealing a note and every **Open my copy** each write one Memo-program transaction on Solana devnet.
+- **Hashes only.** A memo carries a hashed note id, one hash of all copies and an anonymous reader tag. Never the text, the key or a name.
+- **A link on every chip.** Each record has its own Solana Explorer link in the app.
+- **No wallet for readers.** A relayer pays the fee, about **0.000005 SOL** per memo.
 
 ## Judge checklist
 
 | | What | Where |
 |---|---|---|
 | **Done** | Live app | [shubham-sahu.me/nosus-canary/](http://shubham-sahu.me/nosus-canary/) |
-| **Done** | Contract on Monad testnet | [`0xb1a1858866122c84cf97861ca815fb070e010e68`](https://testnet.monadscan.com/address/0xb1a1858866122c84cf97861ca815fb070e010e68) |
-| **Done** | Verified source code | [View verified source](https://sourcify.dev/server/repo-ui/10143/0xb1a1858866122c84cf97861ca815fb070e010e68) |
-| **Done** | Live transaction in the demo | Every **Open my copy** tap |
+| **Done** | Solana devnet memo log | [View on Solana Explorer](https://explorer.solana.com/tx/2BHqnuCxYyemfegHkncgTsQyMPjpyB9boD1XqYfD1Wtbcf51Fpy3y264UwGhnvRKtcxFKCaSAzHxLrDwFRk512bQ?cluster=devnet) |
+| **Done** | Live transaction in the demo | Every seal and every **Open my copy** tap |
 | **Done** | Public repo you can run | [Run it yourself](#more) |
 | Soon | Build in public | _soon_ · _soon_ · _soon_ |
-| Soon | Bonus: Monad mainnet | _soon_ |
 | **Done** | Bonus: custom domain | [shubham-sahu.me](http://shubham-sahu.me/nosus-canary/) |
+
+Earlier prototype: the same flow on Monad testnet ([contract](https://testnet.monadscan.com/address/0xb1a1858866122c84cf97861ca815fb070e010e68), [verified source](https://sourcify.dev/server/repo-ui/10143/0xb1a1858866122c84cf97861ca815fb070e010e68)), still in the repo behind the `CANARY_MONAD` build flag.
 
 > **Honest limits:** it names *whose copy* leaked, not *who shared it*. It doesn't stop screenshots. It makes them traceable.
 
@@ -53,8 +54,8 @@
 <summary><b>How the fingerprint works</b></summary>
 
 - **Write once.** NO SUS swaps safe word twins (`don't` / `do not`, `five` / `5`) to make up to **100 copies**. Each looks normal, each is unique.
-- **Seal it.** Copies are encrypted in your browser. The key lives only in the link's `#fragment`. `sealNote` puts one hash of all copies on Monad before anyone reads.
-- **Share it.** Each reader gets the next unused copy. `openCopy` records it on Monad with an anonymous tag, never the name.
+- **Seal it.** Copies are encrypted in your browser. The key lives only in the link's `#fragment`. A seal memo puts one hash of all copies on Solana devnet before anyone reads.
+- **Share it.** Each reader gets the next unused copy. An open memo records it on Solana with an anonymous tag, never the name.
 - **Catch it.** Paste a leak into **Check a leak**. Matching runs on your device. If too little text survived, it names nobody.
 </details>
 
@@ -72,13 +73,13 @@ cd app
 flutter pub get
 flutter run -d chrome
 
-# Contract
-cd ../contracts
-npm ci
-npx hardhat test
+# Edge function checks (offline)
+cd ..
+npx -y deno@2 check app/supabase/functions/canary/index.ts
+npx -y deno@2 test app/supabase/functions/canary/gating_test.ts
 ```
 
-Own backend and contract: see [`docs/canary/NOSUS_CANARY_BUILD_PLAN.md`](docs/canary/NOSUS_CANARY_BUILD_PLAN.md).
+Own backend: see [`docs/canary/NOSUS_CANARY_BUILD_PLAN.md`](docs/canary/NOSUS_CANARY_BUILD_PLAN.md).
 </details>
 
 <details>
@@ -88,9 +89,9 @@ Own backend and contract: see [`docs/canary/NOSUS_CANARY_BUILD_PLAN.md`](docs/ca
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#FAF6EC','primaryTextColor':'#141414','primaryBorderColor':'#141414','lineColor':'#F28C28','fontFamily':'monospace'}}}%%
 flowchart LR
   S["Sender app"] -- "encrypted copies" --> F["canary function"]
-  F -- "sealNote" --> M[("NoSusCanary on Monad")]
+  F -- "seal memo" --> M[("Memo program on Solana devnet")]
   R["Reader"] -- "open + name" --> F
-  F -- "openCopy" --> M
+  F -- "open memo" --> M
   F -- "their copy" --> R
 ```
 
@@ -112,10 +113,10 @@ Fingerprint test harness, 15-slot demo note:
 | Partial excerpts (30–70%) | named only when sure | 0 / 600 |
 </details>
 
-Full technical write-up (setup, deployment, contract and relayers): [`docs/TECHNICAL_README.md`](docs/TECHNICAL_README.md)
+Full technical write-up (setup, deployment and relayers): [`docs/TECHNICAL_README.md`](docs/TECHNICAL_README.md)
 
 ---
 
-**Team:** Shubham Sahu · Built at **Monad Blitz Mumbai V4** · part of **NO SUS**
+**Team:** Shubham Sahu · Part of **NO SUS**
 
 <p align="center"><a href="http://shubham-sahu.me/nosus-canary/"><img src="assets/readme/game-over.svg" width="100%" alt="Game over? Play again at the live app."></a></p>

@@ -2,17 +2,20 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../config/app_mode.dart';
 import '../../../core/layout/app_breakpoints.dart';
 import '../../../theme.dart';
 import '../data/canary_api.dart';
+import '../domain/canary_link.dart';
 import '../domain/canary_models.dart';
 import 'canary_created_screen.dart';
 import 'canary_leak_check_screen.dart';
 import 'canary_providers.dart';
 import 'canary_ui.dart';
-import 'ui/chain_chip.dart';
 import 'ui/glow_card.dart';
+import 'ui/proof_chips.dart';
 import 'ui/wallet_button.dart';
 
 /// Owner dashboard: live "Seen by" list plus the leak check.
@@ -72,6 +75,25 @@ class _CanaryNoteScreenState extends ConsumerState<CanaryNoteScreen> {
       _loading = false;
     }
   }
+
+  Future<void> _openSolanaSeal(String signature) async {
+    final ok = await launchUrl(
+      Uri.parse(canarySolanaExplorerTxUrl(signature)),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open the explorer.')),
+      );
+    }
+  }
+
+  /// Solana is on for this note when its seal landed there; an open with no
+  /// signature yet is then "still being written" for a short while.
+  bool _solanaPending(CanaryNoteStatus status, CanaryCopyStatus copy) =>
+      status.sealSolanaSig != null &&
+      copy.openSolanaSig == null &&
+      DateTime.now().difference(copy.openedAt) < const Duration(minutes: 2);
 
   @override
   Widget build(BuildContext context) {
@@ -180,10 +202,21 @@ class _CanaryNoteScreenState extends ConsumerState<CanaryNoteScreen> {
                 ),
               ),
             ),
-          VerifyOnMonadButton(
-            noteId: record.noteId,
-            localOpened: status?.copies.length,
-          ),
+          if (kCanaryMonad)
+            VerifyOnMonadButton(
+              noteId: record.noteId,
+              localOpened: status?.copies.length,
+            ),
+          if (status?.sealSolanaSig case final sig?)
+            OutlinedButton.icon(
+              icon: const Icon(Icons.open_in_new, size: 18),
+              label: const Text(
+                'Verify on Solana ↗',
+                semanticsLabel: 'Verify on Solana. Opens the seal on '
+                    'Solana devnet in the explorer.',
+              ),
+              onPressed: () => _openSolanaSeal(sig),
+            ),
           OutlinedButton.icon(
             icon: const Icon(Icons.qr_code),
             label: const Text('Show link & QR'),
@@ -214,6 +247,7 @@ class _CanaryNoteScreenState extends ConsumerState<CanaryNoteScreen> {
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CircleAvatar(
                   backgroundColor: CanaryTokens.surfaceHi,
@@ -233,25 +267,19 @@ class _CanaryNoteScreenState extends ConsumerState<CanaryNoteScreen> {
                           color: CanaryTokens.textDim,
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      // Below the name, not beside it: two chips need the
+                      // card's full width to wrap on a phone.
+                      ProofChips(
+                        monadTxHash: copy.openTxHash,
+                        solanaSig: copy.openSolanaSig,
+                        monadPending: copy.openTxHash == null,
+                        solanaPending: _solanaPending(status, copy),
+                        compact: true,
+                      ),
                     ],
                   ),
                 ),
-                if (copy.openTxHash == null)
-                  const Tooltip(
-                    message: 'Recording on Monad…',
-                    child: Icon(
-                      Icons.hourglass_empty,
-                      color: CanaryTokens.monad,
-                    ),
-                  )
-                else
-                  Flexible(
-                    child: ChainChip(
-                      label: 'Monad',
-                      txHash: copy.openTxHash,
-                      compact: true,
-                    ),
-                  ),
               ],
             ),
           ),
