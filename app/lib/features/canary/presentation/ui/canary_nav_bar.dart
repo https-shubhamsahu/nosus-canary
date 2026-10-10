@@ -97,16 +97,19 @@ class CanaryTopBar extends StatelessWidget implements PreferredSizeWidget {
                     ],
                   ),
 
-                // Right side: Monad pulse pill + NO SUS app link
+                // Right side: network pulse pill (+ Monad wallet when the
+                // CANARY_MONAD build flag is on) + NO SUS app link
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (showPill) ...[
-                      const MonadTestnetPill(),
+                      const NetworkPill(),
                       const SizedBox(width: 14),
                     ],
-                    WalletButton(compact: !expanded),
-                    const SizedBox(width: 12),
+                    if (kCanaryMonad) ...[
+                      WalletButton(compact: !expanded),
+                      const SizedBox(width: 12),
+                    ],
                     if (standalone)
                       expanded
                           ? ConstrainedBox(
@@ -239,15 +242,23 @@ class _NavLinkState extends State<_NavLink> {
   }
 }
 
-/// Pulsing "Monad testnet" indicator pill.
-class MonadTestnetPill extends StatefulWidget {
-  const MonadTestnetPill({super.key});
+/// Name of the network Canary proofs land on, for pills and strips.
+/// "SOLANA DEVNET", or "MONAD TESTNET" in a CANARY_MONAD build.
+const String kCanaryNetworkLabel = kCanaryMonad
+    ? 'MONAD TESTNET'
+    : 'SOLANA DEVNET';
+
+/// Pulsing network indicator pill ([kCanaryNetworkLabel]).
+class NetworkPill extends StatefulWidget {
+  const NetworkPill({super.key, this.label = kCanaryNetworkLabel});
+
+  final String label;
 
   @override
-  State<MonadTestnetPill> createState() => _MonadTestnetPillState();
+  State<NetworkPill> createState() => _NetworkPillState();
 }
 
-class _MonadTestnetPillState extends State<MonadTestnetPill>
+class _NetworkPillState extends State<NetworkPill>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
@@ -307,9 +318,9 @@ class _MonadTestnetPillState extends State<MonadTestnetPill>
             },
           ),
           const SizedBox(width: 8),
-          const Text(
-            'MONAD TESTNET',
-            style: TextStyle(
+          Text(
+            widget.label,
+            style: const TextStyle(
               fontFamily: CanaryTokens.monoFont,
               fontSize: 21,
               letterSpacing: 1,
@@ -443,11 +454,13 @@ class CanaryFooter extends StatelessWidget {
           spacing: 12,
           runSpacing: 8,
           children: [
-            const Text(
-              'Built at Monad Blitz Mumbai V4',
-              style: TextStyle(color: CanaryTokens.textDim, fontSize: 13),
-            ),
-            const Text('·', style: TextStyle(color: CanaryTokens.textDim)),
+            if (kCanaryMonad) ...[
+              const Text(
+                'Built at Monad Blitz Mumbai V4',
+                style: TextStyle(color: CanaryTokens.textDim, fontSize: 13),
+              ),
+              const Text('·', style: TextStyle(color: CanaryTokens.textDim)),
+            ],
             InkWell(
               onTap: () => _openUrl(context, 'https://nosus.foo'),
               child: const Text(

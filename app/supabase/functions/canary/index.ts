@@ -5,24 +5,46 @@
 //
 //   { action: "create", note_id, owner_hash, copy_count, copies_hash,
 //     expires_in_hours, copies: [{ index, ciphertext, iv }] }
-//     -> { seal_tx_hash, expires_at }
+//     -> { seal_tx_hash, seal_solana_sig, expires_at }
 //   { action: "open", note_id, device_id, reader_name }
-//     -> { copy_index, copy_count, ciphertext, iv, open_tx_hash, opened_at }
+//     -> { copy_index, copy_count, ciphertext, iv, open_tx_hash, open_solana_sig, opened_at }
 //   { action: "status", note_id, owner_secret }
-//     -> { copy_count, seal_tx_hash, expires_at,
-//          copies: [{ copy_index, reader_name, opened_at, open_tx_hash }] }
+//     -> { copy_count, seal_tx_hash, seal_solana_sig, expires_at,
+//          copies: [{ copy_index, reader_name, opened_at, open_tx_hash, open_solana_sig }] }
+//
+// *_solana_sig is the Solana devnet memo signature. *_tx_hash is the Monad
+// testnet transaction hash and stays null whenever Monad is off.
 //
 // Errors: { error: "<safe message>", retry?: true } with a 4xx/5xx status.
 //
 // The server never sees note text or keys: copies arrive already encrypted
-// and the key stays in the link fragment. Monad receives only
+// and the key stays in the link fragment. The chains receive only
 // sha256-based ids and hashes (never names or text).
 //
+// Proof chains (rules in gating.ts):
+// - Solana devnet (solana.ts) is the receipt: one SPL Memo per seal and per
+//   open. With Monad off a note is sealed only once its Solana memo lands, so
+//   a failed seal memo fails `create` with retry: true. A failed open memo is
+//   stored as null and sent again on the next open of that copy.
+// - Monad testnet is the earlier prototype, kept behind a switch: on only
+//   while CANARY_CONTRACT_ADDRESS is set. When on, it runs in parallel with
+//   Solana exactly as before (Monad authoritative; a Solana failure only
+//   leaves *_solana_sig null). When off: no viem calls, no relayer leases.
+// - A note counts as sealed when seal_tx_hash OR seal_solana_sig is set.
+// - With neither chain configured, create and open return 503.
+//
 // Secrets (supabase secrets set ...):
-//   CANARY_CONTRACT_ADDRESS  0x… NoSusCanary on Monad testnet
-//   CANARY_RELAYER_KEYS      comma-separated 0x… private keys (testnet only)
 //   CANARY_TAG_SALT          64 hex chars, random, never shared
-//   MONAD_RPC_URL            optional, default https://testnet-rpc.monad.xyz
+//   SOLANA_RELAYER_KEYS      comma-separated devnet keypairs (base58 64-byte
+//                            secret key or solana-keygen JSON array). Required
+//                            while Monad is off; unset = Solana proof off and
+//                            responses carry null.
+//   SOLANA_RPC_URL           optional, default https://api.devnet.solana.com
+//   SOLANA_MEMO_PROGRAM      optional, default MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr
+//   CANARY_CONTRACT_ADDRESS  optional; 0x… NoSusCanary on Monad testnet.
+//                            Unset or empty = Monad off.
+//   CANARY_RELAYER_KEYS      Monad only: comma-separated 0x… private keys (testnet)
+//   MONAD_RPC_URL            Monad only, default https://testnet-rpc.monad.xyz
 // SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are injected automatically.
 
 import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.39.8";
@@ -34,6 +56,8 @@ import {
   type Hex,
 } from "npm:viem@2.56.5";
 import { privateKeyToAccount } from "npm:viem@2.56.5/accounts";
+import { loadSolana, openMemo, sealMemo, sendSolanaMemo, type SolanaConfig } from "./solana.ts";
+import { isSealed, monadEnabled, planOpen, planSeal } from "./gating.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -113,8 +137,11 @@ type Chain = {
   rpcUrl: string;
 };
 
-function loadChain(): Chain {
-  const contract = requireEnv("CANARY_CONTRACT_ADDRESS").trim();
+// Null when Monad is off (CANARY_CONTRACT_ADDRESS unset or empty). Once an
+// address is set, a bad Monad config is a 503 as before.
+function loadChainOrNull(): Chain | null {
+  const contract = (Deno.env.get("CANARY_CONTRACT_ADDRESS") ?? "").trim();
+  if (!monadEnabled(contract)) return null;
   if (!/^0x[0-9a-fA-F]{40}$/.test(contract)) {
     throw new HttpError(503, "canary is not configured (contract address)");
   }
@@ -130,6 +157,29 @@ function loadChain(): Chain {
     keys: keys as Hex[],
     rpcUrl: Deno.env.get("MONAD_RPC_URL") ?? "https://testnet-rpc.monad.xyz",
   };
+}
+
+// A bad Solana config is logged and treated as "off". With Monad on, a failed
+// memo is logged and stored as null; with Monad off, see handleCreate.
+function loadSolanaOrNull(): SolanaConfig | null {
+  try {
+    return loadSolana();
+  } catch (e) {
+    console.error("canary: solana is misconfigured", e);
+    return null;
+  }
+}
+
+function requireProofChain(chain: Chain | null, solana: SolanaConfig | null) {
+  if (!chain && !solana) {
+    throw new HttpError(503, "canary is not configured (no proof chain)");
+  }
+}
+
+function solanaSig(result: PromiseSettledResult<string | null>, label: string): string | null {
+  if (result.status === "fulfilled") return result.value;
+  console.error(`${label}: solana memo failed`, result.reason);
+  return null;
 }
 
 // Sends one contract call from a leased relayer key and waits for success.
@@ -221,12 +271,14 @@ async function handleCreate(admin: SupabaseClient, body: Record<string, unknown>
     return { note_id: noteId, copy_index: index, ciphertext, iv };
   });
 
-  const chain = loadChain();
+  const chain = loadChainOrNull();
+  const solana = loadSolanaOrNull();
+  requireProofChain(chain, solana);
   const chainNoteId = `0x${await sha256Hex(`nosus-canary:${noteId}`)}`;
 
   const { data: existing, error: readError } = await admin
     .from("canary_notes")
-    .select("owner_hash, seal_tx_hash, expires_at")
+    .select("owner_hash, seal_tx_hash, seal_solana_sig, expires_at")
     .eq("id", noteId)
     .maybeSingle();
   if (readError) throw readError;
@@ -234,9 +286,6 @@ async function handleCreate(admin: SupabaseClient, body: Record<string, unknown>
   let expiresAt: string;
   if (existing) {
     if (existing.owner_hash !== ownerHash) throw new HttpError(409, "This note id is taken.");
-    if (existing.seal_tx_hash) {
-      return json({ seal_tx_hash: existing.seal_tx_hash, expires_at: existing.expires_at });
-    }
     expiresAt = existing.expires_at;
   } else {
     expiresAt = new Date(Date.now() + hours * 3600 * 1000).toISOString();
@@ -256,26 +305,59 @@ async function handleCreate(admin: SupabaseClient, body: Record<string, unknown>
     }
   }
 
-  const expiresAtSeconds = BigInt(Math.floor(new Date(expiresAt).getTime() / 1000));
-  let sealTx: Hex;
-  try {
-    sealTx = await sendCanaryTx(admin, chain, "sealNote", [
-      chainNoteId,
-      copyCount,
-      copiesHash,
-      expiresAtSeconds,
-    ]);
-  } catch (e) {
+  const expiresAtSeconds = Math.floor(new Date(expiresAt).getTime() / 1000);
+  const memo = sealMemo({ note: chainNoteId, copies: copyCount, hash: copiesHash, exp: expiresAtSeconds });
+  const sealTxBefore: string | null = existing?.seal_tx_hash ?? null;
+  let sealSolana: string | null = existing?.seal_solana_sig ?? null;
+  const plan = planSeal({
+    monadOn: chain !== null,
+    solanaOn: solana !== null,
+    sealTx: sealTxBefore,
+    sealSolana,
+  });
+
+  if (!chain || !plan.monad) {
+    // Nothing to send on Monad (Monad is off, or the note is sealed there
+    // already); at most the Solana memo is missing.
+    if (solana && plan.solana) {
+      const [sol] = await Promise.allSettled([sendSolanaMemo(solana, memo)]);
+      if (sol.status === "rejected" && plan.solanaRequired) {
+        // Solana is the only receipt: no memo means no seal. The row stays, and
+        // a retry with the same note id takes the existing-note path.
+        console.error("canary create: solana seal failed", sol.reason);
+        throw new HttpError(503, "Could not seal the note on Solana. Try again.", true);
+      }
+      sealSolana = solanaSig(sol, existing ? "canary create (retry)" : "canary create");
+      if (sealSolana) {
+        await admin.from("canary_notes").update({ seal_solana_sig: sealSolana }).eq("id", noteId);
+      }
+    }
+    if (!isSealed({ seal_tx_hash: sealTxBefore, seal_solana_sig: sealSolana })) {
+      // Not reachable while requireProofChain holds; never hand out an unsealed link.
+      throw new HttpError(503, "Could not seal the note. Try again.", true);
+    }
+    return json({ seal_tx_hash: sealTxBefore, seal_solana_sig: sealSolana, expires_at: expiresAt });
+  }
+
+  // Monad and Solana in parallel. Monad is authoritative; Solana may fail quietly.
+  const [monad, sol] = await Promise.allSettled([
+    sendCanaryTx(admin, chain, "sealNote", [chainNoteId, copyCount, copiesHash, BigInt(expiresAtSeconds)]),
+    solana && plan.solana ? sendSolanaMemo(solana, memo) : Promise.resolve(sealSolana),
+  ]);
+  sealSolana = solanaSig(sol, "canary create");
+  if (monad.status === "rejected") {
+    const e = monad.reason;
     if (e instanceof HttpError) throw e;
     console.error("canary create: seal failed", e);
     throw new HttpError(503, "Could not seal the note on Monad. Try again.", true);
   }
+  const sealTx: Hex = monad.value;
   const { error: updateError } = await admin
     .from("canary_notes")
-    .update({ seal_tx_hash: sealTx })
+    .update({ seal_tx_hash: sealTx, seal_solana_sig: sealSolana })
     .eq("id", noteId);
   if (updateError) throw updateError;
-  return json({ seal_tx_hash: sealTx, expires_at: expiresAt });
+  return json({ seal_tx_hash: sealTx, seal_solana_sig: sealSolana, expires_at: expiresAt });
 }
 
 async function handleOpen(admin: SupabaseClient, body: Record<string, unknown>) {
@@ -292,15 +374,17 @@ async function handleOpen(admin: SupabaseClient, body: Record<string, unknown>) 
 
   const { data: note, error: noteError } = await admin
     .from("canary_notes")
-    .select("copy_count, chain_note_id, seal_tx_hash, expires_at")
+    .select("copy_count, chain_note_id, seal_tx_hash, seal_solana_sig, expires_at")
     .eq("id", noteId)
     .maybeSingle();
   if (noteError) throw noteError;
-  if (!note || !note.seal_tx_hash) throw new HttpError(404, "This Canary link is not valid.");
+  if (!note || !isSealed(note)) throw new HttpError(404, "This Canary link is not valid.");
   if (new Date(note.expires_at) <= new Date()) throw new HttpError(410, "This Canary link has expired.");
 
   const tagSalt = requireEnv("CANARY_TAG_SALT");
-  const chain = loadChain();
+  const chain = loadChainOrNull();
+  const solana = loadSolanaOrNull();
+  requireProofChain(chain, solana);
   const deviceHash = await sha256Hex(`device:${deviceId}`);
 
   let assigned: Record<string, unknown> | null = null;
@@ -321,12 +405,28 @@ async function handleOpen(admin: SupabaseClient, body: Record<string, unknown>) 
   if (assigned === null) throw new HttpError(409, "Every copy of this note has been opened.");
 
   const copyIndex = Number(assigned.copy_index);
+  const readerTag = `0x${await sha256Hex(`${tagSalt}:${noteId}:${copyIndex}:${deviceHash}`)}`;
+  const memo = openMemo({ note: note.chain_note_id, copy: copyIndex, tag: readerTag });
   let openTx = (assigned.open_tx_hash as string | null) ?? null;
-  if (!openTx) {
-    const readerTag = `0x${await sha256Hex(`${tagSalt}:${noteId}:${copyIndex}:${deviceHash}`)}`;
-    try {
-      openTx = await sendCanaryTx(admin, chain, "openCopy", [note.chain_note_id, copyIndex, readerTag]);
-    } catch (e) {
+  let openSolana = (assigned.open_solana_sig as string | null) ?? null;
+  const plan = planOpen({
+    monadOn: chain !== null,
+    solanaOn: solana !== null,
+    noteSealTx: note.seal_tx_hash ?? null,
+    openTx,
+    openSolana,
+  });
+  if (chain && plan.monad) {
+    // Monad and Solana in parallel. Monad is authoritative; Solana may fail quietly.
+    const [monad, sol] = await Promise.allSettled([
+      sendCanaryTx(admin, chain, "openCopy", [note.chain_note_id, copyIndex, readerTag]),
+      solana && plan.solana ? sendSolanaMemo(solana, memo) : Promise.resolve(openSolana),
+    ]);
+    openSolana = solanaSig(sol, "canary open");
+    if (monad.status === "fulfilled") {
+      openTx = monad.value;
+    } else {
+      const e = monad.reason;
       if (e instanceof HttpError) throw e;
       const message = e instanceof Error ? e.message : String(e);
       if (!message.includes("CopyTaken")) {
@@ -338,9 +438,26 @@ async function handleOpen(admin: SupabaseClient, body: Record<string, unknown>) 
     }
     await admin
       .from("canary_copies")
-      .update({ reader_tag: readerTag, open_tx_hash: openTx })
+      .update({ reader_tag: readerTag, open_tx_hash: openTx, open_solana_sig: openSolana })
       .eq("note_id", noteId)
       .eq("copy_index", copyIndex);
+  } else if (solana && plan.solana) {
+    // Nothing to send on Monad (Monad is off, or this copy is recorded there
+    // already); only the Solana memo is missing. A failure stays null and is
+    // sent again on the next open of this copy.
+    const firstOpen = !assigned.reader_tag;
+    const [sol] = await Promise.allSettled([sendSolanaMemo(solana, memo)]);
+    openSolana = solanaSig(sol, firstOpen ? "canary open" : "canary open (retry)");
+    const patch: Record<string, string> = {};
+    if (firstOpen) patch.reader_tag = readerTag;
+    if (openSolana) patch.open_solana_sig = openSolana;
+    if (Object.keys(patch).length > 0) {
+      await admin
+        .from("canary_copies")
+        .update(patch)
+        .eq("note_id", noteId)
+        .eq("copy_index", copyIndex);
+    }
   }
 
   return json({
@@ -349,6 +466,7 @@ async function handleOpen(admin: SupabaseClient, body: Record<string, unknown>) 
     ciphertext: assigned.ciphertext,
     iv: assigned.iv,
     open_tx_hash: openTx,
+    open_solana_sig: openSolana,
     opened_at: assigned.opened_at,
   });
 }
@@ -360,7 +478,7 @@ async function handleStatus(admin: SupabaseClient, body: Record<string, unknown>
 
   const { data: note, error: noteError } = await admin
     .from("canary_notes")
-    .select("owner_hash, copy_count, seal_tx_hash, expires_at")
+    .select("owner_hash, copy_count, seal_tx_hash, seal_solana_sig, expires_at")
     .eq("id", noteId)
     .maybeSingle();
   if (noteError) throw noteError;
@@ -369,7 +487,7 @@ async function handleStatus(admin: SupabaseClient, body: Record<string, unknown>
 
   const { data: copies, error: copiesError } = await admin
     .from("canary_copies")
-    .select("copy_index, reader_name, opened_at, open_tx_hash")
+    .select("copy_index, reader_name, opened_at, open_tx_hash, open_solana_sig")
     .eq("note_id", noteId)
     .not("opened_at", "is", null)
     .order("copy_index");
@@ -378,6 +496,7 @@ async function handleStatus(admin: SupabaseClient, body: Record<string, unknown>
   return json({
     copy_count: note.copy_count,
     seal_tx_hash: note.seal_tx_hash,
+    seal_solana_sig: note.seal_solana_sig,
     expires_at: note.expires_at,
     copies: copies ?? [],
   });

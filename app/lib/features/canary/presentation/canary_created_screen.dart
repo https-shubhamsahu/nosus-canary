@@ -13,8 +13,8 @@ import '../domain/canary_models.dart';
 import 'canary_note_screen.dart';
 import 'canary_providers.dart';
 import 'canary_ui.dart';
-import 'ui/chain_chip.dart';
 import 'ui/glow_card.dart';
+import 'ui/proof_chips.dart';
 import 'ui/swap_word_text.dart';
 
 /// Shown right after creating a note, and from the dashboard's "Show QR".
@@ -219,9 +219,13 @@ class _CanaryCreatedScreenState extends ConsumerState<CanaryCreatedScreen> {
             ),
           ],
         ),
-        if (record.sealTxHash != null) ...[
+        if (record.sealTxHash != null || record.sealSolanaSig != null) ...[
           const SizedBox(height: 12),
-          ChainChip(label: 'Sealed on Monad', txHash: record.sealTxHash),
+          ProofChips(
+            monadTxHash: record.sealTxHash,
+            solanaSig: record.sealSolanaSig,
+            labelPrefix: 'Sealed on',
+          ),
         ],
       ],
     );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../config/app_mode.dart';
 import '../../../core/layout/app_breakpoints.dart';
 import '../../../theme.dart';
 import '../domain/canary_link.dart';
@@ -97,7 +98,8 @@ class CanaryUi {
                         ),
                         actions: [
                           ...?actions,
-                          const WalletButton(compact: true),
+                          if (kCanaryMonad)
+                            const WalletButton(compact: true),
                           const SizedBox(width: 8),
                         ],
                       ),

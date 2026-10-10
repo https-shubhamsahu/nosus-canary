@@ -46,7 +46,7 @@ class CanaryCrypto {
   static String copyDigest(String saltHex, int index, String copyText) =>
       sha256Hex('$saltHex:$index:$copyText');
 
-  /// Commitment to every copy, written to Monad: sha256 of the digests
+  /// Commitment to every copy, written on chain: sha256 of the digests
   /// concatenated in copy order, as 0x-prefixed hex.
   static String copiesHash(List<String> copyDigests) =>
       '0x${sha256Hex(copyDigests.join())}';

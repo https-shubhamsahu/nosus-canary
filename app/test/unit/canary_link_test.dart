@@ -66,4 +66,31 @@ void main() {
       '0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e',
     );
   });
+
+  test('explorer links point at the right testnet per chain', () {
+    final monadHash = '0x${'ab' * 32}';
+    // Base58 Solana signatures are 86–88 chars; this one is 88.
+    final solanaSig = '5' * 88;
+
+    expect(
+      canaryExplorerTxUrl(monadHash),
+      'https://testnet.monadscan.com/tx/$monadHash',
+    );
+    expect(
+      canarySolanaExplorerTxUrl(solanaSig),
+      'https://explorer.solana.com/tx/$solanaSig?cluster=devnet',
+    );
+    expect(CanaryChain.monad.txUrl(monadHash), canaryExplorerTxUrl(monadHash));
+    expect(
+      CanaryChain.solana.txUrl(solanaSig),
+      canarySolanaExplorerTxUrl(solanaSig),
+    );
+  });
+
+  test('chain labels read correctly in chips and sentences', () {
+    expect(CanaryChain.monad.label, 'Monad');
+    expect(CanaryChain.solana.label, 'Solana');
+    expect(CanaryChain.monad.network, 'Monad testnet');
+    expect(CanaryChain.solana.network, 'Solana devnet');
+  });
 }

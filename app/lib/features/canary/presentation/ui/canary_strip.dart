@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../theme.dart';
+import 'canary_nav_bar.dart' show kCanaryNetworkLabel;
 
 /// Orange "testnet" strip across the top of the Canary web app.
 class CanaryStrip extends StatelessWidget {
@@ -24,7 +25,7 @@ class CanaryStrip extends StatelessWidget {
           child: const SafeArea(
             bottom: false,
             child: Text(
-              'NO SUS  ·  MONAD TESTNET  ·  USE HARMLESS TEST NOTES ONLY',
+              'NO SUS  ·  $kCanaryNetworkLabel  ·  USE HARMLESS TEST NOTES ONLY',
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
