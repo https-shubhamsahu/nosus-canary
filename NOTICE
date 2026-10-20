@@ -1,0 +1,8 @@
+NO SUS Canary
+Copyright 2026 Shubham Sahu (NO SUS)
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Third-party packages listed in app/pubspec.lock, packages/receipts-dart/pubspec.lock and
+packages/receipts-ts/deno.lock keep their own licenses. The fonts in app/assets/google_fonts/
+are from Google Fonts and keep their own (SIL Open Font) licenses.
