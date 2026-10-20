@@ -1,6 +1,6 @@
 import 'package:encrypt/encrypt.dart' as enc;
 import 'package:flutter/material.dart';
-import '../../../monad/presentation/experiment_frame.dart';
+import '../../../../components/experiment_frame.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:share_plus/share_plus.dart';
