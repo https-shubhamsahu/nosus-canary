@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../config/app_mode.dart';
 import '../../../core/layout/app_breakpoints.dart';
 import '../../../theme.dart';
 import '../data/canary_api.dart';
@@ -8,11 +9,11 @@ import '../domain/canary_models.dart';
 import 'canary_providers.dart';
 import 'canary_ui.dart';
 import 'ui/canary_envelope.dart';
-import 'ui/chain_chip.dart';
 import 'ui/copy_badge.dart';
 import 'ui/glow_card.dart';
 import 'ui/liquid_carve_button.dart';
 import 'ui/pixel_canary.dart';
+import 'ui/proof_chips.dart';
 import 'ui/canary_strip.dart';
 
 /// Standalone app for the web reader path (main.dart runs it directly for
@@ -273,8 +274,13 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'The sender sees your name and when you opened your copy. Monad '
-            'testnet records that a copy was opened, without your name.',
+            kCanaryMonad
+                ? 'The sender sees your name and when you opened your copy. Monad '
+                      'testnet and Solana devnet each record that a copy was opened, '
+                      'without your name.'
+                : 'The sender sees your name and when you opened your copy. '
+                      'Solana devnet records that a copy was opened, without '
+                      'your name.',
             style: TextStyle(
               fontSize: 14,
               height: 1.55,
@@ -316,14 +322,21 @@ class _CanaryReaderScreenState extends ConsumerState<CanaryReaderScreen> {
           const SizedBox(height: 12),
           DelayedFadeIn(
             delay: const Duration(milliseconds: 450),
-            child: copy.openTxHash == null
+            // No polling here, so no pending chip: show the proofs that
+            // exist, or the time alone when no shown proof was stored.
+            child:
+                copy.openSolanaSig == null &&
+                    (!kCanaryMonad || copy.openTxHash == null)
                 ? Text(
-                    'Recorded on Monad testnet at ${CanaryUi.clock(copy.openedAt)}',
+                    kCanaryMonad
+                        ? 'Recorded on Monad testnet at ${CanaryUi.clock(copy.openedAt)}'
+                        : 'Opened at ${CanaryUi.clock(copy.openedAt)}',
                     style: const TextStyle(fontFamily: CanaryTokens.monoFont),
                   )
-                : ChainChip(
-                    label: 'Recorded on Monad',
-                    txHash: copy.openTxHash,
+                : ProofChips(
+                    monadTxHash: copy.openTxHash,
+                    solanaSig: copy.openSolanaSig,
+                    labelPrefix: 'Recorded on',
                   ),
           ),
         ],
@@ -337,7 +350,9 @@ class _BrandSide extends StatelessWidget {
 
   static const _facts = [
     'YOUR COPY IS UNIQUE TO YOU',
-    'OPENING IT = 1 MONAD TRANSACTION',
+    kCanaryMonad
+        ? 'OPENING IT = 1 TX ON MONAD + 1 ON SOLANA'
+        : 'OPENING IT = 1 MEMO ON SOLANA DEVNET',
     'NO WALLET, NO APP, NO SIGN-UP',
   ];
 
@@ -363,7 +378,9 @@ class _BrandSide extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         const Text(
-          ' Your own copy. Recorded on Monad. ',
+          kCanaryMonad
+              ? ' Your own copy. Recorded on Monad + Solana. '
+              : ' Your own copy. Recorded on Solana. ',
           style: TextStyle(
             fontFamily: CanaryTokens.displayFont,
             fontSize: 26,

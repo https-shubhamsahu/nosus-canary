@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../../config/app_mode.dart';
 import '../../../../theme.dart';
 import '../../domain/canary_fingerprint.dart';
+import '../../domain/canary_link.dart';
 import '../../domain/canary_models.dart';
 import '../canary_ui.dart';
 import 'canary_mark.dart';
@@ -126,9 +128,16 @@ class _CanaryRevealState extends State<CanaryReveal>
               'Opened ${CanaryUi.clock(copy.openedAt)}',
               style: const TextStyle(fontFamily: CanaryTokens.monoFont),
             ),
-            if (copy.openTxHash != null) ...[
+            if (kCanaryMonad && copy.openTxHash != null) ...[
               const SizedBox(height: 8),
               ChainChip(label: 'Proof on Monad', txHash: copy.openTxHash),
+            ] else if (!kCanaryMonad && copy.openSolanaSig != null) ...[
+              const SizedBox(height: 8),
+              ChainChip(
+                chain: CanaryChain.solana,
+                label: 'Proof on Solana',
+                txHash: copy.openSolanaSig,
+              ),
             ],
           ],
           const SizedBox(height: 8),
