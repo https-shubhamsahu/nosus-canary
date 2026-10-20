@@ -12,7 +12,6 @@ sql = sql.replaceAll('rxfnazmusofikwaggntb.supabase.co', 'ffidvfguojalzpclipzi.s
 // drops it. Skip only its search_path adjustment when it does not exist.
 sql = sql.replace('ALTER FUNCTION public.revoke_device(uuid) SET search_path = public;',
   "DO $bootstrap$ BEGIN IF to_regprocedure('public.revoke_device(uuid)') IS NOT NULL THEN ALTER FUNCTION public.revoke_device(uuid) SET search_path = public; END IF; END $bootstrap$;");
-sql += '\n' + readFileSync(resolve(root, 'supabase/migrations/20260916082811_experiment_drops.sql'), 'utf8');
 if (sql.includes('rxfnazmusofikwaggntb.supabase.co')) throw new Error('Production URL in bootstrap');
 const output = resolve(root, 'app/supabase/.temp/experiment-bootstrap.sql');
 mkdirSync(dirname(output), { recursive: true });

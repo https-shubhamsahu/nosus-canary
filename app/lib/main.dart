@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'features/monad/domain/monad_receipt.dart';
-import 'features/monad/presentation/experiment_frame.dart';
-import 'features/monad/presentation/monad_screen.dart';
+import 'components/experiment_frame.dart';
 import 'features/canary/domain/canary_link.dart';
 import 'features/canary/presentation/canary_app.dart';
 import 'features/canary/presentation/canary_home_screen.dart';
@@ -614,12 +612,6 @@ class MyApp extends ConsumerWidget {
             settings: settings,
             builder: (_) => const CanaryHomeScreen(),
           );
-        }
-        if (route == '/monad' || route.startsWith('/monad/')) {
-          final id = route.startsWith('/monad/')
-              ? parseMonadDropId(route.substring('/monad/'.length)) : null;
-          return MaterialPageRoute<void>(settings: settings,
-            builder: (_) => MonadScreen(dropId: id));
         }
         // Web OAuth (Google/GitHub) redirects land on e.g. "/?code=..." — not
         // exactly "/", so Flutter treats it as a distinct route instead of
