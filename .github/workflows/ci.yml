@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter:
+    name: Flutter app
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.7
+          cache: true
+      - run: flutter pub get
+      - name: Analyze
+        run: flutter analyze
+      - name: Test
+        run: flutter test
+      - name: Fingerprint harness (must print FAILURES 0)
+        run: dart run tool/canary_fingerprint_harness.dart | tail -4
+
+  receipts-dart:
+    name: Receipts library (Dart)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/receipts-dart
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.7
+          cache: true
+      - run: dart pub get
+      - run: dart analyze --fatal-infos
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: dart test
+
+  deno:
+    name: Relayer + receipts library (TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.9.x
+      - name: Receipts library checks
+        working-directory: packages/receipts-ts
+        run: |
+          deno check mod.ts cli.ts test/
+          deno lint
+          deno fmt --check
+          deno test
+      - name: Relayer checks
+        working-directory: app/supabase/functions/canary
+        run: |
+          deno check index.ts
+          deno test --allow-env
+      - name: Relayer bundles for deploy
+        run: deno bundle --platform=deno app/supabase/functions/canary/index.ts -o "$RUNNER_TEMP/canary.bundle.js"
+      - name: Devnet spike type-checks
+        run: deno check tool/solana-spike/send_memo.ts
