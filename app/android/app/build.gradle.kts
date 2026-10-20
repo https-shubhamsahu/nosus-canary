@@ -14,7 +14,7 @@ plugins {
 // config, and checking one in would tie the open repo to one Firebase project).
 //
 // Drop the file in android/app/ and this wires itself up on the next build.
-// Nothing else needs to change. See AGENTS.md §8.
+// Nothing else needs to change.
 if (file("google-services.json").exists()) {
     apply(plugin = "com.google.gms.google-services")
 }

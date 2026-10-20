@@ -65,7 +65,7 @@ class NoSusApplication : Application() {
                     // upload plaintext decryption keys to a third party. Do
                     // not remove this line on the grounds that it is
                     // redundant — it is pinning a default that must never
-                    // drift. See AGENTS.md §5.
+                    // drift.
                     trackActivityIntentData = false,
                 ),
             )

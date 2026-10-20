@@ -15,7 +15,7 @@ import 'package:flutter/foundation.dart';
 /// `services/measure_reporting.dart`, so its JavaScript-incompatible package
 /// code is excluded from the web program rather than merely skipped at runtime.
 /// iOS is excluded too: that target has never shipped (still on Flutter's
-/// `com.example.*` template ids, see AGENTS.md §5) and Measure's iOS setup
+/// `com.example.*` template ids) and Measure's iOS setup
 /// needs a `pod install` + `AppDelegate` change that does not exist here.
 ///
 /// **The same two values are also read by Gradle**, out of the repo-root

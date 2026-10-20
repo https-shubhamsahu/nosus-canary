@@ -18,7 +18,7 @@ import '../../../services/supabase_service.dart';
 /// when you open the app" rather than breaking.
 ///
 /// Written this way deliberately: NO SUS already carries one never-exercised
-/// security scaffold (Play Integrity, AGENTS.md §8), and the lesson from it is
+/// security scaffold (Play Integrity), and the lesson from it is
 /// that a scaffold must fail loudly closed and never pretend to work. Nothing
 /// here reports success it did not achieve.
 ///

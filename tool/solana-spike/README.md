@@ -33,7 +33,7 @@ lamports (0.000005 SOL), so 1 SOL covers about 200,000 memos.
 
 ## Using the key as the edge function relayer
 
-Owner only, experiment project only, with explicit approval (see `AGENTS.md`):
+Maintainers only, on the devnet test project only:
 set `SOLANA_RELAYER_KEYS` to the contents of `relayer.json` (or to a base58
 64-byte secret key; several keys may be comma-separated). Leaving it unset keeps
 the Solana proof off and the function behaves exactly as before.

@@ -75,14 +75,14 @@ void main() {
   testWidgets('the guest tool cards carry screen-reader labels', (
     tester,
   ) async {
-    // AGENTS.md §7: a bare GestureDetector announces nothing. These cards are
+    // A bare GestureDetector announces nothing to screen readers. These cards are
     // the primary calls to action on the app's first screen.
     await pumpWelcome(tester);
 
     // Matched on the Semantics widget's own properties rather than through
     // find.bySemanticsLabel — the same approach the existing auth/groups
     // regression tests use, because the rendered semantics tree does not
-    // resolve reliably in this codebase (AGENTS.md §7).
+    // resolve reliably in this codebase.
     final labelled = tester
         .widgetList<Semantics>(find.byType(Semantics))
         .where((s) => s.properties.label?.contains('Send a Burn Note') ?? false)

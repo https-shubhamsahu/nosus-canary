@@ -53,9 +53,9 @@ dependencies:
   # plugin implementations for android/ios only and contains unsupported web
   # code. services/measure_reporting.dart conditionally excludes it from web
   # compilation. Inert unless MEASURE_API_KEY *and* MEASURE_API_URL are
-  # supplied; see AGENTS.md §8 for the two defaults that are hostile to this
-  # product (server-side screenshot-on-crash, and gesture labels) and why the
-  # app is deliberately not wrapped in MeasureWidget.
+  # supplied. Two of its defaults are hostile to this product (server-side
+  # screenshot-on-crash, and gesture labels), which is why the app is
+  # deliberately not wrapped in MeasureWidget.
   #
   # Pulls image_picker transitively for a bug-report feature this app does not
   # use. Checked: it adds a FileProvider and a Play-services module service to

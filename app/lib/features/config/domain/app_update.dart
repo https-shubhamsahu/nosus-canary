@@ -1,8 +1,7 @@
 // Domain model for the in-app update check.
 //
 // The latest released version is published to the `app_latest_version` row
-// in `remote_configs` as part of the release flow (see CLAUDE.md, CI
-// section) — the app never calls out to GitHub or any other third party to
+// in `remote_configs` as part of the release flow — the app never calls out to GitHub or any other third party to
 // learn about updates, consistent with the product's privacy stance.
 
 /// Compares two dotted version strings numerically, segment by segment.

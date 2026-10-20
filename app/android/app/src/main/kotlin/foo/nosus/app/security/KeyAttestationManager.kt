@@ -28,8 +28,7 @@ import java.security.spec.ECGenParameterSpec
  * Scope note: this is the *local* half. The server still takes the client's
  * word that the id came from hardware — proving that requires verifying an
  * attestation certificate chain server-side, which needs a real physical
- * device to test against and is deliberately not attempted here. See the
- * "device identity" section of CLAUDE.md.
+ * device to test against and is deliberately not attempted here.
  */
 object KeyAttestationManager {
     private const val KEYSTORE_PROVIDER = "AndroidKeyStore"

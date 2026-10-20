@@ -17,8 +17,7 @@ import io.flutter.plugin.common.MethodChannel
  * (Google rejects it). The Dart-side call site
  * (lib/services/play_integrity_service.dart) is also gated behind
  * AppIntegrityConfig.enabled, which defaults false, so this native code
- * exists but is never invoked until BOTH are switched on. See CLAUDE.md's
- * "Play Integrity — scaffolded, not enabled" note for the full setup path.
+ * exists but is never invoked until BOTH are switched on.
  */
 object PlayIntegrityManager {
     private const val cloudProjectNumber: Long = 0L

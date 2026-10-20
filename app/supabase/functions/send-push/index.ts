@@ -7,7 +7,7 @@
 //
 // STATUS: structurally complete, never exercised against a real FCM project.
 // It needs FCM_SERVICE_ACCOUNT_EMAIL / FCM_PRIVATE_KEY / FCM_PROJECT_ID, which
-// are not set — see AGENTS.md §8. Do NOT assume the Play publishing service
+// are not set. Do NOT assume the Play publishing service
 // account (GOOGLE_PLAY_SERVICE_ACCOUNT_JSON) covers this: FCM needs the
 // firebase.messaging scope, so it takes its own service account, same
 // convention as drive-proxy's GD_SERVICE_ACCOUNT_EMAIL.
@@ -91,7 +91,7 @@ Deno.serve(async (req: Request) => {
         error: "Push delivery is not configured.",
         setupInstructions:
           "Set PUSH_SWEEP_SECRET, FCM_SERVICE_ACCOUNT_EMAIL, FCM_PRIVATE_KEY and " +
-          "FCM_PROJECT_ID in Supabase project secrets. See AGENTS.md §8.",
+          "FCM_PROJECT_ID in Supabase project secrets.",
       },
       503,
     );

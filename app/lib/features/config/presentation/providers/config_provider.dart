@@ -100,8 +100,7 @@ class SecureSendConfigs {
   static const appLatestVersion = _ConfigParam(
     'app_latest_version',
     // Empty default = "latest version unknown" — the update banner stays
-    // hidden rather than guessing. The row is bumped as part of each release
-    // (see CLAUDE.md, CI section).
+    // hidden rather than guessing. The row is bumped as part of each release.
     '',
   );
 }
