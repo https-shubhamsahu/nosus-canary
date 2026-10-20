@@ -1,0 +1,69 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "blockTime": 1791632882,
+    "meta": {
+      "computeUnitsConsumed": 84546,
+      "costUnits": 85639,
+      "err": null,
+      "fee": 5000,
+      "innerInstructions": [],
+      "logMessages": [
+        "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr invoke [1]",
+        "Program log: Signed by CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx",
+        "Program log: Memo (len 197): \"{\\\"p\\\":\\\"nosus-canary\\\",\\\"v\\\":1,\\\"t\\\":\\\"open\\\",\\\"note\\\":\\\"0x56f7956802f494824332309f033188a8850e78b4aed1eca6b1d923534315831d\\\",\\\"copy\\\":1,\\\"tag\\\":\\\"0x6ec7e19683ff70ce1d03ebf3df42242872f98407b47baada27b8cb50d934306e\\\"}\"",
+        "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr consumed 84546 of 200000 compute units",
+        "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr success"
+      ],
+      "postBalances": [
+        4999895000,
+        41509609334
+      ],
+      "postTokenBalances": [],
+      "preBalances": [
+        4999900000,
+        41509609334
+      ],
+      "preTokenBalances": [],
+      "rewards": [],
+      "status": {
+        "Ok": null
+      }
+    },
+    "slot": 509530556,
+    "transaction": {
+      "message": {
+        "accountKeys": [
+          {
+            "pubkey": "CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx",
+            "signer": true,
+            "source": "transaction",
+            "writable": true
+          },
+          {
+            "pubkey": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+            "signer": false,
+            "source": "transaction",
+            "writable": false
+          }
+        ],
+        "addressTableLookups": [],
+        "instructions": [
+          {
+            "parsed": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0x56f7956802f494824332309f033188a8850e78b4aed1eca6b1d923534315831d\",\"copy\":1,\"tag\":\"0x6ec7e19683ff70ce1d03ebf3df42242872f98407b47baada27b8cb50d934306e\"}",
+            "program": "spl-memo",
+            "programId": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+            "stackHeight": 1
+          }
+        ],
+        "recentBlockhash": "2D2Goyob1SvB8PEYNqjwGfs8FdJ4mHEMYs4mxzMSQy8f"
+      },
+      "signatures": [
+        "4NXs89eDP5hm2GyAkuA5rRDBQUNB5e6ssAChQJRCFGTYimyMDa3LmQRbcEVmaezQSXCx8kgt5GRkpUje59WqH2rc"
+      ]
+    },
+    "transactionIndex": 5,
+    "version": 0
+  },
+  "id": 1
+}

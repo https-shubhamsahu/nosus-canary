@@ -1,59 +1,45 @@
-# NO SUS — Monad Experiment agent map
+# NO SUS Canary: agent map
 
-This repository is an isolated, **testnet-only** experiment. Read
-[docs/STATUS.md](docs/STATUS.md), then only the local guide for files you will change.
+Read [docs/STATUS.md](docs/STATUS.md) first, then only the guide for the files you will change.
 
-## Current workstream: NO SUS Canary (owner decision, 19 Sep 2026)
+## What this is
 
-- Brand: **NO SUS**. Feature: **NO SUS Canary**. This supersedes the "NO SUS — Monad Experiment"
-  naming rule below for user-facing text.
-- Build plan: [docs/canary/NOSUS_CANARY_BUILD_PLAN.md](docs/canary/NOSUS_CANARY_BUILD_PLAN.md)
-  (executed; the live code in `app/` and `contracts/` is the source of truth). Verification log:
-  [docs/canary/VERIFICATION.md](docs/canary/VERIFICATION.md).
-- Canary is server-gated copy delivery and is described as such. It does not use Lit, does not
-  change Gate T1, and does not change `monadThresholdVerified`.
-- Still requires explicit owner approval each time: contract deploys, funding wallets, applying
-  SQL, setting secrets, deploying functions, creating public repos or Pages, commits and pushes.
+NO SUS Canary: every reader of a note gets a uniquely marked copy, and every seal and every open is
+one SPL Memo transaction on **Solana devnet**, sent by a relayer (Supabase Edge Function `canary`)
+so readers need no wallet. Leak matching runs on the sender's device.
 
-## Product boundaries
+## Map
 
-- Brand it **NO SUS — Monad Experiment**. Do not call it Rasid and do not change the production
-  NO SUS repository, credentials, Supabase project, deployment, or URL.
-- Use only harmless, personally owned test notes. Never use credentials, third-party documents,
-  employment records, financial information, or sensitive personal data.
-- The product may say "threshold-gated decryption after a wallet acknowledgement." It must never
-  claim legal proof, a human read, screenshot prevention, serverless deletion, or identity proof.
-- The contract must never receive plaintext, encryption keys, salts, filenames, or document content.
-- Threshold custody is a release gate, not decoration: if the Monad-to-Lit proof is not clean, do
-  not present it as shipped and never substitute a hidden server key-release path.
+| Area | Code | Read first |
+|---|---|---|
+| Canary UI and fingerprinting | `app/lib/features/canary/` | `app/AGENTS.md` |
+| Relayer | `app/supabase/functions/canary/` | `docs/ARCHITECTURE.md` |
+| Receipt format and libraries | `packages/receipts-ts/`, `packages/receipts-dart/`, `packages/test-vectors/` | `docs/RECEIPTS_SPEC.md` |
+| Schema | `app/supabase/migrations/2026091909*`, `2026101009*` | `docs/SELF_HOSTING.md` |
+| Security model | — | `SECURITY.md` |
 
-## How to navigate
+## Rules
 
-| Area | Read first |
-|---|---|
-| Contract | `contracts/README.md` and `contracts/AGENTS.md` |
-| Web app | `web/README.md` and `web/AGENTS.md` |
-| Storage schema | `supabase/README.md` |
-| Handover | `docs/CURSOR_HANDOFF.md` |
-| Lit technical gate | `docs/LIT_MONAD_SPIKE.md` |
-| Parallel work | `docs/AGENT_COLLABORATION.md` |
+- Backend: experiment project `ffidvfguojalzpclipzi` only. Never touch the NO SUS production
+  project, its credentials or deployment.
+- Never put note text, keys, names or device ids on chain. Memos carry hashes only; the format is
+  frozen at v1 (see the spec) and both libraries must stay byte-identical with the test vectors.
+- Secrets live in Supabase function secrets or git-ignored files (`.env.example` lists them). The
+  Supabase publishable key in `app/lib/config/supabase_credentials.dart` is public by design.
+- Keep the legacy EVM prototype path off: `CANARY_MONAD` stays false in Flutter and
+  `CANARY_CONTRACT_ADDRESS` stays unset for the function. User-facing text mentions Solana only.
+- Never claim screenshot prevention, legal proof, identity proof or proof that a human read a note.
+- Use harmless test notes only.
+- Smallest change that works. No new dependency or abstraction without a current consumer.
+- Owner approval is needed every time for: commits and pushes, merges, deploying the function,
+  applying SQL, setting secrets, funding keys or spending devnet SOL, changing gh-pages, and
+  making anything public.
 
-## Working rules
+## Checks (CI runs all of these)
 
-- Use the smallest necessary change. Do not add an abstraction, dependency, code generator, or
-  generic utility without a current consumer.
-- Keep all secrets in ignored environment files. `NEXT_PUBLIC_*` values are public by design; never
-  put service-role keys, private keys, Lit account keys, or test-wallet keys there.
-- Work in a dedicated branch and small commits. Update `docs/STATUS.md` and local README files when
-  behavior, contracts, or setup changes.
-- Normal work uses focused checks and localhost. Do not deploy, fund wallets, apply a Supabase
-  migration, or use a real test note without explicit user direction.
-- After each substantive response that changes files, ask exactly: "Would you like to finalize today's
-  work? If yes, say whether to verify only, build a target, or deploy a named target."
-
-Would you like to finalize today's work? If yes, say whether to verify only, build a target, or deploy a named target.
-
-## Finalization
-
-"Verify only" permits the contract tests, web checks, repository checks, and the real Monad/Lit
-technical gate. A deployment additionally needs an explicitly named target.
+```bash
+(cd app && flutter analyze && flutter test && dart run tool/canary_fingerprint_harness.dart)
+(cd app/supabase/functions/canary && deno check index.ts && deno test --allow-env)
+(cd packages/receipts-ts && deno check mod.ts cli.ts && deno lint && deno fmt --check && deno test)
+(cd packages/receipts-dart && dart pub get && dart analyze && dart format --set-exit-if-changed . && dart test)
+```

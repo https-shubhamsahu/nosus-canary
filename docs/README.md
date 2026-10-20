@@ -1,15 +1,11 @@
-# Documentation index
+# Docs
 
-Read this page after the root `AGENTS.md`; then open only the document relevant
-to the task.
-
-| Document | Use it for |
+| Document | Read it for |
 |---|---|
-| [STATUS.md](STATUS.md) | Actual completed work, checks, and current blockers |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Data flow and the limits of the receipt |
-| [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) | Visual tokens, component rules, and the Burn-kit boundary |
-| [LIT_MONAD_SPIKE.md](LIT_MONAD_SPIKE.md) | First technical gate: real address-bound threshold decrypt |
-| [../tool/threshold-spike/README.md](../tool/threshold-spike/README.md) | Dry-run / live runner for that gate |
-| [DEMO_RUNBOOK.md](DEMO_RUNBOOK.md) | Safe rehearsal and honest presentation language |
-| [CURSOR_HANDOFF.md](CURSOR_HANDOFF.md) | Continuing with Cursor without importing production context |
-| [AGENT_COLLABORATION.md](AGENT_COLLABORATION.md) | Isolated worktrees and path ownership for independent agents |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | How a note, a copy and a receipt move between device, relayer and Solana |
+| [RECEIPTS_SPEC.md](RECEIPTS_SPEC.md) | The memo format (v1) and how to verify a receipt by hand |
+| [../SECURITY.md](../SECURITY.md) | What is stored where, how each hash is made, the threat model |
+| [SELF_HOSTING.md](SELF_HOSTING.md) | Running your own backend and devnet relayer |
+| [STATUS.md](STATUS.md) | What is live, what is in progress, what needs owner approval |
+| [canary/VERIFICATION.md](canary/VERIFICATION.md) | Every check that was run, with results |
+| [../SUBMISSION.md](../SUBMISSION.md) | Judge FAQ and the 2-minute demo script |
