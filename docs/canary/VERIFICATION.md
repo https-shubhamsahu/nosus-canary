@@ -8,7 +8,7 @@ owner approval.
 | Check | Command | Result |
 |---|---|---|
 | Static analysis | `flutter analyze` (from `app/`) | No issues found |
-| Flutter tests | `flutter test` (from `app/`) | All passed (live-network diagnostic `db_test.dart` removed; `supabase_service_test.dart` stays skipped) |
+| Flutter tests | `flutter test` (from `app/`) | 145 passed, 1 skipped (live-network diagnostic `db_test.dart` removed; `supabase_service_test.dart` stays skipped) |
 | Fingerprint harness | `dart run tool/canary_fingerprint_harness.dart` (from `app/`) | `FAILURES: 0` |
 | Relayer type-check | `deno check index.ts` (from `app/supabase/functions/canary/`) | Clean |
 | Relayer tests | `deno test --allow-env` (same folder) | `gating_test.ts` 7 passed, `solana_test.ts` 5 passed |
@@ -17,6 +17,7 @@ owner approval.
 | Dart library | `dart analyze`, `dart format --set-exit-if-changed .`, `dart test` (from `packages/receipts-dart/`) | No issues, 16 passed |
 | Secret scan | All 46 commits on 17 refs plus unreachable objects | No secrets; only the Supabase publishable key (public by design) |
 | Live end to end | Scripted Chrome on https://shubham-sahu.me/nosus-canary/ at 1280×720: create (10 copies, 1 hour) → Priya and Ben open → dashboard → leak check → Explorer | Sealed in 2.9 s; leak check named "Priya · Copy 1 / 10"; receipts below |
+| Relayer redeploy (version 7, uses `packages/receipts-ts`) | `supabase functions deploy canary --no-verify-jwt --use-api` from a bundle; then `create` → `open` → `status` against the live function with a throwaway 2-copy note | All 200; [seal](https://explorer.solana.com/tx/6raNrS3Lccq68vqbmyBJrQqKKMJkiZETc1j9ZLPdXcPr1x2M7qRxgdLem7VD4tsPt1g2WzigJoajioREutkPZ5f?cluster=devnet) and [open](https://explorer.solana.com/tx/3s7bXFakuoDbcuLz6BA13oAXqNmbj71QHuyR31g3m4Q2c3bybFp2Hro4ktTo7Nwq6eHau8z8G7SVK7dEW7AypU8p?cluster=devnet) decode with `cli.ts --note` (match) |
 
 Receipts from the live run:
 [seal](https://explorer.solana.com/tx/QqdiqT84UfFyHNhpfLrK32HfqbUB5vF8qtC4DiAQ7wZZGn2MkUVJGGpVPpgmk4MCxVLtkhmZm6rbuBxqyuL11wb?cluster=devnet),

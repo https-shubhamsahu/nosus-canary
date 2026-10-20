@@ -14,7 +14,9 @@ different copy, and every seal and every open is recorded as a Solana transactio
 leaks, NO SUS tells you whose copy it was.**
 
 [**Live demo**](https://shubham-sahu.me/nosus-canary/) ·
-[Judge FAQ and 2-minute demo](SUBMISSION.md) ·
+[Pitch video (2:24)](https://github.com/https-shubhamsahu/nosus-canary/releases/download/v0.1.0/nosus-canary-pitch.mp4) ·
+[Demo video (1:18)](https://github.com/https-shubhamsahu/nosus-canary/releases/download/v0.1.0/nosus-canary-demo.mp4) ·
+[Judge FAQ](SUBMISSION.md) ·
 [A real receipt on Solana Explorer](https://explorer.solana.com/tx/5TXFPfTDFWyVe98DVPph7r55uRdJAcih6vKMBBRJKA96KtWT7Q4MUoFQG6GwH8N1FFkiMMbZzPssGtqtoW3wAsy2?cluster=devnet) ·
 [Security model](SECURITY.md)
 
@@ -73,7 +75,7 @@ which copy something neither side can edit.
 We are early: live, pre-revenue, devnet only.
 
 - **Canary on Solana devnet:** live at [shubham-sahu.me/nosus-canary](https://shubham-sahu.me/nosus-canary/)
-  since 10 Oct 2026. The relayer has written **29 receipts** so far (20 Oct 2026), all from our own
+  since 10 Oct 2026. The relayer has written **31 receipts** so far (20 Oct 2026), all from our own
   tests and demos. Every one is public on the
   [relayer's account page](https://explorer.solana.com/address/CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx?cluster=devnet).
 - **Parent product, [NO SUS](https://nosus.foo):** a privacy app for notes and files that open once
@@ -189,7 +191,7 @@ Full threat model and how to report a problem: [SECURITY.md](SECURITY.md).
 | Next | What | Status |
 |---|---|---|
 | **Mainnet** | Receipts on Solana mainnet-beta with priority fees, retries with backoff, and relayer key rotation | Devnet live |
-| **Open-source receipts library** | `@nosus/receipts` (TypeScript) and `nosus_receipts` (Dart): encode, parse, send, fetch and verify Canary receipts, with shared test vectors | **v0.1 in [`packages/`](packages/)**; the relayer's code uses it; not yet published to JSR, npm or pub.dev |
+| **Open-source receipts library** | `@nosus/receipts` (TypeScript) and `nosus_receipts` (Dart): encode, parse, send, fetch and verify Canary receipts, with shared test vectors | **v0.1 in [`packages/`](packages/)**; the live relayer runs it; not yet published to JSR, npm or pub.dev |
 | **Solana dApp Store / Seeker** | Canary inside the NO SUS Android app, submitted to the Solana dApp Store | Android build exists; not submitted |
 | **PDFs and images** | Per-copy marks for files, not only text | Not started |
 | **Merkle / compressed batching** | Many opens in one transaction (a Merkle root per batch, or state compression) to cut cost at scale | Not started |
