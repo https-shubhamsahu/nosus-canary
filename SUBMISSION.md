@@ -8,7 +8,9 @@ it was.
 |---|---|
 | Live app (Solana devnet) | https://shubham-sahu.me/nosus-canary/ |
 | Code (Apache-2.0) | https://github.com/https-shubhamsahu/nosus-canary |
-| 36-second demo | [GIF](docs/media/canary-demo.gif) · [MP4](docs/media/canary-demo.mp4) |
+| Pitch video (2:24) | [nosus-canary-pitch.mp4](https://github.com/https-shubhamsahu/nosus-canary/releases/download/v0.1.0/nosus-canary-pitch.mp4) |
+| Product demo, narrated (1:18) | [nosus-canary-demo.mp4](https://github.com/https-shubhamsahu/nosus-canary/releases/download/v0.1.0/nosus-canary-demo.mp4) |
+| 36-second silent demo | [GIF](docs/media/canary-demo.gif) · [MP4](docs/media/canary-demo.mp4) |
 | A real open receipt | [`5TXFPfTD…oW3wAsy2` on Solana Explorer](https://explorer.solana.com/tx/5TXFPfTDFWyVe98DVPph7r55uRdJAcih6vKMBBRJKA96KtWT7Q4MUoFQG6GwH8N1FFkiMMbZzPssGtqtoW3wAsy2?cluster=devnet) |
 | Every receipt so far | [Relayer account on Solana Explorer](https://explorer.solana.com/address/CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx?cluster=devnet) |
 | Receipt format | [docs/RECEIPTS_SPEC.md](docs/RECEIPTS_SPEC.md) |
@@ -100,7 +102,7 @@ groups in India. Planned paid features for teams: leak alerts, a team dashboard 
 None of those are built yet.
 
 **What traction is there?**
-Canary has been live on devnet since 10 Oct 2026; its relayer has written 29 receipts (20 Oct
+Canary has been live on devnet since 10 Oct 2026; its relayer has written 31 receipts (20 Oct
 2026), all from our own tests and demos. The parent app, NO SUS, has been in production since July
 2026 with 18 registered users and 6 active in the last 30 days (10 Oct 2026). We do not claim more
 than that.
