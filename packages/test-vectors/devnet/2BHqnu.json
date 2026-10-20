@@ -1,0 +1,69 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "blockTime": 1791631256,
+    "meta": {
+      "computeUnitsConsumed": 91585,
+      "costUnits": 92683,
+      "err": null,
+      "fee": 5000,
+      "innerInstructions": [],
+      "logMessages": [
+        "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr invoke [1]",
+        "Program log: Signed by CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx",
+        "Program log: Memo (len 217): \"{\\\"p\\\":\\\"nosus-canary\\\",\\\"v\\\":1,\\\"t\\\":\\\"seal\\\",\\\"note\\\":\\\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\\\",\\\"copies\\\":3,\\\"hash\\\":\\\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\\\",\\\"exp\\\":1791634855}\"",
+        "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr consumed 91585 of 200000 compute units",
+        "Program MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr success"
+      ],
+      "postBalances": [
+        4999995000,
+        41509609334
+      ],
+      "postTokenBalances": [],
+      "preBalances": [
+        5000000000,
+        41509609334
+      ],
+      "preTokenBalances": [],
+      "rewards": [],
+      "status": {
+        "Ok": null
+      }
+    },
+    "slot": 509523773,
+    "transaction": {
+      "message": {
+        "accountKeys": [
+          {
+            "pubkey": "CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx",
+            "signer": true,
+            "source": "transaction",
+            "writable": true
+          },
+          {
+            "pubkey": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+            "signer": false,
+            "source": "transaction",
+            "writable": false
+          }
+        ],
+        "addressTableLookups": [],
+        "instructions": [
+          {
+            "parsed": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+            "program": "spl-memo",
+            "programId": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+            "stackHeight": 1
+          }
+        ],
+        "recentBlockhash": "5RQyZ259mmkoeNFD4pfU7zzDwHc9zW1LijXT4GQxaQmB"
+      },
+      "signatures": [
+        "2BHqnuCxYyemfegHkncgTsQyMPjpyB9boD1XqYfD1Wtbcf51Fpy3y264UwGhnvRKtcxFKCaSAzHxLrDwFRk512bQ"
+      ]
+    },
+    "transactionIndex": 3,
+    "version": 0
+  },
+  "id": 1
+}

@@ -1,0 +1,453 @@
+{
+  "about": "NO SUS Canary receipt vectors, memo format v1. Both packages test against this file.",
+  "maxMemoBytes": 566,
+  "chainNoteId": [
+    {
+      "noteId": "1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed",
+      "expected": "0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e"
+    },
+    {
+      "noteId": "00000000-0000-4000-8000-000000000000",
+      "expected": "0x88538326b97d656f5d8f8cd20a2673e4621c615292f8ef03207faef39f93d7f7"
+    },
+    {
+      "noteId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "expected": "0xbf3c93bbf98524532e883d50f2790461d21e2664f1d8b1448aeba7ab9c80d812"
+    }
+  ],
+  "deviceHash": [
+    {
+      "deviceId": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      "expected": "9738e16064bc6e9a5ac8505293475b0717e349efc66d42a058608d402a0b3372"
+    },
+    {
+      "deviceId": "device-on-a-test-phone",
+      "expected": "db5d5e52631e9e113a27dbbf52d93cc2c4273e3f136bc44aa1968bea99c81924"
+    }
+  ],
+  "copyDigest": [
+    {
+      "saltHex": "5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+      "index": 0,
+      "copyText": "Lunch is at noon on Friday.",
+      "expected": "19c74fd9f2a8a2264ea8a8af015977085578380cd7272522b785e1fd15f42dab"
+    },
+    {
+      "saltHex": "5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+      "index": 1,
+      "copyText": "Lunch is at noon on Friday.​",
+      "expected": "5b183e08c2cf4d6dc49bfb52732e0fdb7b95ec80e22a03cebf72037e2ac79827"
+    },
+    {
+      "saltHex": "5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+      "index": 2,
+      "copyText": "Café ☕ at noon.",
+      "expected": "a1981e202f5edc1f9ee01fba89418946fbab343c1c60707e89a1e91e9e056867"
+    }
+  ],
+  "copiesHash": [
+    {
+      "digests": [
+        "19c74fd9f2a8a2264ea8a8af015977085578380cd7272522b785e1fd15f42dab",
+        "5b183e08c2cf4d6dc49bfb52732e0fdb7b95ec80e22a03cebf72037e2ac79827",
+        "a1981e202f5edc1f9ee01fba89418946fbab343c1c60707e89a1e91e9e056867"
+      ],
+      "expected": "0x7103d90f50d512f9f9ec27663bb1a9e15f5598d7f9e71395ed4197758a0754f4"
+    },
+    {
+      "digests": [
+        "19c74fd9f2a8a2264ea8a8af015977085578380cd7272522b785e1fd15f42dab",
+        "5b183e08c2cf4d6dc49bfb52732e0fdb7b95ec80e22a03cebf72037e2ac79827"
+      ],
+      "expected": "0x1c15eeda35f08e6c3f71856d299e32a91d33e5c6397078dbc14362a99d1e0735"
+    }
+  ],
+  "readerTag": [
+    {
+      "tagSalt": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+      "noteId": "1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed",
+      "copyIndex": 0,
+      "deviceHash": "9738e16064bc6e9a5ac8505293475b0717e349efc66d42a058608d402a0b3372",
+      "expected": "0x3d7f04addc9492ec9b75534e7174b076a746f33235bef0ee31e944b0894d4fab"
+    },
+    {
+      "tagSalt": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+      "noteId": "1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed",
+      "copyIndex": 2,
+      "deviceHash": "9738e16064bc6e9a5ac8505293475b0717e349efc66d42a058608d402a0b3372",
+      "expected": "0x5b95884239658bc8d460e497449fa024c892cabf1c90f2eaf4174917ce3b0c81"
+    }
+  ],
+  "sealMemo": [
+    {
+      "name": "devnet 2BHqnu",
+      "input": {
+        "note": "0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40",
+        "copies": 3,
+        "hash": "0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8",
+        "exp": 1791634855
+      },
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}"
+    },
+    {
+      "name": "devnet 62Frr2",
+      "input": {
+        "note": "0x56f7956802f494824332309f033188a8850e78b4aed1eca6b1d923534315831d",
+        "copies": 10,
+        "hash": "0x40846d626dd4beb151497162ca5c1de105281a20d076223b76a44ab1d47962df",
+        "exp": 1791719237
+      },
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0x56f7956802f494824332309f033188a8850e78b4aed1eca6b1d923534315831d\",\"copies\":10,\"hash\":\"0x40846d626dd4beb151497162ca5c1de105281a20d076223b76a44ab1d47962df\",\"exp\":1791719237}"
+    },
+    {
+      "name": "never expires",
+      "input": {
+        "note": "0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e",
+        "copies": 3,
+        "hash": "0x7103d90f50d512f9f9ec27663bb1a9e15f5598d7f9e71395ed4197758a0754f4",
+        "exp": 0
+      },
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e\",\"copies\":3,\"hash\":\"0x7103d90f50d512f9f9ec27663bb1a9e15f5598d7f9e71395ed4197758a0754f4\",\"exp\":0}"
+    },
+    {
+      "name": "largest seal today (100 copies)",
+      "input": {
+        "note": "0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e",
+        "copies": 100,
+        "hash": "0x7103d90f50d512f9f9ec27663bb1a9e15f5598d7f9e71395ed4197758a0754f4",
+        "exp": 1791634855
+      },
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e\",\"copies\":100,\"hash\":\"0x7103d90f50d512f9f9ec27663bb1a9e15f5598d7f9e71395ed4197758a0754f4\",\"exp\":1791634855}"
+    }
+  ],
+  "openMemo": [
+    {
+      "name": "devnet NwoJau",
+      "input": {
+        "note": "0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40",
+        "copy": 0,
+        "tag": "0x10947d1df8aaba2c25d2088b054593cfdafd46f959c89007447309960b4845e6"
+      },
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copy\":0,\"tag\":\"0x10947d1df8aaba2c25d2088b054593cfdafd46f959c89007447309960b4845e6\"}"
+    },
+    {
+      "name": "devnet 2b9SS9",
+      "input": {
+        "note": "0x56f7956802f494824332309f033188a8850e78b4aed1eca6b1d923534315831d",
+        "copy": 0,
+        "tag": "0xe52417df0e5f0b104525ec1a583ec0bb64a71c2358a3e93d855b121172a4d10e"
+      },
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0x56f7956802f494824332309f033188a8850e78b4aed1eca6b1d923534315831d\",\"copy\":0,\"tag\":\"0xe52417df0e5f0b104525ec1a583ec0bb64a71c2358a3e93d855b121172a4d10e\"}"
+    },
+    {
+      "name": "devnet 4NXs89",
+      "input": {
+        "note": "0x56f7956802f494824332309f033188a8850e78b4aed1eca6b1d923534315831d",
+        "copy": 1,
+        "tag": "0x6ec7e19683ff70ce1d03ebf3df42242872f98407b47baada27b8cb50d934306e"
+      },
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0x56f7956802f494824332309f033188a8850e78b4aed1eca6b1d923534315831d\",\"copy\":1,\"tag\":\"0x6ec7e19683ff70ce1d03ebf3df42242872f98407b47baada27b8cb50d934306e\"}"
+    },
+    {
+      "name": "copy 99",
+      "input": {
+        "note": "0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e",
+        "copy": 99,
+        "tag": "0x5b95884239658bc8d460e497449fa024c892cabf1c90f2eaf4174917ce3b0c81"
+      },
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e\",\"copy\":99,\"tag\":\"0x5b95884239658bc8d460e497449fa024c892cabf1c90f2eaf4174917ce3b0c81\"}"
+    }
+  ],
+  "encodeErrors": [
+    {
+      "name": "seal: uppercase note",
+      "kind": "seal",
+      "input": {
+        "note": "0xB8168EFCC5C17AFC454283C0E2237B39F5DC917D39AB0EB0F540F544B9878F2E",
+        "copies": 3,
+        "hash": "0x7103d90f50d512f9f9ec27663bb1a9e15f5598d7f9e71395ed4197758a0754f4",
+        "exp": 0
+      },
+      "error": "memo note must be 0x + 64 hex chars"
+    },
+    {
+      "name": "seal: hash without 0x",
+      "kind": "seal",
+      "input": {
+        "note": "0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e",
+        "copies": 3,
+        "hash": "7103d90f50d512f9f9ec27663bb1a9e15f5598d7f9e71395ed4197758a0754f4",
+        "exp": 0
+      },
+      "error": "memo hash must be 0x + 64 hex chars"
+    },
+    {
+      "name": "seal: negative copies",
+      "kind": "seal",
+      "input": {
+        "note": "0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e",
+        "copies": -1,
+        "hash": "0x7103d90f50d512f9f9ec27663bb1a9e15f5598d7f9e71395ed4197758a0754f4",
+        "exp": 0
+      },
+      "error": "memo copies must be a non-negative integer"
+    },
+    {
+      "name": "seal: negative exp",
+      "kind": "seal",
+      "input": {
+        "note": "0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e",
+        "copies": 3,
+        "hash": "0x7103d90f50d512f9f9ec27663bb1a9e15f5598d7f9e71395ed4197758a0754f4",
+        "exp": -5
+      },
+      "error": "memo exp must be a non-negative integer"
+    },
+    {
+      "name": "open: short tag",
+      "kind": "open",
+      "input": {
+        "note": "0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e",
+        "copy": 0,
+        "tag": "0xababababababababababababababababababababababababababababababab"
+      },
+      "error": "memo tag must be 0x + 64 hex chars"
+    },
+    {
+      "name": "open: negative copy",
+      "kind": "open",
+      "input": {
+        "note": "0xb8168efcc5c17afc454283c0e2237b39f5dc917d39ab0eb0f540f544b9878f2e",
+        "copy": -1,
+        "tag": "0x3d7f04addc9492ec9b75534e7174b076a746f33235bef0ee31e944b0894d4fab"
+      },
+      "error": "memo copy must be a non-negative integer"
+    }
+  ],
+  "invalidMemos": [
+    {
+      "name": "empty string",
+      "memo": "",
+      "error": "memo is not JSON"
+    },
+    {
+      "name": "not JSON",
+      "memo": "hello",
+      "error": "memo is not JSON"
+    },
+    {
+      "name": "truncated JSON",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855",
+      "error": "memo is not JSON"
+    },
+    {
+      "name": "JSON array",
+      "memo": "[1,2]",
+      "error": "memo is not a JSON object"
+    },
+    {
+      "name": "JSON null",
+      "memo": "null",
+      "error": "memo is not a JSON object"
+    },
+    {
+      "name": "longer than 566 bytes",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"pad\":\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"}",
+      "error": "memo is longer than 566 bytes"
+    },
+    {
+      "name": "wrong p",
+      "memo": "{\"p\":\"nosus\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo p must be \"nosus-canary\""
+    },
+    {
+      "name": "missing p",
+      "memo": "{\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo p must be \"nosus-canary\""
+    },
+    {
+      "name": "v=2",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":2,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo v must be 1"
+    },
+    {
+      "name": "v as string",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":\"1\",\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo v must be 1"
+    },
+    {
+      "name": "unknown t",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"burn\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo t must be \"seal\" or \"open\""
+    },
+    {
+      "name": "extra key",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855,\"x\":1}",
+      "error": "memo keys must be p,v,t,note,copies,hash,exp in this order"
+    },
+    {
+      "name": "missing key (seal exp)",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\"}",
+      "error": "memo keys must be p,v,t,note,copies,hash,exp in this order"
+    },
+    {
+      "name": "missing key (open tag)",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copy\":0}",
+      "error": "memo keys must be p,v,t,note,copy,tag in this order"
+    },
+    {
+      "name": "keys out of order",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"copies\":3,\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo keys must be p,v,t,note,copies,hash,exp in this order"
+    },
+    {
+      "name": "open with seal keys",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo keys must be p,v,t,note,copy,tag in this order"
+    },
+    {
+      "name": "uppercase hex note",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xE5BBE8D0602B1DFDA55EA516343E6A5064D021C37E6B7BA648BC5719AEA1FC40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo note must be 0x + 64 hex chars"
+    },
+    {
+      "name": "uppercase 0X prefix",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copy\":0,\"tag\":\"0X10947d1df8aaba2c25d2088b054593cfdafd46f959c89007447309960b4845e6\"}",
+      "error": "memo tag must be 0x + 64 hex chars"
+    },
+    {
+      "name": "short hex hash",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271\",\"exp\":1791634855}",
+      "error": "memo hash must be 0x + 64 hex chars"
+    },
+    {
+      "name": "note as number",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":12,\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo note must be 0x + 64 hex chars"
+    },
+    {
+      "name": "negative copies",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":-3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo copies must be a non-negative integer"
+    },
+    {
+      "name": "float copies",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":1.5,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo copies must be a non-negative integer"
+    },
+    {
+      "name": "negative copy",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copy\":-1,\"tag\":\"0x10947d1df8aaba2c25d2088b054593cfdafd46f959c89007447309960b4845e6\"}",
+      "error": "memo copy must be a non-negative integer"
+    },
+    {
+      "name": "float exp",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855.5}",
+      "error": "memo exp must be a non-negative integer"
+    },
+    {
+      "name": "copies as string",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":\"3\",\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo copies must be a non-negative integer"
+    },
+    {
+      "name": "exp above 2^53",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":9007199254740993}",
+      "error": "memo exp must be a non-negative integer"
+    },
+    {
+      "name": "integer written as 3.0",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3.0,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo is not in canonical form"
+    },
+    {
+      "name": "integer written as 3e0",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3e0,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo is not in canonical form"
+    },
+    {
+      "name": "v written as 1.0",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1.0,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo is not in canonical form"
+    },
+    {
+      "name": "whitespace",
+      "memo": "{\"p\":\"nosus-canary\",\"v\": 1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}",
+      "error": "memo is not in canonical form"
+    },
+    {
+      "name": "trailing newline",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}\n",
+      "error": "memo is not in canonical form"
+    },
+    {
+      "name": "duplicate key",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855,\"p\":\"nosus-canary\"}",
+      "error": "memo is not in canonical form"
+    }
+  ],
+  "rawMemoInstruction": {
+    "programId": "Memo4c2pN8afCj432Lb7RMVKi9PbQnnW7ewFFaV3oAH",
+    "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copy\":0,\"tag\":\"0x10947d1df8aaba2c25d2088b054593cfdafd46f959c89007447309960b4845e6\"}",
+    "data": "Z7gZmhkMcFnC3TVXoi3681EbSqDfPuwjedJgqq7RUjdYgAz8VbnbKPJ1zFaos13xmGoS1Srt5vFCBRvx1qHiLLN4Ph2oW7Rvxs1nNANHUPiADwEYgbyQBjpG2ZBuSFgyDG57qPSDKvaUhjpGkDjJDFaUDJQmjVkiTz9Bn9q8WbMuUgD9oacePZsftzD4QsoEeiUXVTA5bE19kkTT4T3ye8gRwxP9m6EsxgrTrvmJ9j7mxvhNkFeNcs2JjEkYUv7JNJ9e3tXeJVVgg"
+  },
+  "explorerTxUrl": [
+    {
+      "signature": "2BHqnuCxYyemfegHkncgTsQyMPjpyB9boD1XqYfD1Wtbcf51Fpy3y264UwGhnvRKtcxFKCaSAzHxLrDwFRk512bQ",
+      "cluster": "devnet",
+      "expected": "https://explorer.solana.com/tx/2BHqnuCxYyemfegHkncgTsQyMPjpyB9boD1XqYfD1Wtbcf51Fpy3y264UwGhnvRKtcxFKCaSAzHxLrDwFRk512bQ?cluster=devnet"
+    },
+    {
+      "signature": "2BHqnuCxYyemfegHkncgTsQyMPjpyB9boD1XqYfD1Wtbcf51Fpy3y264UwGhnvRKtcxFKCaSAzHxLrDwFRk512bQ",
+      "cluster": "mainnet-beta",
+      "expected": "https://explorer.solana.com/tx/2BHqnuCxYyemfegHkncgTsQyMPjpyB9boD1XqYfD1Wtbcf51Fpy3y264UwGhnvRKtcxFKCaSAzHxLrDwFRk512bQ"
+    }
+  ],
+  "devnet": [
+    {
+      "signature": "2BHqnuCxYyemfegHkncgTsQyMPjpyB9boD1XqYfD1Wtbcf51Fpy3y264UwGhnvRKtcxFKCaSAzHxLrDwFRk512bQ",
+      "fixture": "devnet/2BHqnu.json",
+      "slot": 509523773,
+      "blockTime": 1791631256,
+      "feePayer": "CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx",
+      "memoProgram": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copies\":3,\"hash\":\"0x2a1ab6e3b5fae89ea53b689e88c9f6560d2b33711e36cc1d4524df6c680271e8\",\"exp\":1791634855}"
+    },
+    {
+      "signature": "NwoJauec9otkicaGf8yD6UechYgUnXRdYPqnuc5Kpn6uMYym6XVJcMmWdbVnwnRVncKKVgEyuZB2mR3T5REvdSr",
+      "fixture": "devnet/NwoJau.json",
+      "slot": 509523778,
+      "blockTime": 1791631257,
+      "feePayer": "CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx",
+      "memoProgram": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0xe5bbe8d0602b1dfda55ea516343e6a5064d021c37e6b7ba648bc5719aea1fc40\",\"copy\":0,\"tag\":\"0x10947d1df8aaba2c25d2088b054593cfdafd46f959c89007447309960b4845e6\"}"
+    },
+    {
+      "signature": "62Frr29RyPXhhUkAaxDLQHDKinMztPhrsYeokzvoiAAUjp9JBXbNUn3S6D4gX7QEqt2yfurqG54PAERb7fLKCskF",
+      "fixture": "devnet/62Frr2.json",
+      "slot": 509530368,
+      "blockTime": 1791632837,
+      "feePayer": "CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx",
+      "memoProgram": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"seal\",\"note\":\"0x56f7956802f494824332309f033188a8850e78b4aed1eca6b1d923534315831d\",\"copies\":10,\"hash\":\"0x40846d626dd4beb151497162ca5c1de105281a20d076223b76a44ab1d47962df\",\"exp\":1791719237}"
+    },
+    {
+      "signature": "2b9SS9RhwPvMrsDR5upY5a9w3gk7E2zgV4jmC69QTtZseBMmguXxNdBDqSFTZXW23cgLgAs8L9kFV39LyiU4bnTn",
+      "fixture": "devnet/2b9SS9.json",
+      "slot": 509530464,
+      "blockTime": 1791632860,
+      "feePayer": "CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx",
+      "memoProgram": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0x56f7956802f494824332309f033188a8850e78b4aed1eca6b1d923534315831d\",\"copy\":0,\"tag\":\"0xe52417df0e5f0b104525ec1a583ec0bb64a71c2358a3e93d855b121172a4d10e\"}"
+    },
+    {
+      "signature": "4NXs89eDP5hm2GyAkuA5rRDBQUNB5e6ssAChQJRCFGTYimyMDa3LmQRbcEVmaezQSXCx8kgt5GRkpUje59WqH2rc",
+      "fixture": "devnet/4NXs89.json",
+      "slot": 509530556,
+      "blockTime": 1791632882,
+      "feePayer": "CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx",
+      "memoProgram": "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr",
+      "memo": "{\"p\":\"nosus-canary\",\"v\":1,\"t\":\"open\",\"note\":\"0x56f7956802f494824332309f033188a8850e78b4aed1eca6b1d923534315831d\",\"copy\":1,\"tag\":\"0x6ec7e19683ff70ce1d03ebf3df42242872f98407b47baada27b8cb50d934306e\"}"
+    }
+  ]
+}
