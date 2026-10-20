@@ -27,6 +27,7 @@ class CanaryOwnerRecord {
     required this.plan,
     required this.codewords,
     this.sealTxHash,
+    this.sealSolanaSig,
   });
 
   final String noteId;
@@ -49,26 +50,37 @@ class CanaryOwnerRecord {
   /// codewords[i] is the 0/1 choice per slot for copy i.
   final List<List<int>> codewords;
 
-  /// Monad transaction that sealed the note. Null until sealing succeeded.
+  /// Monad testnet transaction that sealed the note (earlier prototype).
+  /// Null while the server has Monad off, and for unsealed drafts.
   final String? sealTxHash;
 
-  bool get isSealed => sealTxHash != null;
+  /// Solana devnet memo signature that sealed the note: the product's
+  /// receipt. Null for unsealed drafts and for records saved before Solana
+  /// proofs existed.
+  final String? sealSolanaSig;
 
-  CanaryOwnerRecord copyWith({String? sealTxHash, DateTime? expiresAt}) =>
-      CanaryOwnerRecord(
-        noteId: noteId,
-        keyHex: keyHex,
-        ownerSecret: ownerSecret,
-        saltHex: saltHex,
-        copyCount: copyCount,
-        createdAt: createdAt,
-        expiresAt: expiresAt ?? this.expiresAt,
-        readerLink: readerLink,
-        preview: preview,
-        plan: plan,
-        codewords: codewords,
-        sealTxHash: sealTxHash ?? this.sealTxHash,
-      );
+  /// Sealed once either chain holds the seal.
+  bool get isSealed => sealTxHash != null || sealSolanaSig != null;
+
+  CanaryOwnerRecord copyWith({
+    String? sealTxHash,
+    String? sealSolanaSig,
+    DateTime? expiresAt,
+  }) => CanaryOwnerRecord(
+    noteId: noteId,
+    keyHex: keyHex,
+    ownerSecret: ownerSecret,
+    saltHex: saltHex,
+    copyCount: copyCount,
+    createdAt: createdAt,
+    expiresAt: expiresAt ?? this.expiresAt,
+    readerLink: readerLink,
+    preview: preview,
+    plan: plan,
+    codewords: codewords,
+    sealTxHash: sealTxHash ?? this.sealTxHash,
+    sealSolanaSig: sealSolanaSig ?? this.sealSolanaSig,
+  );
 
   Map<String, Object?> toJson() => {
     'v': 1,
@@ -84,6 +96,7 @@ class CanaryOwnerRecord {
     'plan': plan.toJson(),
     'codewords': [for (final c in codewords) c.join()],
     'sealTxHash': sealTxHash,
+    'sealSolanaSig': sealSolanaSig,
   };
 
   factory CanaryOwnerRecord.fromJson(Map<String, dynamic> json) {
@@ -104,6 +117,8 @@ class CanaryOwnerRecord {
           [for (final ch in (c as String).split('')) ch == '1' ? 1 : 0],
       ],
       sealTxHash: json['sealTxHash'] as String?,
+      // Records saved before Solana proofs existed have no key here.
+      sealSolanaSig: json['sealSolanaSig'] as String?,
     );
   }
 }
@@ -115,36 +130,52 @@ class CanaryCopyStatus {
     required this.readerName,
     required this.openedAt,
     required this.openTxHash,
+    required this.openSolanaSig,
   });
 
   final int copyIndex;
   final String readerName;
   final DateTime openedAt;
 
-  /// Null while the Monad record is still being written.
+  /// Monad testnet transaction for this open. Null while it is being
+  /// written, and always null while the server has Monad off.
   final String? openTxHash;
+
+  /// Solana devnet memo signature for this open. Null while it is being
+  /// written (a failed memo is sent again on the reader's next open).
+  final String? openSolanaSig;
+
+  /// The open has a public receipt on at least one chain.
+  bool get isRecorded => openTxHash != null || openSolanaSig != null;
 }
 
 class CanaryNoteStatus {
   const CanaryNoteStatus({
     required this.copyCount,
     required this.sealTxHash,
+    required this.sealSolanaSig,
     required this.expiresAt,
     required this.copies,
   });
 
   final int copyCount;
+
+  /// Monad testnet transaction that sealed the note. Null while the server
+  /// has Monad off.
   final String? sealTxHash;
+
+  /// Solana devnet memo signature that sealed the note.
+  final String? sealSolanaSig;
   final DateTime expiresAt;
 
   /// Only copies that have been opened, ordered by copy index.
   final List<CanaryCopyStatus> copies;
 
-  /// Nothing more can change: every copy is opened and on Monad, or the
-  /// link has expired. Screens stop polling at this point.
+  /// Nothing more can change: every copy is opened and recorded on chain,
+  /// or the link has expired. Screens stop polling at this point.
   bool get isSettled =>
       !expiresAt.isAfter(DateTime.now()) ||
-      (copies.length >= copyCount && copies.every((c) => c.openTxHash != null));
+      (copies.length >= copyCount && copies.every((c) => c.isRecorded));
 
   CanaryCopyStatus? copy(int index) {
     for (final c in copies) {
@@ -163,6 +194,7 @@ class CanaryOpenedCopy {
     required this.readerName,
     required this.openedAt,
     required this.openTxHash,
+    required this.openSolanaSig,
   });
 
   /// The copy text, including its invisible marker.
@@ -172,7 +204,12 @@ class CanaryOpenedCopy {
   final String readerName;
   final DateTime openedAt;
 
-  /// Null only in the rare case the Monad write succeeded but its hash was
-  /// not stored; the UI then shows the time without a proof link.
+  /// Monad testnet transaction for this open (earlier prototype). Null
+  /// while the server has Monad off.
   final String? openTxHash;
+
+  /// Solana devnet memo signature for this open. Null when the memo has not
+  /// landed yet (it is sent again on the next open of this copy); the UI
+  /// then shows the time without a proof link.
+  final String? openSolanaSig;
 }

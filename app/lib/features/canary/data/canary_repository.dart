@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart';
 
+import '../../../config/app_mode.dart';
 import '../../../core/utils/web_links.dart';
 import '../domain/canary_fingerprint.dart';
 import '../domain/canary_link.dart';
@@ -33,7 +34,9 @@ class CanaryRepository {
   CanaryOwnerRecord? findNote(String noteId) => _store.findNote(noteId);
 
   /// Sender: builds every copy on this device, uploads only ciphertext, and
-  /// seals the note on Monad. [onStage] receives short progress messages.
+  /// seals the note on Solana devnet (plus Monad testnet when the server has
+  /// the prototype on).
+  /// [onStage] receives short progress messages.
   Future<CanaryOwnerRecord> createNote({
     required String text,
     required int copyCount,
@@ -118,7 +121,9 @@ class CanaryRepository {
     // the codewords. Removed again below if the upload fails.
     await _store.saveNote(draft);
 
-    onStage?.call('Sealing on Monad…');
+    onStage?.call(
+      kCanaryMonad ? 'Sealing on Monad + Solana…' : 'Sealing on Solana devnet…',
+    );
     try {
       final result = await _api.create(
         noteId: noteId,
@@ -130,6 +135,7 @@ class CanaryRepository {
       );
       final sealed = draft.copyWith(
         sealTxHash: result.sealTxHash,
+        sealSolanaSig: result.sealSolanaSig,
         expiresAt: result.expiresAt,
       );
       await _store.saveNote(sealed);
@@ -177,6 +183,7 @@ class CanaryRepository {
       readerName: name,
       openedAt: result.openedAt,
       openTxHash: result.openTxHash,
+      openSolanaSig: result.openSolanaSig,
     );
   }
 
