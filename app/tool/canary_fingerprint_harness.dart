@@ -3,6 +3,7 @@
 // It must end with "FAILURES: 0". Its printed report is its output.
 // ignore_for_file: avoid_print
 
+import 'dart:io';
 import 'dart:math';
 
 import 'package:no_sus/features/canary/domain/canary_fingerprint.dart';
@@ -192,4 +193,5 @@ void main() {
   runFor('LONG NOTE', longNote, 100);
   print('');
   print('FAILURES: $failures');
+  if (failures > 0) exitCode = 1;
 }
