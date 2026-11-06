@@ -1,24 +1,21 @@
 <p align="center">
-  <a href="https://shubham-sahu.me/nosus-canary/"><img src="assets/readme/banner.svg" width="100%" alt="NO SUS Canary: every reader gets their own copy. Receipts on Solana devnet."></a>
+  <a href="https://shubham-sahu.me/nosus-canary/"><img src="assets/readme/hero.svg" width="100%" alt="NO SUS Canary. Every reader gets their own copy. Every open is a receipt on Solana devnet. Three copy badges: copy 1 made for Priya, copy 2 made for Ben, copy 3 not opened, each worded slightly differently."></a>
 </p>
 
 <p align="center">
   <a href="https://github.com/https-shubhamsahu/nosus-canary/actions/workflows/ci.yml"><img src="https://github.com/https-shubhamsahu/nosus-canary/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://explorer.solana.com/address/CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx?cluster=devnet"><img src="https://img.shields.io/badge/Solana-devnet%20receipts-9945FF?logo=solana&logoColor=white" alt="Solana devnet receipts"></a>
-  <a href="https://shubham-sahu.me/nosus-canary/"><img src="https://img.shields.io/badge/live%20demo-open-F28C28" alt="Live demo"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-141414" alt="License: Apache-2.0"></a>
 </p>
 
-**NO SUS Canary lets you share a sensitive note with a group so that every reader gets a secretly
-different copy, and every seal and every open is recorded as a Solana transaction. If a screenshot
-leaks, NO SUS tells you whose copy it was.**
+<p align="center">
+  <a href="https://shubham-sahu.me/nosus-canary/"><b>Live demo</b></a> ·
+  <a href="https://github.com/https-shubhamsahu/nosus-canary/releases/download/v0.1.0/nosus-canary-pitch.mp4">Pitch video (2:24)</a> ·
+  <a href="https://github.com/https-shubhamsahu/nosus-canary/releases/download/v0.1.0/nosus-canary-demo.mp4">Demo video (1:18)</a> ·
+  <a href="https://explorer.solana.com/tx/5TXFPfTDFWyVe98DVPph7r55uRdJAcih6vKMBBRJKA96KtWT7Q4MUoFQG6GwH8N1FFkiMMbZzPssGtqtoW3wAsy2?cluster=devnet">A real receipt</a> ·
+  <a href="SECURITY.md">Security model</a> ·
+  <a href="SUBMISSION.md">Reviewer FAQ</a>
+</p>
 
-[**Live demo**](https://shubham-sahu.me/nosus-canary/) ·
-[Pitch video (2:24)](https://github.com/https-shubhamsahu/nosus-canary/releases/download/v0.1.0/nosus-canary-pitch.mp4) ·
-[Demo video (1:18)](https://github.com/https-shubhamsahu/nosus-canary/releases/download/v0.1.0/nosus-canary-demo.mp4) ·
-[Judge FAQ](SUBMISSION.md) ·
-[A real receipt on Solana Explorer](https://explorer.solana.com/tx/5TXFPfTDFWyVe98DVPph7r55uRdJAcih6vKMBBRJKA96KtWT7Q4MUoFQG6GwH8N1FFkiMMbZzPssGtqtoW3wAsy2?cluster=devnet) ·
-[Security model](SECURITY.md)
+Salary sheets, offer letters, exam papers and investor decks leak as screenshots, and nobody can show whose copy it was. Canary gives every reader of a note a secretly different copy. When text leaks, you paste it in and Canary names the copy it came from. Every seal and every open is written to Solana devnet, so the record of who got which copy isn't just our word. Readers don't need a wallet, an app or an account.
 
 <p align="center">
   <img src="docs/media/canary-demo.gif" width="100%" alt="Demo on the live site: the sender writes a note and it is sealed on Solana devnet; Priya opens her own copy with no wallet; the sender sees who opened which copy; the leaked text is pasted in and the canary names copy 1, Priya's; the open receipt is shown on Solana Explorer.">
@@ -30,32 +27,19 @@ Receipts from this run:
 <a href="https://explorer.solana.com/tx/3tqhYUQ2BppvWh6dy8q5u7U23NpZ7FqfAnd34B58GTriGVZXtykcPj1i4sF7bNh4t8ShnhQokySNz7Uwh7GMTcT1?cluster=devnet">Ben's open</a>.
 <a href="docs/media/canary-demo.mp4">MP4 version</a>.</sub></p>
 
-## The problem
+## How a leak gets matched
 
-Salary sheets, offer letters, investor decks, exam papers and internal memos leak as screenshots
-and forwards. When they do, nobody can show whose copy it was. Name watermarks get cropped.
-Document-security tools ask every reader to make an account or install an app, so people go back
-to WhatsApp and email.
+<p align="center">
+  <img src="assets/readme/leak-match.svg" width="100%" alt="A leaked excerpt with five swapped words marked (do not, it is, 10, please, till: slots 2 to 6 of the demo note's 15). Ten copies are rows of 15 bits. The leak is read slot by slot, every copy that disagrees is struck out, and only copy 1 is left: the canary sang, copy 1 of 10, made for Priya, 5 of 5 fingerprints match.">
+</p>
 
-## The insight
+1. **You write the note once.** Your browser finds the words that have a safe twin: `don't` / `do not`, `ten` / `10`, `until` / `till`, `organize` / `organise`, from a fixed list of 148 swaps. We keep swappable words at least three words apart and use up to 24 per note. The app's demo note has 15.
+2. **Every copy gets a codeword.** One bit per swappable word: 0 keeps your word, 1 uses its twin. Codewords are random and distinct, and kept at least 4 bits apart when the note has room, so even a few surviving words separate copies. An invisible marker (zero-width characters carrying the copy number) is also hidden after the 1st, 11th, 21st word and so on.
+3. **Your browser encrypts each copy** with AES-256, and the key stays in the link's `#fragment`, so we never see it. A **seal** memo goes to Solana with one hash of all copies before anyone reads.
+4. **Readers type a name and get the next unused copy.** Their open is another memo, paid by our relayer.
+5. **You paste the leak.** If the marker survived, it names the copy outright. If it was stripped by retyping or OCR, Canary reads each swappable word it can find, using the words around it, and keeps only copies that agree. With fewer than 3 readable words, or more than one copy left, it names nobody. Matching runs on your device.
 
-Give every reader a slightly different copy (a "canary trap"), and make the record of who got
-which copy something neither side can edit.
-
-- **Small wording changes survive.** `do not` / `don't`, `5` / `five`, `until` / `till`, plus an
-  invisible marker. They survive copy-paste, retyping into a chat and OCR, so even part of a
-  leaked text points to one copy.
-- **Receipts are now cheap and fast.** A Solana memo costs about 0.000005 SOL and confirms in about
-  a second. That makes one neutral, timestamped receipt per reader affordable. A row in our own
-  database is only our word.
-
-## The product
-
-| | What happens | Where it runs |
-|---|---|---|
-| **1. Write once** | You write the note. Canary makes up to 100 copies that read the same but are each unique, and encrypts them. A **seal** memo goes to Solana with one hash of all copies. | Your browser (AES-256, key only in the link's `#fragment`) + relayer |
-| **2. Share one link** | Each reader types a name and gets the next unused copy. An **open** memo goes to Solana with an anonymous tag. **Readers need no wallet, no app and no sign-up.** | Reader's browser + relayer |
-| **3. Catch a leak** | Paste the leaked text (or part of it). Canary names the copy, or names nobody if too little survived. | Your device only |
+The board above uses the demo note's real 15 slots and Priya's real copy from the screenshots below. We drew the other nine codewords the way the app draws them.
 
 <table>
   <tr>
@@ -70,62 +54,9 @@ which copy something neither side can edit.
   </tr>
 </table>
 
-## Traction
-
-We are early: live, pre-revenue, devnet only.
-
-- **Canary on Solana devnet:** live at [shubham-sahu.me/nosus-canary](https://shubham-sahu.me/nosus-canary/)
-  since 10 Oct 2026. The relayer has written **31 receipts** so far (20 Oct 2026), all from our own
-  tests and demos. Every one is public on the
-  [relayer's account page](https://explorer.solana.com/address/CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx?cluster=devnet).
-- **Parent product, [NO SUS](https://nosus.foo):** a privacy app for notes and files that open once
-  and are watermarked with the viewer's name. In production since July 2026 (Google Play closed
-  test, APK and web), 10+ releases. On 10 Oct 2026: 18 registered users, 6 active in the last 30
-  days.
-
-## Why Solana
-
-1. **Cost per open.** A receipt is one SPL Memo instruction with one signature, so it pays the
-   5,000-lamport base fee (0.000005 SOL). One receipt per reader stays affordable even for a
-   100-reader note.
-2. **Speed.** Receipts confirm in about a second, so the sender sees "opened" while the reader is
-   still reading. In the recording above, the sealed link was ready about 3 s after clicking
-   Create, including encryption and confirmation.
-3. **Neutral and append-only.** Once written, neither the sender, the reader nor NO SUS can edit
-   a receipt. Anyone can check it on Solana Explorer without trusting our database.
-4. **No program to audit, no wallet to install.** We use the standard SPL Memo program, which
-   Explorer shows as plain text. The relayer pays fees, so readers never see a wallet.
-5. **Room to scale.** Batching many opens into one transaction (Merkle roots, state compression)
-   and the Solana dApp Store for the Android app are both on the roadmap below.
-
-## Architecture
-
-```mermaid
-flowchart LR
-  subgraph S["Sender's device"]
-    W["Write note"] --> K["Make N marked copies<br/>word swaps + invisible marker"]
-    K --> E["Encrypt each copy<br/>AES-256, key stays in the link #fragment"]
-    L["Leaked text"] --> M["Match on device<br/>names a copy or nobody"]
-  end
-  E -- "ciphertexts + one hash of all copies" --> F["Relayer<br/>Supabase Edge Function 'canary'"]
-  RD["Reader's browser<br/>no wallet"] -- "open + typed name" --> F
-  F -- "their ciphertext only" --> RD
-  F -- "seal memo / open memo<br/>hashed ids only" --> SOL[("Solana devnet<br/>SPL Memo program")]
-  SOL -- "signature" --> X["Solana Explorer link<br/>on every proof chip"]
-  F <--> DB[("Postgres<br/>ciphertexts, names, signatures")]
-```
-
-| Where | What it holds | What it never holds |
-|---|---|---|
-| Solana (public) | Hashed note id, copy count, one hash of all copies, expiry, copy number, salted reader tag | Note text, keys, names, device ids |
-| Server (Supabase) | Encrypted copies, reader names and open times (shown to the sender), signatures | Note text, the decryption key |
-| Sender's device | The note, every copy's fingerprint, the owner secret | — |
-| The link | Note id and the AES key, in the `#fragment` (browsers never send it to a server) | — |
-
-More: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and the receipt format in
-[docs/RECEIPTS_SPEC.md](docs/RECEIPTS_SPEC.md).
-
 ## Receipts you can check now
+
+A receipt is one SPL Memo instruction with one signature, so it pays the 5,000-lamport base fee (0.000005 SOL) and confirms in about a second. In the recording above, the link was ready about 3 s after clicking Create, encryption and confirmation included. Once it's written, nobody can edit a receipt: not you, not the reader, not us. Anyone can read it on Solana Explorer without trusting our database.
 
 | Receipt | Signature | Memo |
 |---|---|---|
@@ -165,26 +96,51 @@ Run the checks that CI runs (add [Deno](https://deno.com) 2.x for the last three
 Your own backend and relayer: [docs/SELF_HOSTING.md](docs/SELF_HOSTING.md). Secrets template:
 [.env.example](.env.example).
 
-## Security notes
+<a name="more"></a>
+## Implementation and limits
 
-- **On chain:** only sha256-based ids and hashes. The reader tag is salted with a server secret
-  and bound to the note and copy, so tags can't be linked across notes. Never note text, keys,
-  names or device ids.
-- **On the server:** encrypted copies it cannot read (the key never leaves the link fragment),
-  plus each reader's typed name and open time, which the sender sees.
-- **On the sender's device:** the original note and the fingerprint of every copy. Leak matching
-  runs here. Clearing browser data deletes it.
-- **What a receipt proves:** that the NO SUS relayer recorded this seal or this open at this time,
-  and that the note's copies were committed before anyone read them. It does **not** prove who a
-  person is, that a human read the text, or who shared a leak. Canary names *whose copy* leaked.
-- **Known limits:** it does not stop screenshots; a reader who rewrites the text in their own
-  words can defeat it; two readers who blend their copies can confuse the match (measured rates
-  in the threat model). Encryption is AES-256 in CTR mode without an authentication tag today;
-  moving to AES-GCM is on the roadmap.
-- **Secrets:** none in the repo. The whole history (46 commits, all branches) was scanned on
-  20 Oct 2026; the only key found is the Supabase publishable key, which is public by design.
+```mermaid
+flowchart LR
+  subgraph S["Sender's device"]
+    W["Write note"] --> K["Make N marked copies<br/>word swaps + invisible marker"]
+    K --> E["Encrypt each copy<br/>AES-256, key stays in the link #fragment"]
+    L["Leaked text"] --> M["Match on device<br/>names a copy or nobody"]
+  end
+  E -- "ciphertexts + one hash of all copies" --> F["Relayer<br/>Supabase Edge Function 'canary'"]
+  RD["Reader's browser<br/>no wallet"] -- "open + typed name" --> F
+  F -- "their ciphertext only" --> RD
+  F -- "seal memo / open memo<br/>hashed ids only" --> SOL[("Solana devnet<br/>SPL Memo program")]
+  SOL -- "signature" --> X["Solana Explorer link<br/>on every proof chip"]
+  F <--> DB[("Postgres<br/>ciphertexts, names, signatures")]
+```
 
-Full threat model and how to report a problem: [SECURITY.md](SECURITY.md).
+| Where | What it holds | What it never holds |
+|---|---|---|
+| Solana (public) | Hashed note id, copy count, one hash of all copies, expiry, copy number, salted reader tag | Note text, keys, names, device ids |
+| Server (Supabase) | Encrypted copies, reader names and open times (shown to the sender), signatures | Note text, the decryption key |
+| Sender's device | The note, every copy's fingerprint, the owner secret | |
+| The link | Note id and the AES key, in the `#fragment` (browsers never send it to a server) | |
+
+**How often matching is right.** Measured by `app/tool/canary_fingerprint_harness.dart`, which CI runs, on a note with 15 swappable words like the demo note:
+
+| Leak | 20 copies | 50 copies | 100 copies |
+|---|---|---|---|
+| Full copy without the invisible marker, OCR-style text, 2% typos | 300 / 300 each, 0 wrong | 300 / 300 each, 0 wrong | 300 / 300 each, 0 wrong |
+| Partial excerpts: named / wrong | 431 / 600, 0 wrong | 313 / 600, 0 wrong | 188 / 600, 0 wrong |
+| Two copies blended: an innocent reader named | 1 / 600 | 8 / 600 | 23 / 600 |
+
+**What a receipt proves.** That the NO SUS relayer recorded this seal or this open at this time, and that the note's copies were committed before anyone read them. It doesn't prove who a person is, that a human read the text, or who shared a leak. Canary names *whose copy* leaked; phones get lost and screens get shown to friends.
+
+**What it can't do yet.**
+
+- It doesn't stop screenshots. It makes them traceable.
+- A reader who rewrites the text in their own words can defeat it, and two readers who blend their copies can confuse the match (rates above).
+- We encrypt copies with AES-256 in CTR mode, without an authentication tag. AES-GCM is on the roadmap.
+- Our server could give two readers the same copy or skip a receipt. The seal commits to every copy first, so your device can check any copy a reader shows you against it.
+- On chain there are only sha256-based ids and hashes. The reader tag is salted with a server secret and bound to the note and copy, so tags can't be linked across notes.
+- No secrets in the repo. The whole history (46 commits, all branches) was scanned on 20 Oct 2026; the only key found is the Supabase publishable key, which is public by design.
+
+Full threat model and how to report a problem: [SECURITY.md](SECURITY.md). More detail: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and the receipt format in [docs/RECEIPTS_SPEC.md](docs/RECEIPTS_SPEC.md).
 
 ## Roadmap
 
@@ -207,12 +163,20 @@ Full threat model and how to report a problem: [SECURITY.md](SECURITY.md).
 | [`packages/receipts-ts/`](packages/receipts-ts/) · [`packages/receipts-dart/`](packages/receipts-dart/) | The receipts library, v0.1, plus [shared test vectors](packages/test-vectors/) from real devnet transactions |
 | [`docs/`](docs/) | Architecture, receipt spec, self-hosting, status and verification log |
 | [`tool/solana-spike/`](tool/solana-spike/) | Script that sends a test seal and open memo to devnet with your own key |
+| [`scripts/build_readme_assets.py`](scripts/build_readme_assets.py) | Rebuilds the README visuals in `assets/readme/` |
 
-## Team
+## Where it stands
 
-**Shubham Sahu**, founder of NO SUS. B.E. Electronics & Computer Engineering, TSEC Mumbai (2028).
-[nosus.foo](https://nosus.foo) · [shubhamsahu@nosus.foo](mailto:shubhamsahu@nosus.foo) ·
-[LinkedIn](https://www.linkedin.com/in/shubhamsahu9372) · [X @isagi0011](https://x.com/isagi0011)
+We're early: live, pre-revenue, devnet only.
+
+- **Live** at [shubham-sahu.me/nosus-canary](https://shubham-sahu.me/nosus-canary/) since 10 Oct 2026. As of 20 Oct 2026 the relayer had written 31 receipts (19 seals, 12 opens, 0 failed), all from our own tests and demos, every one public on the [relayer's account page](https://explorer.solana.com/address/CCD4SUQt4No2QNidpCuNAxJZXsqY1KhxkpfkuphueQJx?cluster=devnet).
+- **2nd place** at Monad Blitz Mumbai V4 (September 2026).
+- **Part of [NO SUS](https://nosus.foo)**, a privacy app for notes and files that open once and carry the viewer's watermark. In production since July 2026 (Google Play closed test, APK and web), with 10+ releases. Traceable copies ship inside the NO SUS app too.
+
+## Who builds it
+
+NO SUS Canary is built by [NO SUS](https://nosus.foo), the privacy startup founded by **Shubham Sahu** (B.E. Electronics & Computer Engineering, TSEC Mumbai, 2028).
+[shubhamsahu@nosus.foo](mailto:shubhamsahu@nosus.foo) · [LinkedIn](https://www.linkedin.com/in/shubhamsahu9372) · [X @isagi0011](https://x.com/isagi0011)
 
 ## License
 
